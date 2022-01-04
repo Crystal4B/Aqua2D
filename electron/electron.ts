@@ -17,9 +17,6 @@ function createWindow()
 	// Load the index
 	mainWindow.loadFile(path.join(__dirname, "index.html"));
 
-	// Open devtools
-	mainWindow.webContents.openDevTools();
-
 	mainWindow.on("closed", () => {
 		mainWindow = null;
 	});
