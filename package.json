@@ -17,8 +17,11 @@
     "web-vitals": "^2.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start:web": "react-scripts start",
+    "start:desktop": "npm run build:all && electron ./build/electron.js",
+	"build:all": "npm run build:web && npm run build:desktop",
+    "build:web": "PUBLIC_URL=./ react-scripts build",
+    "build:desktop": "tsc -p electron/tsconfig.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -39,5 +42,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "electron": "^16.0.6"
   }
 }
