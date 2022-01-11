@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
-interface ILevelProps
+export interface ILevelProps
 {
-	key: number;
-	scale: number;
+	key: string;
+	x: number;
+	y: number;
 }
 
 interface ILevelSize
@@ -11,22 +12,17 @@ interface ILevelSize
 	width: number;
 	height: number;
 }
-interface ILevelPosition
-{
-	x: number;
-	y: number;
-}
+
 
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-function Level(props: ILevelProps)
+export const Level = (props: ILevelProps) =>
 {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 
 	const [dragging, setDragging] = useState<boolean>(false);
-	const [position, setPosition] = useState<ILevelPosition>({x: 300, y: 300});
 	const [size, setSize] = useState<ILevelSize>({width: 300, height: 300});
 
 	useEffect(() => {
@@ -78,7 +74,7 @@ function Level(props: ILevelProps)
 	{
 		if (dragging)
 		{
-			setPosition({x: position.x + movementX, y: position.y + movementY});
+			//setPosition({x: position.x + movementX, y: position.y + movementY});
 		}
 	}
 
@@ -87,7 +83,7 @@ function Level(props: ILevelProps)
 			key={props.key}
 			width={size.width}
 			height={size.height}
-			style={{left: position.x, top: position.y}}
+			style={{left: props.x, top: props.y}}
 
 			onMouseDown={handleMouseDown}
 			onMouseUp={handleMouseUp}

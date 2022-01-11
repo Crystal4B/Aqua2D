@@ -1,19 +1,20 @@
+import React from 'react';
 import './Menu.css';
 
 interface IItem
 {
 	name: string;
-	function: {(): void}
+	function: {({clientX, clientY}: React.MouseEvent): void}
 }
 
-interface IMenuProps
+export interface IMenuProps
 {
 	x: number;
 	y: number;
 	items: IItem[];
 };
 
-const Menu = ({x, y, items}: IMenuProps) => {
+export const Menu = ({x, y, items}: IMenuProps) => {
 	return(
 		<div id='contextMenu' className='context-menu' style={{top: y, left: x}}>
 			<ul className='menu'>
@@ -24,5 +25,3 @@ const Menu = ({x, y, items}: IMenuProps) => {
 		</div>
 	);
 };
-
-export default Menu;

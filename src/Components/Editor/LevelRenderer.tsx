@@ -1,22 +1,18 @@
-import React, {useEffect, useState} from 'react';
-import Level from './Level';
-import Menu from '../Menu/Menu';
+import {useState} from 'react';
+import {Level, ILevelProps} from './Level';
+import {Menu, IMenuProps} from '../Menu/Menu';
 import './Editor.css';
-
-const LEVELS = [Level, Level]
-
-interface IContextItem
-{
-	name: string;
-	function: {(): void}
-}
 
 interface IContextMenu
 {
 	active: boolean;
-	x: number;
-	y: number;
-	items: IContextItem[];
+	props: IMenuProps;
+}
+
+interface ILevel
+{
+	last: number;
+	props: ILevelProps[];
 }
 
 /**
@@ -25,7 +21,8 @@ interface IContextMenu
 const LevelRenderer = () =>
 {
 	const [zoom, setZoom] = useState(1);
-	const [contextMenu, setActiveContext] = useState<IContextMenu>({active: false, x: 0, y: 0, items:[]});
+	const [contextMenu, setActiveContext] = useState<IContextMenu>({active: false, props: {x: 0, y: 0, items:[]}});
+	const [levels, setLevels] = useState<ILevel>({last: 0, props: []});
 
 	function handleWheel({deltaY, clientX, clientY}: React.WheelEvent)
 	{
@@ -37,14 +34,13 @@ const LevelRenderer = () =>
 	{
 		e.preventDefault();
 		
-		console.log(e);
 		if (!contextMenu.active)
 		{
-			setActiveContext({active: true, x: e.clientX, y: e.clientY, items: [{name: 'Add Level', function: onAddLevel}]});
+			setActiveContext({active: true, props: {x: e.clientX, y: e.clientY, items: [{name: 'Add Level', function: onAddLevel}]}});
 		}
-		else if (e.clientX != contextMenu.x || e.clientY != contextMenu.y)
+		else if (e.clientX !== contextMenu.props.x || e.clientY !== contextMenu.props.y)
 		{
-			setActiveContext({...contextMenu, x: e.clientX, y: e.clientY});
+			setActiveContext({...contextMenu, props: {...contextMenu.props, x: e.clientX, y: e.clientY}});
 		}
 		else
 		{
@@ -52,28 +48,28 @@ const LevelRenderer = () =>
 		}
 	}
 
-	function onAddLevel()
+	function onAddLevel({clientX, clientY}: React.MouseEvent)
 	{
-		console.log("adding item");
-	}
+		let name = `Scene_${levels.last+1}`;
+		let newLevels = [...levels.props];
+		newLevels.push({key: name, x: clientX, y: clientY});
 
-	function onDeleteLevel()
-	{
-		console.log("deleting button")
+
+		setLevels({last: levels.last+1, props: newLevels});
 	}
 
 	function getContextMenu()
 	{
 		if (contextMenu.active)
 		{
-			return <Menu x={contextMenu.x} y={contextMenu.y} items={contextMenu.items}/>
+			return <Menu {...contextMenu.props}/>
 		}
 	}
 
 	return(
 		<div className='viewport' onContextMenu={handleOnContextMenu} onWheel={handleWheel} style={{zoom: zoom}}>
-			{LEVELS.map((Level, index) => {
-				return Level({key: index, scale: 1})
+			{levels.props.map((level) => {
+				return <Level key={level.key} x={level.x} y={level.y} />
 			})}
 			{getContextMenu()}
 		</div>
