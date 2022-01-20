@@ -9,13 +9,17 @@ export interface MenuProps {
 
 export const Menu = ({names, functions}: MenuProps) => {
 	const {xPos, yPos, showMenu} = useContextMenu();
+
+	if (!showMenu)
+	{
+		return null;
+	}
+
 	return(
 		<div id='contextMenu' className='context-menu' style={{top: yPos, left: xPos}}>
-			{showMenu &&
-				(<ul className='menu'>
-					{functions.map((_, index) => <li className='button' onClick={functions[index]}>{names[index]}</li>)}
-				</ul>)
-			}
+			<ul className='menu'>
+				{functions.map((_, index) => <li key={names[index]} className='button' onClick={functions[index]}>{names[index]}</li>)}
+			</ul>
 		</div>
 	);
 };

@@ -6,6 +6,7 @@ import './Editor.css';
 interface ILevel
 {
 	last: number;
+	names: string[];
 	props: ILevelProps[];
 }
 
@@ -15,7 +16,7 @@ interface ILevel
 const LevelRenderer = () =>
 {
 	const [zoom, setZoom] = useState(1);
-	const [levels, setLevels] = useState<ILevel>({last: 0, props: []});
+	const [levels, setLevels] = useState<ILevel>({last: 0, names: [], props: []});
 
 	function handleWheel({deltaY, clientX, clientY}: React.WheelEvent)
 	{
@@ -26,16 +27,19 @@ const LevelRenderer = () =>
 	function onAddLevel({clientX, clientY}: React.MouseEvent)
 	{
 		let name = `Scene_${levels.last+1}`;
-		let newLevels = [...levels.props];
-		newLevels.push({key: name, x: clientX, y: clientY});
+		let newNames = [...levels.names];
+		newNames.push(name);
 
-		setLevels({last: levels.last+1, props: newLevels});
+		let newLevels = [...levels.props];
+		newLevels.push({x: clientX, y: clientY});
+
+		setLevels({last: levels.last+1, names: newNames, props: newLevels});
 	}
 
 	return(
 		<div className='viewport' onWheel={handleWheel} style={{zoom: zoom}}>
-			{levels.props.map((level) => {
-				return <Level key={level.key} x={level.x} y={level.y} />
+			{levels.props.map((level, index) => {
+				return <Level key={levels.names[index]} x={level.x} y={level.y} />
 			})}
 			<Menu names={["Add Level"]} functions={[onAddLevel]}/>
 		</div>

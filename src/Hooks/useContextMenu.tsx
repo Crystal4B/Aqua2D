@@ -1,5 +1,6 @@
 import {useEffect, useState} from "react";
 
+// FIXME: Context menus reliant on multiple items break as the hook unhooks previous context menu
 const useContextMenu = () => {
 	const [xPos, setXPos] = useState(0);
 	const [yPos, setYPos] = useState(0);

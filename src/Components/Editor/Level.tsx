@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Draggable from "react-draggable";
 
 export interface ILevelProps
 {
-	key: string;
 	x: number;
 	y: number;
 }
@@ -17,7 +16,7 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = (props: ILevelProps) =>
+export const Level = ({x, y}: ILevelProps) =>
 {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
@@ -40,16 +39,18 @@ export const Level = (props: ILevelProps) =>
 		}
 	}, []);
 
+
 	return (
-		<Draggable>
-			<canvas
-				key={props.key}
-				width={size.width}
-				height={size.height}
-				style={{left: props.x, top: props.y}}
-				ref={canvasRef}
-			/>
-		</Draggable>
+		<div>
+			<Draggable>
+				<canvas
+					width={size.width}
+					height={size.height}
+					style={{left: x, top: y}}
+					ref={canvasRef}
+				/>
+			</Draggable>
+		</div>
 	);
 }
 
