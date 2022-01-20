@@ -54,7 +54,6 @@ const LevelRenderer = () =>
 		let newLevels = [...levels.props];
 		newLevels.push({key: name, x: clientX, y: clientY});
 
-
 		setLevels({last: levels.last+1, props: newLevels});
 	}
 
