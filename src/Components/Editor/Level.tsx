@@ -14,7 +14,6 @@ interface ILevelSize
 	height: number;
 }
 
-
 /**
  * Level class will contain details about the level being rendered by the renderer
  */

@@ -1,27 +1,21 @@
 import React from 'react';
+import useContextMenu from '../../Hooks/useContextMenu';
 import './Menu.css';
 
-interface IItem
-{
-	name: string;
-	function: {({clientX, clientY}: React.MouseEvent): void}
+export interface MenuProps {
+	names: Array<string>;
+	functions: Array<(event: React.MouseEvent) => void>;
 }
 
-export interface IMenuProps
-{
-	x: number;
-	y: number;
-	items: IItem[];
-};
-
-export const Menu = ({x, y, items}: IMenuProps) => {
+export const Menu = ({names, functions}: MenuProps) => {
+	const {xPos, yPos, showMenu} = useContextMenu();
 	return(
-		<div id='contextMenu' className='context-menu' style={{top: y, left: x}}>
-			<ul className='menu'>
-				{items.map(item => {
-					return <li className='button' onClick={item.function}>{item.name}</li>
-				})}
-			</ul>
+		<div id='contextMenu' className='context-menu' style={{top: yPos, left: xPos}}>
+			{showMenu &&
+				(<ul className='menu'>
+					{functions.map((_, index) => <li className='button' onClick={functions[index]}>{names[index]}</li>)}
+				</ul>)
+			}
 		</div>
 	);
 };
