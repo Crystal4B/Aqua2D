@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 
 // FIXME: Context menus reliant on multiple items break as the hook unhooks previous context menu
+//	SOLUTION (I THINK): Make menu take reference of object subject to menu make context menu on object && Make click only attach after menu is open
 const useContextMenu = () => {
 	const [xPos, setXPos] = useState(0);
 	const [yPos, setYPos] = useState(0);
