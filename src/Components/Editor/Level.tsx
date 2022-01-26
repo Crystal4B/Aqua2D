@@ -102,7 +102,7 @@ export const Level = ({x, y}: ILevelProps) =>
 			// Remove tile in space
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
 
-			if (layers[x][y] != 0)
+			if (layers[x][y] !== 0)
 			{
 				context.fillStyle = "white"; // REMOVE ME (For now drawn is white)
 				context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
@@ -123,14 +123,14 @@ export const Level = ({x, y}: ILevelProps) =>
 		{
 		case 0:
 			drawRef.current = 1;
-			if (x != -1 && y != -1)
+			if (x !== -1 && y !== -1)
 			{
 				addTile(x, y);
 			}
 			break;
 		case 2:
 			drawRef.current = -1;
-			if (x != -1 && y != -1)
+			if (x !== -1 && y !== -1)
 			{
 				removeTile(x, y);
 			}
@@ -159,12 +159,12 @@ export const Level = ({x, y}: ILevelProps) =>
 		}
 		
 		const layers = layersRef.current;
-		if (drawRef.current == 1 && layers != null)
+		if (drawRef.current === 1 && layers != null)
 		{
 			addTile(x, y);
 			context.fillStyle = "white"; // REMOVE ME: (For now white is drawn black is preview)
 		}
-		else if (drawRef.current == -1 && layers != null)
+		else if (drawRef.current === -1 && layers != null)
 		{
 			removeTile(x, y);
 		}
@@ -172,7 +172,7 @@ export const Level = ({x, y}: ILevelProps) =>
 		{
 			if (x !== previewRef.current.x || y !== previewRef.current.y)
 			{
-				if (previewRef.current.x != -1 && previewRef.current.y != -1)
+				if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
 				{
 					restoreTile(previewRef.current.x, previewRef.current.y);
 				}
@@ -202,7 +202,7 @@ export const Level = ({x, y}: ILevelProps) =>
 		}
 
 		// Clear Preview
-		context.clearRect(previewRef.current.x * squareSize, previewRef.current.y * squareSize, squareSize, squareSize);
+		restoreTile(previewRef.current.x, previewRef.current.y);
 
 		// Reset drawing
 		drawRef.current = 0;
