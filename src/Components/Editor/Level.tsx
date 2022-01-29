@@ -15,56 +15,70 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({x, y}: ILevelProps) =>
-{
+export const Level = ({x, y}: ILevelProps) => {
+	const squareSize = 32;
+
+	// Initilise modes drawing modes
+	const DRAWING = 1;
+	const PREVIEW = 0;
+	const ERASING = -1;
+
+	// Initilise References for level
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-	const drawRef = useRef(0);
+	const modeRef = useRef(PREVIEW);
 	const layersRef = useRef<Number[][]>();
 	const previewRef = useRef({x: -1, y: -1});
 
+	// Initialise States for level
 	const [size, setSize] = useState<ILevelSize>({width: 320, height: 320});
-	const squareSize = 32;
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
-		if (canvas != null)
+		if (canvas == null)
 		{
-			const context = canvas.getContext("2d");
-			contextRef.current = context;
+			return;
+		}
+		
+		const context = canvas.getContext("2d");
+		contextRef.current = context;
 
-			// Prepare level array
-			layersRef.current = new Array(size.width);
-			for (let i = 0; i < size.width; i++)
+		// Prepare level array
+		layersRef.current = new Array(size.width);
+		for (let i = 0; i < size.width; i++)
+		{
+			layersRef.current[i] = new Array(size.height);
+			for (let j = 0; j < size.height; j++)
 			{
-				layersRef.current[i] = new Array(size.height);
-				for (let j = 0; j < size.height; j++)
-				{
-					layersRef.current[i][j] = 0;
-				}
+				layersRef.current[i][j] = 0;
 			}
+		}
 
-			const layers = layersRef.current;
-			if (context != null)
+		const layers = layersRef.current;
+		if (context != null)
+		{
+			// Draw level
+			for (let i = 0; i < layers.length; i++)
 			{
-				// Draw level
-				for (let i = 0; i < layers.length; i++)
+				for (let j = 0; j < layers[i].length; j++)
 				{
-					for (let j = 0; j < layers[i].length; j++)
+					if (layers[i][j] === 0)
 					{
-						if (layers[i][j] === 0)
-						{
-							continue;
-						}
-
-						context.fillStyle = "white"; // REMOVE ME: For now drawn is white
-						context.fillRect(i * squareSize, j * squareSize, squareSize, squareSize);
+						continue;
 					}
+
+					context.fillStyle = "white"; // REMOVE ME: For now drawn is white
+					context.fillRect(i * squareSize, j * squareSize, squareSize, squareSize);
 				}
 			}
 		}
 	}, []);
 
+	/**
+	 * Converts mouse coordinates to canvas coordinates
+	 * @param event Mouse event being broken down to clientX and clientY
+	 * @returns [x,y] coordinates of the mouse on the canvas or [-1, -1] if an error occurred
+	 */
 	const getCoords = ({clientX, clientY}: React.MouseEvent) => {
 		const canvas = canvasRef.current;
 		if (canvas == null)
@@ -78,22 +92,57 @@ export const Level = ({x, y}: ILevelProps) =>
 		return [Math.floor(mouseX / squareSize), Math.floor(mouseY / squareSize)];
 	}
 
+	/**
+	 * Renders a preview of the selected tile on the canvas
+	 * @param x position of tile on the x-axis
+	 * @param y position of tile on the y-axis
+	 */
+	const previewTile = (x: number, y: number) => {
+		const context = contextRef.current;
+		if (context != null)
+		{
+			// Remove tile in space
+			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
+
+			// Draw preview tile
+			context.fillStyle = "black";
+			context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+		}
+	}
+
+	/**
+	 * Adds a tile to the layers saved for the level
+	 * @param x position of tile on the x-axis
+	 * @param y position of tile on the y-axis
+	 */
 	const addTile = (x: number, y: number) => {
 		const layers = layersRef.current;
 		if (layers != null)
 		{
 			layers[x][y] = 1;
+			restoreTile(x, y);
 		}
 	}
 
+	/**
+	 * Removes a tile from the layers saved for the level
+	 * @param x position of tile on the x-axis
+	 * @param y position of tile on the y-axis
+	 */
 	const removeTile = (x: number, y: number) => {
 		const layers = layersRef.current;
 		if (layers != null)
 		{
 			layers[x][y] = 0;
+			restoreTile(x, y);
 		}
 	}
 
+	/**
+	 * Restores a tile to the canvas from the layers saved for the level
+	 * @param x position of tile on the x-axis
+	 * @param y position of tile on the y-axis
+	 */
 	const restoreTile = (x: number, y: number) => {
 		const context = contextRef.current;
 		const layers = layersRef.current;
@@ -111,6 +160,15 @@ export const Level = ({x, y}: ILevelProps) =>
 	}
 
 	/**
+	 * Used to reset the drawing references for the level
+	 */
+	const resetDrawing = () => {
+		modeRef.current = PREVIEW;
+		previewRef.current.x = -1;
+		previewRef.current.y = -1;
+	}
+
+	/**
 	 * Handles mouse down events. For a level mouse downn means that the user is
 	 * interacting with the level
 	 */
@@ -122,14 +180,14 @@ export const Level = ({x, y}: ILevelProps) =>
 		switch(event.button)
 		{
 		case 0:
-			drawRef.current = 1;
+			modeRef.current = DRAWING;
 			if (x !== -1 && y !== -1)
 			{
 				addTile(x, y);
 			}
 			break;
 		case 2:
-			drawRef.current = -1;
+			modeRef.current = ERASING;
 			if (x !== -1 && y !== -1)
 			{
 				removeTile(x, y);
@@ -142,7 +200,7 @@ export const Level = ({x, y}: ILevelProps) =>
 	 * Handles mouse up events. For a level mouse up means drawing is ending
 	 */
 	const handleMouseUp = (event: React.MouseEvent) => {
-		drawRef.current = 0;
+		modeRef.current = PREVIEW;
 	}
 
 	/**
@@ -157,21 +215,20 @@ export const Level = ({x, y}: ILevelProps) =>
 		{
 			return;
 		}
-		
-		const layers = layersRef.current;
-		if (drawRef.current === 1 && layers != null)
+
+		switch(modeRef.current)
 		{
+		case DRAWING:
 			addTile(x, y);
-			context.fillStyle = "white"; // REMOVE ME: (For now white is drawn black is preview)
-		}
-		else if (drawRef.current === -1 && layers != null)
-		{
+			break;
+		case ERASING:
 			removeTile(x, y);
-		}
-		else
-		{
+			break;
+		case PREVIEW:
+			// Update preview only when mouse enters a new square
 			if (x !== previewRef.current.x || y !== previewRef.current.y)
 			{
+				// Restore tile if preview is already drawn on canvas
 				if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
 				{
 					restoreTile(previewRef.current.x, previewRef.current.y);
@@ -181,33 +238,26 @@ export const Level = ({x, y}: ILevelProps) =>
 				previewRef.current.x = x;
 				previewRef.current.y = y;
 
-				context.fillStyle = "black"; // REMOVE ME: (For now white is drawn black is preview)
+				previewTile(x, y);
 			}
 		}
-
-		// Draw new preview
-		context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 	}
 
 	/**
 	 * Handles mouse out events. for a level mouse out means that the
 	 * preview square disappears and only the commited level is shown.
 	 */
-	const handleMouseOut = (event: React.MouseEvent) => {
-		const canvas = canvasRef.current;
-		const context = contextRef.current;
-		if (canvas == null || context == null)
-		{
-			return;
-		}
-
-		// Clear Preview
+	const handleMouseOut = () => {
 		restoreTile(previewRef.current.x, previewRef.current.y);
+		resetDrawing
+	}
 
-		// Reset drawing
-		drawRef.current = 0;
-		previewRef.current.x = -1;
-		previewRef.current.y = -1;
+	/**
+	 * Handles Context Menu event, causing it to not appear in drawing mode
+	 */
+	const handleContextMenu = (event: React.MouseEvent) => {
+		event.preventDefault();
+		event.stopPropagation();
 	}
 
 	return (
@@ -221,6 +271,7 @@ export const Level = ({x, y}: ILevelProps) =>
 			onMouseUp={handleMouseUp}
 			onMouseMove={handleMouseMove}
 			onMouseOut={handleMouseOut}
+			onContextMenu={handleContextMenu}
 		/>
 	);
 }
