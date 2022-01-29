@@ -249,7 +249,7 @@ export const Level = ({x, y}: ILevelProps) => {
 	 */
 	const handleMouseOut = () => {
 		restoreTile(previewRef.current.x, previewRef.current.y);
-		resetDrawing
+		resetDrawing();
 	}
 
 	/**
