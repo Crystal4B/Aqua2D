@@ -163,10 +163,14 @@ export const Level = ({x, y}: ILevelProps) =>
 		{
 			addTile(x, y);
 			context.fillStyle = "white"; // REMOVE ME: (For now white is drawn black is preview)
+
+			// Draw new preview
+			context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 		}
 		else if (drawRef.current === -1 && layers != null)
 		{
 			removeTile(x, y);
+			restoreTile(x, y);
 		}
 		else
 		{
@@ -182,11 +186,11 @@ export const Level = ({x, y}: ILevelProps) =>
 				previewRef.current.y = y;
 
 				context.fillStyle = "black"; // REMOVE ME: (For now white is drawn black is preview)
+
+				// Draw new preview
+				context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 			}
 		}
-
-		// Draw new preview
-		context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
 	}
 
 	/**
@@ -210,6 +214,11 @@ export const Level = ({x, y}: ILevelProps) =>
 		previewRef.current.y = -1;
 	}
 
+	const handleContextMenu = (event: React.MouseEvent) => {
+		event.preventDefault();
+		event.stopPropagation();
+	}
+
 	return (
 		<canvas
 			width={size.width}
@@ -221,6 +230,7 @@ export const Level = ({x, y}: ILevelProps) =>
 			onMouseUp={handleMouseUp}
 			onMouseMove={handleMouseMove}
 			onMouseOut={handleMouseOut}
+			onContextMenu={handleContextMenu}
 		/>
 	);
 }
