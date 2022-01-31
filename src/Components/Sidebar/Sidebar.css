@@ -11,3 +11,21 @@
 	background-color: black;
 	color: white;
 }
+
+.resizer
+{
+	width: 10px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.resizer:hover
+{
+	cursor: e-resize;
+}
+
+.resizer .line {
+	background: #888;
+	width: 5px;
+}

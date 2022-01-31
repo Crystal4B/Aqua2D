@@ -4,6 +4,7 @@ export interface ILevelProps
 {
 	x: number;
 	y: number;
+	selected: boolean;
 }
 
 interface ILevelSize
@@ -15,7 +16,7 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({x, y}: ILevelProps) => {
+export const Level = ({x, y, selected}: ILevelProps) => {
 	const squareSize = 32;
 
 	// Initilise modes drawing modes
@@ -173,6 +174,10 @@ export const Level = ({x, y}: ILevelProps) => {
 	 * interacting with the level
 	 */
 	const handleMouseDown = (event: React.MouseEvent) => {
+		if (!selected) {
+			return;
+		}
+
 		event.stopPropagation();
 
 		[x, y] = getCoords(event);
@@ -208,6 +213,11 @@ export const Level = ({x, y}: ILevelProps) => {
 	 * as well as previews of tiles
 	 */
 	const handleMouseMove = (event: React.MouseEvent) => {
+		if (!selected)
+		{
+			return;
+		}
+
 		const canvas = canvasRef.current;
 		const context = contextRef.current;
 		const [x, y] = getCoords(event);
@@ -262,6 +272,7 @@ export const Level = ({x, y}: ILevelProps) => {
 
 	return (
 		<canvas
+			className={`level ${selected ? "selected" : ""}`}
 			width={size.width}
 			height={size.height}
 			style={{left: x, top: y}}

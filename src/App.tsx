@@ -6,8 +6,9 @@ function App()
 {
 	return (
 		<div className='rowC'>
-			<Sidebar />
+			<Sidebar left={true}/>
 			<LevelRenderer />
+			<Sidebar left={false}/>
 		</div>
 	);
 }

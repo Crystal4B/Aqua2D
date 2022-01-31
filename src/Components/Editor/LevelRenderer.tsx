@@ -31,7 +31,7 @@ const LevelRenderer = () =>
 		newNames.push(name);
 
 		let newLevels = [...levels.props];
-		newLevels.push({x: clientX, y: clientY});
+		newLevels.push({x: clientX, y: clientY, selected: false});
 
 		setLevels({last: levels.last+1, names: newNames, props: newLevels});
 	}
@@ -39,7 +39,8 @@ const LevelRenderer = () =>
 	return(
 		<div className='viewport' onWheel={handleWheel} style={{zoom: zoom}}>
 			{levels.props.map((level, index) => {
-				return <Level key={levels.names[index]} x={level.x} y={level.y} />
+				return <Level key={levels.names[index]} x={level.x} y={level.y} selected={level.selected
+				} />
 			})}
 			<Menu names={["Add Level"]} functions={[onAddLevel]}/>
 		</div>
