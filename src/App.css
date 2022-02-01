@@ -1,13 +1,13 @@
 body
 {
 	overflow: hidden;
-	margin: 8px 8px 8px 8px;
-	background: rgb(58, 59, 71);
+	margin: 4px;
+	background: #1f1f1f;
 }
 
 .rowC
 {
-	height: 49vw;
+	height: 96vh;
 	display: flex;
 	flex-direction: row;
 }

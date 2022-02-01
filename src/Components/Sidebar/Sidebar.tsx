@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 
 interface iSidebarProps {
 	left: boolean;
+	children: JSX.Element;
 }
 
-const Sidebar = ({left}: iSidebarProps) => {
+const Sidebar = ({left, children}: iSidebarProps) => {
 	const [width, setWidth] = useState(300);
 
 	const resize = ({movementX}: React.MouseEvent) => {
@@ -17,11 +18,7 @@ const Sidebar = ({left}: iSidebarProps) => {
 		<>
 			{left ? null : <Resizer func={resize}/> }
 			<div className="sidebar" style={{width: `${width}px`}}>
-				<div className="panels">
-					<div className="tilesets-panel">
-						<div className="header">Sidebar</div>
-					</div>
-				</div>
+				{children}
 			</div>
 			{left ? <Resizer func={resize}/> : null}
 		</>
