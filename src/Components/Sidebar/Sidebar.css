@@ -1,10 +1,16 @@
 .sidebar
 {
-	height: 100%;
 	width: 300px;
-	border: 1px solid black;
+}
+
+.panel {
 	border-radius: 5px;
 	background: #474747;
+	margin-bottom: 4px;
+}
+
+.sidebar .panel:last-child {
+	margin-bottom: 0px;
 }
 
 .sidebar .tileset {
@@ -23,6 +29,12 @@
 	color: #F7F7F7;
 	border-radius: 5px 5px 0px 0px;
 	padding-left: 10px;
+}
+
+.toolbar .divider {
+	height: 50px;
+	width: 2px;
+	background: #4f4f4f;
 }
 
 .toolbar .button {
@@ -48,7 +60,7 @@
 
 .resizer
 {
-	width: 4px;
+	width: 6px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -61,5 +73,19 @@
 
 .resizer .line {
 	background: #888;
-	width: 5px;
+}
+
+.resizer.vertical .line {
+	width: 1px;
+	height: 100px;
+}
+
+.resizer.horizontal .line {
+	width: 100px;
+	height: 1px;
+}
+
+.resizer .line:hover
+{
+	cursor: e-resize;
 }

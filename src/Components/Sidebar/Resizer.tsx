@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 
 interface iResizerProps {
-	func: (e: React.MouseEvent) => any
+	orientation: string;
 }
 
-const Resizer = ({func}: iResizerProps) => {
+const Resizer = ({orientation}: iResizerProps) => {
 	const dragRef = useRef(false);
 	const [active, setActive] = useState(false);
 
@@ -34,12 +34,12 @@ const Resizer = ({func}: iResizerProps) => {
 	const handleMouseMove = (e: React.MouseEvent) => {
 		if (dragRef.current === true)
 		{
-			func(e);
+			//func(e);
 		}
 	}
 
 	return (
-		<div className="resizer" 
+		<div className={`resizer ${orientation}`}
 			onMouseOver={handleMouseOver} 
 			onMouseOut={handleMouseOut} 
 			onMouseDown={handleMouseDown} 

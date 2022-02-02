@@ -1,14 +1,15 @@
 import './Sidebar.css';
 import Resizer from './Resizer';
 import React, { useState } from 'react';
+import { JsxEmit } from 'typescript';
 
 interface iSidebarProps {
 	left: boolean;
-	children: JSX.Element;
+	children: JSX.Element | JSX.Element[];
 }
 
 const Sidebar = ({left, children}: iSidebarProps) => {
-	const [width, setWidth] = useState(300);
+	const [width, setWidth] = useState(400);
 
 	const resize = ({movementX}: React.MouseEvent) => {
 		setWidth(width - movementX);
@@ -16,11 +17,11 @@ const Sidebar = ({left, children}: iSidebarProps) => {
 
 	return(
 		<>
-			{left ? null : <Resizer func={resize}/> }
+			{left ? null : <Resizer orientation={"vertical"}/*func={resize}*//> }
 			<div className="sidebar" style={{width: `${width}px`}}>
 				{children}
 			</div>
-			{left ? <Resizer func={resize}/> : null}
+			{left ? <Resizer orientation={"vertical"}/*func={resize}*//> : null}
 		</>
 	);
 }
