@@ -1,9 +1,9 @@
-export interface toolActions
+export interface toolAction
 {
 	type: string;
 }
 
-export const switchTool = (tool: string): toolActions =>
+export const switchTool = (tool: string): toolAction =>
 {
 	return {type: tool};
 }
