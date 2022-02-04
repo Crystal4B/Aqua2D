@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { rootState } from '../../../Redux/store';
 import { toolState } from '../../../Redux/Tools/toolReducer';
-import { switchTool } from '../../../Redux/Tools/switchTool';
+import { switchTool } from '../../../Redux/Tools/toolActions';
 
 const Toolbar = () => {
 	const tool = useSelector<rootState, toolState>(state => state.tool);

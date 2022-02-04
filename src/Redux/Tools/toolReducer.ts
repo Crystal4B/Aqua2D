@@ -1,10 +1,10 @@
-import { switchTool } from "./switchTool";
+import { toolActions } from "./toolActions";
 
 export type toolState = number;
 
 const initialState = 0
 
-const toolReducer = (state: toolState = initialState, action: switchTool) => {
+const toolReducer = (state: toolState = initialState, action: toolActions) => {
 	switch(action.type)
 	{
 	case 'MOVE':
