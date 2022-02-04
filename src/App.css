@@ -7,7 +7,7 @@ body
 
 .rowC
 {
-	height: 96vh;
+	height: 100vh;
 	display: flex;
 	flex-direction: row;
 }

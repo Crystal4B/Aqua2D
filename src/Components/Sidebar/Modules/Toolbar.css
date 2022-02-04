@@ -1,0 +1,27 @@
+.toolbar .divider {
+	height: 50px;
+	width: 2px;
+	background: #4f4f4f;
+}
+
+.toolbar .button {
+	font-size: 19px;
+	margin: 2px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+.toolbar .button:hover {
+	background: #666;
+}
+
+.toolbar .button.active {
+	color: #fff;
+	background: #222;
+}
+
+.toolbar .button.inactive {
+	color: #666;
+	background: transparent;
+}

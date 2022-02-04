@@ -1,8 +1,8 @@
 import LevelRenderer from './Components/Editor/LevelRenderer';
 import Sidebar from './Components/Sidebar/Sidebar';
-import TilesetModule from './Components/Sidebar/Modules/TilesetModule';
-import LevelsModule from './Components/Sidebar/Modules/LevelsModule';
-import PropertiesModule from './Components/Sidebar/Modules/PropertiesModule';
+import PropertiesPanel from './Components/Sidebar/Modules/PropertiesPanel/PropertiesPanel';
+import TilesetPanel from './Components/Sidebar/Modules/TilesetPanel/TilesetPanel';
+import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import './App.css';
 
 function App()
@@ -10,12 +10,12 @@ function App()
 	return (
 		<div className='rowC'>
 			<Sidebar left={true}>
-				<PropertiesModule />
+				<PropertiesPanel />
 			</Sidebar>
 			<LevelRenderer />
 			<Sidebar left={false}>
-				<LevelsModule />
-				<TilesetModule />
+				<LevelsPanel levels={["Level 1", "Level 2"]} scenes={[["Scene 1", "Scene 2"],[]]}/>
+				<TilesetPanel />
 			</Sidebar>
 		</div>
 	);

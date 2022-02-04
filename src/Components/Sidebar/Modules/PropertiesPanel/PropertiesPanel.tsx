@@ -1,12 +1,12 @@
-const LevelsModule = () => {
+const PropertiesPanel = () => {
     return (
         <div className="panel">
             <div className="header">Properties</div>
-            <div className="properties-list" style={{height: "93vh"}}>
+            <div className="properties-list" style={{height: "100vh"}}>
                 
             </div>
         </div>
     )
 }
 
-export default LevelsModule;
+export default PropertiesPanel;

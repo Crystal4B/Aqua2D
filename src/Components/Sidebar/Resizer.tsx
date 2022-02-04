@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import './Resizer.css';
 
 interface iResizerProps {
 	orientation: string;

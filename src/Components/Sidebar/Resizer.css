@@ -1,0 +1,32 @@
+.resizer
+{
+	width: 6px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.resizer:hover
+{
+	cursor: e-resize;
+}
+
+.resizer .line {
+	background: #888;
+	border-radius: 2px;
+}
+
+.resizer.vertical .line {
+	width: 1px;
+	height: 100px;
+}
+
+.resizer.horizontal .line {
+	width: 100px;
+	height: 1px;
+}
+
+.resizer .line:hover
+{
+	cursor: e-resize;
+}
