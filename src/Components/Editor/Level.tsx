@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
+import {getCoords} from "../../Helpers/TileHelper";
 
 export interface ILevelProps
 {
 	x: number;
 	y: number;
+	selected: boolean;
 }
 
 interface ILevelSize
@@ -15,7 +17,7 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({x, y}: ILevelProps) => {
+export const Level = ({x, y, selected}: ILevelProps) => {
 	const squareSize = 32;
 
 	// Initilise modes drawing modes
@@ -73,24 +75,6 @@ export const Level = ({x, y}: ILevelProps) => {
 			}
 		}
 	}, []);
-
-	/**
-	 * Converts mouse coordinates to canvas coordinates
-	 * @param event Mouse event being broken down to clientX and clientY
-	 * @returns [x,y] coordinates of the mouse on the canvas or [-1, -1] if an error occurred
-	 */
-	const getCoords = ({clientX, clientY}: React.MouseEvent) => {
-		const canvas = canvasRef.current;
-		if (canvas == null)
-		{
-			return [-1, -1];
-		}
-
-		const {x, y} = canvas.getBoundingClientRect();
-		const mouseX = clientX - x;
-		const mouseY = clientY - y;
-		return [Math.floor(mouseX / squareSize), Math.floor(mouseY / squareSize)];
-	}
 
 	/**
 	 * Renders a preview of the selected tile on the canvas
@@ -173,6 +157,10 @@ export const Level = ({x, y}: ILevelProps) => {
 	 * interacting with the level
 	 */
 	const handleMouseDown = (event: React.MouseEvent) => {
+		if (!selected) {
+			return;
+		}
+
 		event.stopPropagation();
 
 		[x, y] = getCoords(event);
@@ -181,17 +169,11 @@ export const Level = ({x, y}: ILevelProps) => {
 		{
 		case 0:
 			modeRef.current = DRAWING;
-			if (x !== -1 && y !== -1)
-			{
-				addTile(x, y);
-			}
+			addTile(x, y);
 			break;
 		case 2:
 			modeRef.current = ERASING;
-			if (x !== -1 && y !== -1)
-			{
-				removeTile(x, y);
-			}
+			removeTile(x, y);
 			break;
 		}
 	}
@@ -208,10 +190,15 @@ export const Level = ({x, y}: ILevelProps) => {
 	 * as well as previews of tiles
 	 */
 	const handleMouseMove = (event: React.MouseEvent) => {
+		if (!selected)
+		{
+			return;
+		}
+
 		const canvas = canvasRef.current;
 		const context = contextRef.current;
 		const [x, y] = getCoords(event);
-		if (canvas == null || context == null || x === -1 || y === -1)
+		if (canvas == null || context == null)
 		{
 			return;
 		}
@@ -248,8 +235,13 @@ export const Level = ({x, y}: ILevelProps) => {
 	 * preview square disappears and only the commited level is shown.
 	 */
 	const handleMouseOut = () => {
+		if (!selected)
+		{
+			return;
+		}
+
 		restoreTile(previewRef.current.x, previewRef.current.y);
-		resetDrawing
+		resetDrawing();
 	}
 
 	/**
@@ -262,6 +254,7 @@ export const Level = ({x, y}: ILevelProps) => {
 
 	return (
 		<canvas
+			className={`level ${selected ? "selected" : ""}`}
 			width={size.width}
 			height={size.height}
 			style={{left: x, top: y}}

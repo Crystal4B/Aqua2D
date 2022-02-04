@@ -1,15 +1,28 @@
 import './Sidebar.css';
+import Resizer from './Resizer';
+import React, { useState } from 'react';
+import { JsxEmit } from 'typescript';
 
-function Sidebar()
-{
+interface iSidebarProps {
+	left: boolean;
+	children: JSX.Element | JSX.Element[];
+}
+
+const Sidebar = ({left, children}: iSidebarProps) => {
+	const [width, setWidth] = useState(400);
+
+	const resize = ({movementX}: React.MouseEvent) => {
+		setWidth(width - movementX);
+	}
+
 	return(
-		<div className="sidebar" >
-			<div className="panels">
-				<div className="tilesets-panel">
-					<div className="header">Sidebar</div>
-				</div>
+		<>
+			{left ? null : <Resizer orientation={"vertical"}/*func={resize}*//> }
+			<div className="sidebar" style={{width: `${width}px`}}>
+				{children}
 			</div>
-		</div>
+			{left ? <Resizer orientation={"vertical"}/*func={resize}*//> : null}
+		</>
 	);
 }
 

@@ -1,0 +1,34 @@
+.levels-list .sub-menu
+{
+	margin-left: 6px;
+	border-left: 1px solid #666;
+	box-sizing: border-box;
+	padding-left: 20px;
+}
+
+.levels-list .menu-item
+{
+	padding-left: 15px;
+	color: #F7F7F7;
+	text-decoration: none;
+	font-size: 18px;
+	display: block;
+	font-weight: 400;
+	cursor: pointer;
+}
+
+.levels-list .menu-item .menu-title:hover, .levels-list .menu-item .sub-menu li:hover
+{
+	background: #919191;
+}
+
+.levels-list .menu-item .sub-menu li.active
+{
+	background: #939393;
+}
+
+ul
+{
+	padding-inline-start: 0px;
+	margin: 5px 0 5px 0;
+}

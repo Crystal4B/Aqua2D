@@ -2,13 +2,25 @@
 {
 	height: 100%;
 	width: 100%;
-	border: 1px solid #000;
-	background-color: #40465b;
+	background-color: #303030;
+	position: relative;
+	overflow: auto;
+	border-radius: 5px;
 }
 
-.viewport canvas
+.viewport .level
 {
 	position: absolute;
-	border: 1px solid rgb(255, 255, 255);
+	border: 1px solid #888;
 	transform: translate(-50%, -50%);
+}
+
+.viewport .level:hover
+{
+	border: 2px solid #fff;
+}
+
+.viewport .level.selected
+{
+	border: 3px solid yellow;
 }

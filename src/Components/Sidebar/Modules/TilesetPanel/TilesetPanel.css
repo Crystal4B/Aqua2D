@@ -1,0 +1,11 @@
+.tileset
+{
+	position: relative;
+	overflow: auto;
+}
+
+.tileset img
+{
+	max-width: inherit;
+	overflow: auto;
+}

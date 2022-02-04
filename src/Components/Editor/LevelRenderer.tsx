@@ -1,7 +1,10 @@
 import {useState} from 'react';
 import {Level, ILevelProps} from './Level';
-import {Menu, MenuProps} from '../Menu/Menu';
 import './Editor.css';
+import { setOptions } from '../../Redux/Menu/menuActions';
+import { optionState } from '../../Redux/Menu/menuReducer';
+import { addScene } from '../../Redux/Levels/levelsActions';
+import { useDispatch } from 'react-redux';
 
 interface ILevel
 {
@@ -18,6 +21,16 @@ const LevelRenderer = () =>
 	const [zoom, setZoom] = useState(1);
 	const [levels, setLevels] = useState<ILevel>({last: 0, names: [], props: []});
 
+	const dispatch = useDispatch();
+
+	// Prepare context menu
+	const onAddScene = () => {
+		dispatch(addScene("Level 1", "Scene 1"));
+	}
+	const contextMenu: Array<optionState> = [
+		{optionName: "Add Scene", optionFunction: onAddScene}
+	];
+
 	function handleWheel({deltaY, clientX, clientY}: React.WheelEvent)
 	{
 		// if deltaY < 0 zoom in else zoom out
@@ -31,17 +44,22 @@ const LevelRenderer = () =>
 		newNames.push(name);
 
 		let newLevels = [...levels.props];
-		newLevels.push({x: clientX, y: clientY});
+		newLevels.push({x: clientX, y: clientY, selected: false});
 
 		setLevels({last: levels.last+1, names: newNames, props: newLevels});
 	}
 
+	const handleContextMenu = () =>
+	{
+		dispatch(setOptions(contextMenu));
+	}
+
 	return(
-		<div className='viewport' onWheel={handleWheel} style={{zoom: zoom}}>
+		<div className='viewport' onWheel={handleWheel} onContextMenu={handleContextMenu} style={{zoom: zoom}}>
 			{levels.props.map((level, index) => {
-				return <Level key={levels.names[index]} x={level.x} y={level.y} />
+				return <Level key={levels.names[index]} x={level.x} y={level.y} selected={level.selected
+				} />
 			})}
-			<Menu names={["Add Level"]} functions={[onAddLevel]}/>
 		</div>
 	);
 }

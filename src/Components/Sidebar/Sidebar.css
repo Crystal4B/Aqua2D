@@ -1,13 +1,22 @@
 .sidebar
 {
-	height: 100%;
 	width: 300px;
-	background-color: lightgray;
-	border: 1px solid #000;
+}
+
+.panel {
+	border-radius: 5px;
+	background: #474747;
+	margin-bottom: 4px;
+}
+
+.sidebar .panel:last-child {
+	margin-bottom: 0px;
 }
 
 .header
 {
-	background-color: black;
-	color: white;
+	background: #4f4f4f;
+	color: #F7F7F7;
+	border-radius: 5px 5px 0px 0px;
+	padding-left: 10px;
 }

@@ -1,15 +1,13 @@
 body
 {
 	overflow: hidden;
-	width: 100vw;
-	height: 100vw;
-	margin: 0px;
+	margin: 4px;
+	background: #1f1f1f;
 }
 
 .rowC
 {
-	width: 100vw;
-	height: 100vw;
+	height: 100vh;
 	display: flex;
 	flex-direction: row;
 }
