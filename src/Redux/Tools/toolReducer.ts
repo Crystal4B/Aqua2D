@@ -1,20 +1,35 @@
 import { toolAction } from "./toolActions";
 
-export type toolState = number;
+export interface toolState
+{
+	tool: string;
+	tile: {
+		asset: ImageData | undefined;
+		rotation: number;
+	};
+};
 
-const initialState = 0
+const initialState: toolState = {
+	tool: "Move",
+	tile: {
+		asset: undefined,
+		rotation: 0,
+	}
+}
 
-const toolReducer = (state: toolState = initialState, action: toolAction) => {
+const toolReducer = (state: toolState = initialState, action: toolAction): toolState => {
 	switch(action.type)
 	{
-	case 'MOVE':
-		return state = 0;
-	case 'DRAW':
-		return state = 1;
-	case 'ERASE':
-		return state = 2;
-	case 'FILL':
-		return state = 3;
+	case "SWITCHTOOL":
+		if (action.payload.tool !== undefined)
+		{
+			return {...state, tool: action.payload.tool};
+		}
+		return state;
+	case "SWITCHASSET":
+		return {...state, tile: {...state.tile, asset: action.payload.asset}}
+	case "ROTATEASSET":
+		return state;
 	default:
 		return state;
 	}

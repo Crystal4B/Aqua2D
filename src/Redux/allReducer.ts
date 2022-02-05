@@ -4,7 +4,7 @@ import {combineReducers} from "redux";
 import menuReducer from "./Menu/menuReducer";
 
 const allReducers = combineReducers({
-	tool: toolReducer,
+	toolbar: toolReducer,
 	levels: levelReducer,
 	menu: menuReducer
 });
