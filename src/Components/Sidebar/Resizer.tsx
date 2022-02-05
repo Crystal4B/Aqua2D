@@ -1,11 +1,19 @@
 import { useRef, useState } from "react";
 import './Resizer.css';
 
-interface iResizerProps {
+/**
+ * resizerProps represents the requried props for the operation of the resizer
+ */
+interface resizerProps {
 	orientation: string;
 }
 
-const Resizer = ({orientation}: iResizerProps) => {
+/**
+ * Resizer is a functional component that allows the user to resize it's parent object
+ * @param orientation the positioning of the resizer on the x or y axis
+ * @returns JSX code for the resizer
+ */
+const Resizer = ({orientation}: resizerProps) => {
 	const dragRef = useRef(false);
 	const [active, setActive] = useState(false);
 

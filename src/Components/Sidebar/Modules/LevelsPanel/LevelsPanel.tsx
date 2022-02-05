@@ -7,25 +7,34 @@ import { rootState } from '../../../../Redux/store';
 import { levelsState } from '../../../../Redux/Levels/levelReducer';
 import { setOptions } from '../../../../Redux/Menu/menuActions';
 import { optionState } from '../../../../Redux/Menu/menuReducer';
-import { addLevel } from '../../../../Redux/Levels/levelsActions';
+import { addLevel, selectScene } from '../../../../Redux/Levels/levelsActions';
 
-const LevelsPanel = () => {
+const LevelsPanel = () =>
+{
 	const [expand, setExpand] = useState(true);
 
 	const levels = useSelector<rootState, levelsState["levels"]>(state => state.levels.levels)
 
-	const handleOnClick = () => {
+	const handleOnClick = () =>
+	{
 		setExpand(!expand);
 	}
 
 	const dispatch = useDispatch();
 
-	const onAddLevel = () => {
+	const onAddLevel = () =>
+	{
 		dispatch(addLevel("Level 2"));
 	}
 
-	const onAddScene = () => {
+	const onAddScene = () =>
+	{
 
+	}
+
+	const onSelectScene = (level: string, scene: string) =>
+	{
+		dispatch(selectScene(level, scene));
 	}
 
 	const contextMenu: Array<optionState> = [{optionName: "Add Level", optionFunction: onAddLevel}, {optionName: "Add Scene", optionFunction: onAddScene}];
@@ -57,7 +66,7 @@ const LevelsPanel = () => {
 								?
 								<ul className={`sub-menu active`}>
 									{level.scenes.map((scene) => (
-										<li key={scene.sceneName} className={`${scene.sceneSelected ? "active" : ""}`}><FaMapMarkerAlt className='icon'/> {scene.sceneName}</li>
+										<li key={scene.sceneName} className={`${scene.sceneSelected ? "active" : ""}`} onClick={() => {onSelectScene(level.levelName, scene.sceneName)}}><FaMapMarkerAlt className='icon'/> {scene.sceneName}</li>
 									))}
 								</ul>
 								:

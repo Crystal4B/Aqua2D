@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
+import { rootState } from "../../Redux/store";
+import { toolState } from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
@@ -17,8 +20,23 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({x, y, selected}: ILevelProps) => {
+export const Level = ({x, y, selected}: ILevelProps) =>
+{
 	const squareSize = 32;
+
+	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar)
+
+	// Prepare square
+	const canvas = document.createElement("canvas");
+	canvas.width = squareSize;
+	canvas.height = squareSize;
+
+	const context = canvas.getContext("2d");
+	const imageData = toolbarSettings.tile.asset;
+	if (context !== undefined && imageData !== undefined)
+	{
+		context?.putImageData(imageData, 0, 0);
+	}
 
 	// Initilise modes drawing modes
 	const DRAWING = 1;
@@ -35,7 +53,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	// Initialise States for level
 	const [size, setSize] = useState<ILevelSize>({width: 320, height: 320});
 
-	useEffect(() => {
+	useEffect(() =>
+	{
 		const canvas = canvasRef.current;
 		if (canvas == null)
 		{
@@ -81,7 +100,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * @param x position of tile on the x-axis
 	 * @param y position of tile on the y-axis
 	 */
-	const previewTile = (x: number, y: number) => {
+	const previewTile = (x: number, y: number) =>
+	{
 		const context = contextRef.current;
 		if (context != null)
 		{
@@ -89,8 +109,7 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
 
 			// Draw preview tile
-			context.fillStyle = "black";
-			context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			context.drawImage(canvas, x * squareSize, y * squareSize);
 		}
 	}
 
@@ -99,7 +118,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * @param x position of tile on the x-axis
 	 * @param y position of tile on the y-axis
 	 */
-	const addTile = (x: number, y: number) => {
+	const addTile = (x: number, y: number) =>
+	{
 		const layers = layersRef.current;
 		if (layers != null)
 		{
@@ -113,7 +133,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * @param x position of tile on the x-axis
 	 * @param y position of tile on the y-axis
 	 */
-	const removeTile = (x: number, y: number) => {
+	const removeTile = (x: number, y: number) =>
+	{
 		const layers = layersRef.current;
 		if (layers != null)
 		{
@@ -127,7 +148,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * @param x position of tile on the x-axis
 	 * @param y position of tile on the y-axis
 	 */
-	const restoreTile = (x: number, y: number) => {
+	const restoreTile = (x: number, y: number) =>
+	{
 		const context = contextRef.current;
 		const layers = layersRef.current;
 		if (context != null && layers != null)
@@ -146,7 +168,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	/**
 	 * Used to reset the drawing references for the level
 	 */
-	const resetDrawing = () => {
+	const resetDrawing = () =>
+	{
 		modeRef.current = PREVIEW;
 		previewRef.current.x = -1;
 		previewRef.current.y = -1;
@@ -156,7 +179,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * Handles mouse down events. For a level mouse downn means that the user is
 	 * interacting with the level
 	 */
-	const handleMouseDown = (event: React.MouseEvent) => {
+	const handleMouseDown = (event: React.MouseEvent) =>
+	{
 		if (!selected) {
 			return;
 		}
@@ -181,7 +205,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	/**
 	 * Handles mouse up events. For a level mouse up means drawing is ending
 	 */
-	const handleMouseUp = (event: React.MouseEvent) => {
+	const handleMouseUp = (event: React.MouseEvent) =>
+	{
 		modeRef.current = PREVIEW;
 	}
 
@@ -189,7 +214,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * Handles mouse move events. For a level mouse move means drawing
 	 * as well as previews of tiles
 	 */
-	const handleMouseMove = (event: React.MouseEvent) => {
+	const handleMouseMove = (event: React.MouseEvent) =>
+	{
 		if (!selected)
 		{
 			return;
@@ -234,7 +260,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	 * Handles mouse out events. for a level mouse out means that the
 	 * preview square disappears and only the commited level is shown.
 	 */
-	const handleMouseOut = () => {
+	const handleMouseOut = () =>
+	{
 		if (!selected)
 		{
 			return;
@@ -247,7 +274,8 @@ export const Level = ({x, y, selected}: ILevelProps) => {
 	/**
 	 * Handles Context Menu event, causing it to not appear in drawing mode
 	 */
-	const handleContextMenu = (event: React.MouseEvent) => {
+	const handleContextMenu = (event: React.MouseEvent) =>
+	{
 		event.preventDefault();
 		event.stopPropagation();
 	}

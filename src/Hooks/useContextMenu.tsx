@@ -1,13 +1,21 @@
 import {useEffect, useState} from "react";
 
-// FIXME: Context menus reliant on multiple items break as the hook unhooks previous context menu
-//	SOLUTION (I THINK): Make menu take reference of object subject to menu make context menu on object && Make click only attach after menu is open
-const useContextMenu = () => {
+/**
+ * useContextMenu is a custom hook for operating a ContextMenu in the application
+ * @returns the current state of the context hook
+ */
+const useContextMenu = () =>
+{
 	const [xPos, setXPos] = useState(0);
 	const [yPos, setYPos] = useState(0);
 	const [showMenu, setShowMenu] = useState(false);
 
-	const handleContextMenu = (event: MouseEvent) => {
+	/**
+	 * handleContextMenu updates the state of the menu on event
+	 * @param event a MouseEvent that trigged the menu
+	 */
+	const handleContextMenu = (event: MouseEvent) =>
+	{
 		event.preventDefault();
 
 		const x = event.pageX + 100 < window.innerWidth ? event.pageX : window.innerWidth - 100;
@@ -18,6 +26,9 @@ const useContextMenu = () => {
 		setShowMenu(true);
 	}
 
+	/**
+	 * handleClick removes a unwanted menu from the screen on click event
+	 */
 	const handleClick = () => {
 		if (showMenu)
 		{

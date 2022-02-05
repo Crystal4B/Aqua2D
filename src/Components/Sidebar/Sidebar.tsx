@@ -1,27 +1,38 @@
 import './Sidebar.css';
 import Resizer from './Resizer';
-import React, { useState } from 'react';
-import { JsxEmit } from 'typescript';
+import { useState } from 'react';
 
-interface iSidebarProps {
+/**
+ * sidebarProps represent the probs that the sidebar requires to operate
+ */
+interface sidebarProps {
 	left: boolean;
 	children: JSX.Element | JSX.Element[];
 }
 
-const Sidebar = ({left, children}: iSidebarProps) => {
+/**
+ * Sidebar is a compositional component that manages UI Panels
+ * @param sidebarProps the required props for the toolbar
+ * @returns JSX code for the sidebar
+ */
+const Sidebar = ({left, children}: sidebarProps) => {
 	const [width, setWidth] = useState(400);
 
+	/**
+	 * resize function for resizing the sidebar
+	 * @param movementX the amount of movement on the x-axis caused by the user
+	 */
 	const resize = ({movementX}: React.MouseEvent) => {
 		setWidth(width - movementX);
 	}
 
 	return(
 		<>
-			{left ? null : <Resizer orientation={"vertical"}/*func={resize}*//> }
+			{left ? null : <Resizer orientation={"vertical"}/> }
 			<div className="sidebar" style={{width: `${width}px`}}>
 				{children}
 			</div>
-			{left ? <Resizer orientation={"vertical"}/*func={resize}*//> : null}
+			{left ? <Resizer orientation={"vertical"}/> : null}
 		</>
 	);
 }

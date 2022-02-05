@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {Level, ILevelProps} from './Level';
 import './Editor.css';
 import { setOptions } from '../../Redux/Menu/menuActions';
@@ -24,8 +24,13 @@ const LevelRenderer = () =>
 	const dispatch = useDispatch();
 
 	// Prepare context menu
-	const onAddScene = () => {
+	const onAddScene = ({clientX, clientY}: React.MouseEvent) => {
 		dispatch(addScene("Level 1", "Scene 1"));
+
+		let newNames = [...levels.names, "Scene 1"];
+		let newLevel = [...levels.props, {x: clientX, y: clientY, selected: true}];
+
+		setLevels({last: levels.last+1, names: newNames, props: newLevel});
 	}
 	const contextMenu: Array<optionState> = [
 		{optionName: "Add Scene", optionFunction: onAddScene}

@@ -60,7 +60,7 @@ const initialState: levelsState = {
  * @param action a levelAction object being used to update the state
  * @returns The new state of the levels
  */
-const levelReducer = (state: levelsState = initialState, action: levelAction) => {
+const levelReducer = (state: levelsState = initialState, action: levelAction): levelsState => {
 	const {type, payload} = action;
 	switch(type)
 	{
@@ -68,16 +68,25 @@ const levelReducer = (state: levelsState = initialState, action: levelAction) =>
 		if (payload.parent === "ROOT")
 		{
 			const newLevel = createNewLevel(payload.target);
-			state.levels = [...state.levels, newLevel];
+			return {levels: [...state.levels, newLevel]};
 		}
 		else
 		{
 			const newScene = createNewScene(payload.target);
-			state.levels.find(level => level.levelName === payload.parent)?.scenes.push(newScene);
+			return {
+				levels: state.levels.map(
+					(level) => level.levelName === payload.parent ? {...level, scenes:[...level.scenes, newScene]} : level
+				)
+			}
 		}
-		return {levels: state.levels};
 	case "SELECT":
-		return state;
+		return {
+			levels: state.levels.map(
+				(level) => level.levelName === payload.parent ? {...level, scenes: level.scenes.map(
+					(scene) => scene.sceneName === payload.target ? {...scene, sceneSelected: true}: scene
+				)} : level
+			)
+		};
 	case "RENAME":
 		var target = payload.parent;
 		if (target === "ROOT")

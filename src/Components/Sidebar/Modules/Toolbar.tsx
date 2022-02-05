@@ -9,10 +9,10 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { rootState } from '../../../Redux/store';
 import { toolState } from '../../../Redux/Tools/toolReducer';
-import { switchTool } from '../../../Redux/Tools/switchTool';
+import { switchTool } from '../../../Redux/Tools/toolActions';
 
 const Toolbar = () => {
-	const tool = useSelector<rootState, toolState>(state => state.tool);
+	const tool = useSelector<rootState, toolState["tool"]>(state => state.toolbar.tool);
 	const dispatch = useDispatch();
 
 	const updateToolSelection = (tool: string) => {
@@ -21,14 +21,14 @@ const Toolbar = () => {
 
 	return (
 		<div className="toolbar">
-			<GiArrowCursor onClick={() => updateToolSelection("MOVE")} className={`button ${tool === 0 ? "active" : ""}`}/>
-			<BsPencilFill onClick={() => updateToolSelection("DRAW")} className={`button ${tool === 1 ? "active" : ""}`}/>
-			<BsEraserFill onClick={() => updateToolSelection("ERASE")} className={`button ${tool === 2 ? "active" : ""}`}/>
-			<GiFoundryBucket onClick={() => updateToolSelection("FILL")} className={`button ${tool === 3 ? "active" : ""}`}/>
-			<CgEditFlipH className='button inactive'/>
-			<CgEditFlipV className='button inactive'/>
-			<BiRotateRight className='button inactive'/>
-			<BiRotateLeft className='button inactive'/>
+			<GiArrowCursor onClick={() => updateToolSelection("Move")} className={`button ${tool === "Move" ? "active" : ""}`}/>
+			<BsPencilFill onClick={() => updateToolSelection("Draw")} className={`button ${tool === "Draw" ? "active" : ""}`}/>
+			<BsEraserFill onClick={() => updateToolSelection("Erase")} className={`button ${tool === "Erase" ? "active" : ""}`}/>
+			<GiFoundryBucket onClick={() => updateToolSelection("Fill")} className={`button ${tool === "Fill" ? "active" : ""}`}/>
+			<CgEditFlipH className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
+			<CgEditFlipV className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
+			<BiRotateRight className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
+			<BiRotateLeft className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
 			<AiOutlineFolderOpen className='button'/>
 		</div>
 	)
