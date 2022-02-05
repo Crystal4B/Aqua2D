@@ -6,7 +6,7 @@ import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import Menu from './Components/Menu/Menu';
 import './App.css';
 
-function App()
+const App = () =>
 {
 	return (
 		<>

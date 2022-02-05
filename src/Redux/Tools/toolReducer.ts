@@ -1,5 +1,8 @@
 import { toolAction } from "./toolActions";
 
+/**
+ * toolState represents the tool settings for drawing on canvases
+ */
 export interface toolState
 {
 	tool: string;
@@ -9,6 +12,9 @@ export interface toolState
 	};
 };
 
+/**
+ * initial sstate for the toolReducer
+ */
 const initialState: toolState = {
 	tool: "Move",
 	tile: {
@@ -17,6 +23,12 @@ const initialState: toolState = {
 	}
 }
 
+/**
+ * toolReducer handles actions and state for the tileset panel including toolbar
+ * @param state the state of the tool selection menu
+ * @param action the action being executed on state
+ * @returns the new state after the action was executed
+ */
 const toolReducer = (state: toolState = initialState, action: toolAction): toolState => {
 	switch(action.type)
 	{

@@ -14,7 +14,6 @@ const TilesetPanel = () =>
 	const handleOnClick = (e: React.MouseEvent) => {
 		const [x, y] = getCoords(e);
 		setSelection({xPos: x*32, yPos: y*32, selected: true});
-
 		
 		// MOVE TO FUNCTION
 		const canvas = document.createElement('canvas');
@@ -27,7 +26,7 @@ const TilesetPanel = () =>
 		const asset = assetRef.current;
 		if (asset !== null && context !== null)
 		{
-			context.drawImage(asset, 0, 0);
+			context.drawImage(asset, x * 32, y * 32, 32, 32, 0, 0, 32, 32);
 			const data = context.getImageData(0,0,32,32);
 			dispatch(switchAsset(data));
 		}
