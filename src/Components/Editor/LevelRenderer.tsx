@@ -4,7 +4,9 @@ import './Editor.css';
 import { setOptions } from '../../Redux/Menu/menuActions';
 import { optionState } from '../../Redux/Menu/menuReducer';
 import { addScene } from '../../Redux/Levels/levelsActions';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { rootState } from '../../Redux/store';
+import { levelState } from '../../Redux/Levels/levelReducer';
 
 interface ILevel
 {
@@ -28,19 +30,14 @@ const LevelRenderer = () =>
 	const [drag, setDrag] = useState(false);
 	const [viewerSettings, setViewerSettings] = useState<viewerSettings>({xOffset: 0, yOffset: 0, scale: 1});
 	
-	const [zoom, setZoom] = useState(1);
-	const [levels, setLevels] = useState<ILevel>({last: 0, names: [], props: []});
+	const level = useSelector<rootState, levelState>(state => state.levels.levels[state.levels.selectedIndex]);
 
 	const dispatch = useDispatch();
 
 	// Prepare context menu
-	const onAddScene = ({clientX, clientY}: React.MouseEvent) => {
+	const onAddScene = ({clientX, clientY}: React.MouseEvent) =>
+	{
 		dispatch(addScene("Level 1", "DEFAULT"));
-
-		let newNames = [...levels.names, "scene 1"];
-		let newLevel = [...levels.props, {xOffset: clientX, yOffset: clientY, scale: 1, selected: true}];
-
-		setLevels({last: levels.last+1, names: newNames, props: newLevel});
 	}
 	const contextMenu: Array<optionState> = [
 		{optionName: "Add Scene", optionFunction: onAddScene}
@@ -59,7 +56,6 @@ const LevelRenderer = () =>
 	const handleMouseUp = () =>
 	{
 		setDrag(false);
-		console.log(viewerSettings);
 	}
 
 	const handleMouseOut = () =>
@@ -75,23 +71,9 @@ const LevelRenderer = () =>
 		}
 	}
 
-	function handleWheel({deltaY, clientX, clientY}: React.WheelEvent)
+	const handleWheel = ({deltaY, clientX, clientY}: React.WheelEvent) =>
 	{
-		// if deltaY < 0 zoom in else zoom out
 		setViewerSettings({...viewerSettings, scale: deltaY < 0 ? viewerSettings.scale + 0.1 : viewerSettings.scale - 0.1});
-		console.log(viewerSettings);
-	}
-
-	function onAddLevel({clientX, clientY}: React.MouseEvent)
-	{
-		let name = `Scene_${levels.last+1}`;
-		let newNames = [...levels.names];
-		newNames.push(name);
-
-		let newLevels = [...levels.props];
-		newLevels.push({xOffset: clientX, yOffset: clientY, scale: 1, selected: false});
-
-		setLevels({last: levels.last+1, names: newNames, props: newLevels});
 	}
 
 	const handleContextMenu = () =>
@@ -100,10 +82,9 @@ const LevelRenderer = () =>
 	}
 
 	return(
-		<div className={`viewport ${drag ? "drag" : ""}`} onWheel={handleWheel} onContextMenu={handleContextMenu} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseOut={handleMouseOut} style={{zoom: zoom}}>
-			{levels.props.map((level, index) => {
-				return <Level key={levels.names[index]} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={level.selected
-				} />
+		<div className={`viewport ${drag ? "drag" : ""}`} onWheel={handleWheel} onContextMenu={handleContextMenu} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseOut={handleMouseOut}>
+			{level.scenes.map((scene) => {
+				return <Level key={scene.sceneName} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={scene.sceneSelected} />
 			})}
 		</div>
 	);

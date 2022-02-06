@@ -4,13 +4,14 @@ import { levelAction } from "./levelsActions";
  * Interface for storing level & scene data
  */
 export interface levelsState {
-	levels: Array<levelState>
+	levels: Array<levelState>;
+	selectedIndex: number;
 }
 
 /**
  * Interface representing a level in a game
  */
-interface levelState {
+export interface levelState {
 	levelName: string;
 	levelSelected: boolean;
 	scenes: Array<sceneState>;
@@ -54,8 +55,8 @@ const createNewScene = (name: string): sceneState => {
  * Default State for a new Project
  */
 const initialState: levelsState = {
-	levels: [createNewLevel("Level 1")]
-	
+	levels: [createNewLevel("Level 1")],
+	selectedIndex: 0
 }
 
 /**
@@ -78,7 +79,7 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 			}
 
 			const newLevel = createNewLevel(levelName);
-			return {levels: [...state.levels, newLevel]};
+			return {...state, levels: [...state.levels, newLevel]};
 		}
 		else
 		{
@@ -94,6 +95,7 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 
 			const newScene = createNewScene(sceneName);
 			return {
+				...state,
 				levels: state.levels.map(
 					(level) => level.levelName === payload.parent ? {...level, scenes:[...level.scenes, newScene]} : level
 				)
@@ -101,9 +103,10 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 		}
 	case "SELECT":
 		return {
+			...state,
 			levels: state.levels.map(
 				(level) => level.levelName === payload.parent ? {...level, scenes: level.scenes.map(
-					(scene) => scene.sceneName === payload.target ? {...scene, sceneSelected: true} : scene
+					(scene) => scene.sceneName === payload.target ? {...scene, sceneSelected: !scene.sceneSelected} : scene
 				)} : level
 			)
 		};
@@ -118,7 +121,7 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 		{
 			level.levelName = payload.newName;
 		}
-		return {levels: state.levels};
+		return {...state, levels: state.levels};
 	case "REMOVE":
 		if (payload.parent === "ROOT")
 		{
@@ -137,7 +140,7 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 				level?.scenes.splice(index, index);
 			}
 		}
-		return {levels: state.levels};
+		return {...state, levels: state.levels};
 	default:
 		return state;
 	}

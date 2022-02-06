@@ -4,7 +4,7 @@
 	width: 100%;
 	background-color: #303030;
 	position: relative;
-	overflow: auto;
+	overflow: hidden;
 	border-radius: 5px;
 }
 
@@ -13,6 +13,7 @@
 	position: absolute;
 	border: 1px solid #888;
 	transform: translate(-50%, -50%);
+	transition: width .2s, height .2s ease;
 }
 
 .viewport .level:hover
