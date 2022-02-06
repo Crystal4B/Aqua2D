@@ -24,7 +24,7 @@ const LevelsPanel = () =>
 
 	const onAddLevel = () =>
 	{
-		dispatch(addLevel("Level 2"));
+		dispatch(addLevel("DEFAULT"));
 	}
 
 	const onAddScene = () =>

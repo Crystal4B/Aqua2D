@@ -22,6 +22,8 @@ interface levelState {
 interface sceneState {
 	sceneName: string;
 	sceneSelected: boolean;
+	xPos: number;
+	yPos: number;
 }
 
 /**
@@ -42,7 +44,9 @@ const createNewLevel = (name: string): levelState => {
 const createNewScene = (name: string): sceneState => {
 	return {
 		sceneName: name,
-		sceneSelected: false
+		sceneSelected: false,
+		xPos: -1,
+		yPos: -1
 	}
 }
 
@@ -67,12 +71,28 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 	case "ADD":
 		if (payload.parent === "ROOT")
 		{
-			const newLevel = createNewLevel(payload.target);
+			var levelName = payload.target;
+			if (levelName === "DEFAULT")
+			{
+				levelName = `Level ${state.levels.length + 1}`;
+			}
+
+			const newLevel = createNewLevel(levelName);
 			return {levels: [...state.levels, newLevel]};
 		}
 		else
 		{
-			const newScene = createNewScene(payload.target);
+			var sceneName = payload.target;
+			if (sceneName === "DEFAULT")
+			{
+				const scenesLength = state.levels.find((level) => level.levelName === payload.parent)?.scenes.length;
+				if (scenesLength !== undefined)
+				{
+					sceneName = `Scene ${scenesLength + 1}`
+				}
+			}
+
+			const newScene = createNewScene(sceneName);
 			return {
 				levels: state.levels.map(
 					(level) => level.levelName === payload.parent ? {...level, scenes:[...level.scenes, newScene]} : level

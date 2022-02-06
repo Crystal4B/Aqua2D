@@ -25,9 +25,9 @@ const LevelRenderer = () =>
 
 	// Prepare context menu
 	const onAddScene = ({clientX, clientY}: React.MouseEvent) => {
-		dispatch(addScene("Level 1", "Scene 1"));
+		dispatch(addScene("Level 1", "DEFAULT"));
 
-		let newNames = [...levels.names, "Scene 1"];
+		let newNames = [...levels.names, "scene 1"];
 		let newLevel = [...levels.props, {x: clientX, y: clientY, selected: true}];
 
 		setLevels({last: levels.last+1, names: newNames, props: newLevel});
