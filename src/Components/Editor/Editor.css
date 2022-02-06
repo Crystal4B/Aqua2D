@@ -24,3 +24,8 @@
 {
 	border: 3px solid yellow;
 }
+
+.viewport.drag
+{
+	cursor: move;
+}

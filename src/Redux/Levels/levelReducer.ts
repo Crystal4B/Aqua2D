@@ -103,7 +103,7 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 		return {
 			levels: state.levels.map(
 				(level) => level.levelName === payload.parent ? {...level, scenes: level.scenes.map(
-					(scene) => scene.sceneName === payload.target ? {...scene, sceneSelected: true}: scene
+					(scene) => scene.sceneName === payload.target ? {...scene, sceneSelected: true} : scene
 				)} : level
 			)
 		};

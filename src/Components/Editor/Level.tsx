@@ -6,8 +6,9 @@ import { toolState } from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
-	x: number;
-	y: number;
+	xOffset: number;
+	yOffset: number;
+	scale: number;
 	selected: boolean;
 }
 
@@ -20,7 +21,7 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({x, y, selected}: ILevelProps) =>
+export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 {
 	const squareSize = 32;
 
@@ -187,8 +188,7 @@ export const Level = ({x, y, selected}: ILevelProps) =>
 
 		event.stopPropagation();
 
-		[x, y] = getCoords(event);
-
+		const [x, y] = getCoords(event);
 		switch(event.button)
 		{
 		case 0:
@@ -285,7 +285,7 @@ export const Level = ({x, y, selected}: ILevelProps) =>
 			className={`level ${selected ? "selected" : ""}`}
 			width={size.width}
 			height={size.height}
-			style={{left: x, top: y}}
+			style={{left: `${400 + xOffset}px`, top: `${400 + yOffset}px`, width: `${size.width * scale}px`, height: `${size.height * scale}px`}}
 			ref={canvasRef}
 
 			onMouseDown={handleMouseDown}
