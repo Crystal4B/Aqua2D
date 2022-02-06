@@ -30,7 +30,6 @@ const TilesetPanel = () =>
 			const data = context.getImageData(0,0,32,32);
 			dispatch(switchAsset(data));
 		}
-
 	}
 
 	return (

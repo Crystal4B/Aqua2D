@@ -11,7 +11,7 @@ export interface levelAction {
  */
 interface levelPayload {
 	parent: "ROOT" | string;
-	target: string;
+	target: "DEFAULT" | string;
 	newName?: string;
 }
 
