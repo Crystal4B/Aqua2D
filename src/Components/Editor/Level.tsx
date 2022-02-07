@@ -106,6 +106,9 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const previewTile = (x: number, y: number) =>
 	{
+		previewRef.current.x = x;
+		previewRef.current.y = y;
+
 		const context = contextRef.current;
 		if (context != null)
 		{
@@ -154,6 +157,11 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const restoreTile = (x: number, y: number) =>
 	{
+		if (x != -1 && y != -1)
+		{
+			return;
+		}
+
 		const context = contextRef.current;
 		const layers = layersRef.current;
 		if (context != null && layers != null)
@@ -172,16 +180,16 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	/**
 	 * Used to reset the drawing references for the level
 	 */
-	const resetDrawing = () =>
+	const resetDrawing = (hard: boolean = false) =>
 	{
-		if (drag)
-		{
-			setDrag(false);
-		}
-
 		mouseDownRef.current = false;
-		previewRef.current.x = -1;
-		previewRef.current.y = -1;
+		setDrag(false);
+		
+		if (hard)
+		{
+			previewRef.current.x = -1;
+			previewRef.current.y = -1;
+		}
 	}
 
 	/**
@@ -228,11 +236,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const handleMouseUp = (event: React.MouseEvent) =>
 	{
-		mouseDownRef.current = false;
-		if (drag)
-		{
-			setDrag(false);
-		}
+		resetDrawing();
 	}
 
 	/**
@@ -283,15 +287,9 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 				if (x !== previewRef.current.x || y !== previewRef.current.y)
 				{
 					// Restore tile if preview is already drawn on canvas
-					if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
-					{
-						restoreTile(previewRef.current.x, previewRef.current.y);
-					}
+					restoreTile(previewRef.current.x, previewRef.current.y);
 
-					// Update preview position
-					previewRef.current.x = x;
-					previewRef.current.y = y;
-
+					// Update preview
 					previewTile(x, y);
 				}
 			}
@@ -315,11 +313,8 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			return;
 		}
 
-		if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
-		{
-			restoreTile(previewRef.current.x, previewRef.current.y);
-		}
-		resetDrawing();
+		restoreTile(previewRef.current.x, previewRef.current.y);
+		resetDrawing(true);
 	}
 
 	/**
@@ -336,7 +331,12 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			className={`level ${selected ? "selected" : ""}`}
 			width={size.width}
 			height={size.height}
-			style={{left: `${position.xPos + xOffset}px`, top: `${position.yPos + yOffset}px`, width: `${size.width * scale}px`, height: `${size.height * scale}px`}}
+			style={{
+				left: `${position.xPos + xOffset}px`,
+				top: `${position.yPos + yOffset}px`,
+				width: `${size.width * scale}px`,
+				height: `${size.height * scale}px`
+			}}
 			ref={canvasRef}
 
 			onMouseDown={handleMouseDown}
@@ -348,5 +348,4 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	);
 }
 
-// Export the level class
 export default Level;
