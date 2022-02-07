@@ -33,6 +33,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar)
 	const [position, setPosition] = useState<tempLevelPosition>({xPos: 200, yPos: 200});
+	const [drag, setDrag] = useState(false);
 
 	// Prepare square
 	const canvas = document.createElement("canvas");
@@ -173,6 +174,11 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const resetDrawing = () =>
 	{
+		if (drag)
+		{
+			setDrag(false);
+		}
+
 		mouseDownRef.current = false;
 		previewRef.current.x = -1;
 		previewRef.current.y = -1;
@@ -203,6 +209,10 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			{
 				addTile(x, y);
 			}
+			else if (toolbarSettings.tool === "Move")
+			{
+				setDrag(true);
+			}
 			break;
 		case 2:
 			if (toolbarSettings.tool === "Erase")
@@ -219,6 +229,10 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	const handleMouseUp = (event: React.MouseEvent) =>
 	{
 		mouseDownRef.current = false;
+		if (drag)
+		{
+			setDrag(false);
+		}
 	}
 
 	/**
@@ -245,7 +259,17 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 		case "Move":
 			if (mouseDownRef.current)
 			{
-				setPosition({xPos: position.xPos + event.movementX, yPos: position.yPos + event.movementY});
+				const parent = canvas.parentElement;
+				if (parent !== null)
+				{
+					const {x, y} = parent.getBoundingClientRect();
+					
+					const mouseX = event.clientX - x;
+					const mouseY = event.clientY - y;
+		
+					setPosition({xPos: mouseX, yPos: mouseY});
+				}
+
 			}
 			break;
 		case "Draw":
