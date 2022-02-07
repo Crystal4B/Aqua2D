@@ -29,5 +29,5 @@ export const getCoords = ({target, clientX, clientY}: React.MouseEvent): [xCoord
  */
 const getRatio = (target: HTMLCanvasElement): [xRatio: number, yRatio: number] =>
 {
-	return [target.width / target.clientWidth, target.width / target.clientHeight];
+	return [target.width / target.clientWidth, target.height / target.clientHeight];
 }
