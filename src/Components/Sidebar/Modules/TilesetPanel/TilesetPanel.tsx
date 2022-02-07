@@ -3,7 +3,7 @@ import './TilesetPanel.css'
 import {getCoords} from '../../../../Helpers/TileHelper';
 import { useDispatch } from 'react-redux';
 import React, { useRef, useState } from 'react';
-import { switchAsset } from '../../../../Redux/Tools/toolActions';
+import { switchTile, switchTileset } from '../../../../Redux/Tools/toolActions';
 
 const TilesetPanel = () =>
 {
@@ -16,21 +16,7 @@ const TilesetPanel = () =>
 		const [x, y] = getCoords(e);
 		setSelection({xPos: x*32, yPos: y*32, selected: true});
 		
-		// MOVE TO FUNCTION
-		const canvas = document.createElement('canvas');
-		canvas.width = 32;
-		canvas.height = 32;
-		
-		// Prepare canvas for drawing
-		const context = canvas.getContext("2d");
-		// Get asset
-		const asset = assetRef.current;
-		if (asset !== null && context !== null)
-		{
-			context.drawImage(asset, x * 32, y * 32, 32, 32, 0, 0, 32, 32);
-			const data = context.getImageData(0,0,32,32);
-			dispatch(switchAsset(data));
-		}
+		dispatch(switchTile(x, y));
 	}
 
 	const handleDragOver = (e: React.MouseEvent) =>
@@ -39,14 +25,40 @@ const TilesetPanel = () =>
 		e.stopPropagation();
 	}
 
-	const handleDrop = (e: any) =>
+	const validateImage = (file: File) =>
 	{
-		console.log(e);
+		const VALID_TYPES = ['image/jpeg', 'image/png'];
+		return VALID_TYPES.indexOf(file.type) !== -1;
 	}
 
-	const handleChange = (e: any) =>
+	const handleDrop = (e: React.DragEvent<HTMLInputElement>) =>
 	{
+		e.preventDefault();
+		e.stopPropagation();
 
+		const {dataTransfer} = e;
+		const files = dataTransfer.files;
+
+		if (files.length)
+		{
+			var file = files[0];
+			if (validateImage(file))
+			{
+				const url = URL.createObjectURL(file);
+				dispatch(switchTileset(url));
+
+				const image = assetRef.current;
+				if (image)
+				{
+					image.src = url;
+				}
+			}
+		}
+	}
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+	{
+		console.log(e);
 	}
 
 	return (
@@ -56,6 +68,7 @@ const TilesetPanel = () =>
 				<Toolbar />
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
+					<img ref={assetRef} onClick={handleOnClick}/>
 					<input
 						type={"file"}
 						id="tileset-input"

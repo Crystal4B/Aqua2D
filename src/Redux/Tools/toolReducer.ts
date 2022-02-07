@@ -6,19 +6,27 @@ import { toolAction } from "./toolActions";
 export interface toolState
 {
 	tool: string;
-	tile: {
-		asset: ImageData | undefined;
-		rotation: number;
-	};
+	tileset: string | undefined;
+	tile: tileState;
 };
+
+export interface tileState
+{
+	xCoord: number;
+	yCoord: number;
+	rotation: number;
+}
 
 /**
  * initial sstate for the toolReducer
  */
-const initialState: toolState = {
+const initialState: toolState =
+{
 	tool: "Move",
+	tileset: undefined,
 	tile: {
-		asset: undefined,
+		xCoord: -1,
+		yCoord: -1,
 		rotation: 0,
 	}
 }
@@ -38,10 +46,30 @@ const toolReducer = (state: toolState = initialState, action: toolAction): toolS
 			return {...state, tool: action.payload.tool};
 		}
 		return state;
-	case "SWITCHASSET":
-		return {...state, tile: {...state.tile, asset: action.payload.asset}}
-	case "ROTATEASSET":
-		return state;
+	case "SWITCHTILESET":
+		if (state.tileset)
+		{
+			URL.revokeObjectURL(state.tileset);
+		}
+
+		return {...state, tileset: action.payload.tileset};
+	case "SWITCHTILE":
+		var xCoord = state.tile.xCoord;
+		var yCoord = state.tile.yCoord;
+		if (action.payload.tile?.xCoord !== undefined && action.payload.tile?.yCoord !== undefined)
+		{
+			xCoord = action.payload.tile?.xCoord;
+			yCoord = action.payload.tile?.yCoord;
+		}
+
+		return {...state, tile: {...state.tile, xCoord: xCoord, yCoord: yCoord}}
+	case "ROTATETILE":
+		var rotation = state.tile.rotation;
+		if (action.payload.tile?.rotation)
+		{
+			rotation = action.payload.tile.rotation;
+		}
+		return {...state, tile: {...state.tile, rotation: rotation}};
 	default:
 		return state;
 	}

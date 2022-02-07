@@ -4,7 +4,7 @@ import {getCoords} from "../../Helpers/TileHelper";
 import {sceneState} from "../../Redux/Levels/levelReducer";
 import {moveScene, selectScene} from "../../Redux/Levels/levelsActions";
 import {rootState} from "../../Redux/store";
-import {toolState} from "../../Redux/Tools/toolReducer";
+import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
@@ -13,12 +13,6 @@ export interface ILevelProps
 	yOffset: number;
 	scale: number;
 	selected: boolean;
-}
-
-interface tempLevelPosition
-{
-	xPos: number;
-	yPos: number;
 }
 
 interface ILevelSize
@@ -41,23 +35,18 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 	const [drag, setDrag] = useState(false);
 	const dragRef = useRef({x: 0, y: 0});
 
-	// Prepare square
-	const canvas = document.createElement("canvas");
-	canvas.width = squareSize;
-	canvas.height = squareSize;
-
-	const context = canvas.getContext("2d");
-	const imageData = toolbarSettings.tile.asset;
-	if (context !== undefined && imageData !== undefined)
+	// Load image
+	const image = new Image();
+	if (toolbarSettings.tileset)
 	{
-		context?.putImageData(imageData, 0, 0);
+		image.src = toolbarSettings.tileset;
 	}
 
 	// Initilise References for level
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 	const mouseDownRef = useRef(false);
-	const layersRef = useRef<Number[][]>();
+	const layersRef = useRef<tileState[][]>(Array(320).fill(0).map(row => new Array(320).fill({xCoord: -1, yCoord: -1, rotation: 0})));
 	const previewRef = useRef({x: -1, y: -1});
 
 	// Initialise States for level
@@ -74,17 +63,6 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 		const context = canvas.getContext("2d");
 		contextRef.current = context;
 
-		// Prepare level array
-		layersRef.current = new Array(size.width);
-		for (let i = 0; i < size.width; i++)
-		{
-			layersRef.current[i] = new Array(size.height);
-			for (let j = 0; j < size.height; j++)
-			{
-				layersRef.current[i][j] = 0;
-			}
-		}
-
 		const layers = layersRef.current;
 		if (context != null)
 		{
@@ -93,13 +71,12 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 			{
 				for (let j = 0; j < layers[i].length; j++)
 				{
-					if (layers[i][j] === 0)
+					if (layers[i][j].xCoord === -1 || layers[i][j].yCoord === -1)
 					{
 						continue;
 					}
 
-					context.fillStyle = "white"; // REMOVE ME: For now drawn is white
-					context.fillRect(i * squareSize, j * squareSize, squareSize, squareSize);
+					draw(layers[i][j], i, j);
 				}
 			}
 		}
@@ -122,7 +99,7 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
 
 			// Draw preview tile
-			context.drawImage(canvas, x * squareSize, y * squareSize);
+			draw(toolbarSettings.tile, x, y);
 		}
 	}
 
@@ -133,12 +110,9 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 	 */
 	const addTile = (x: number, y: number) =>
 	{
-		const layers = layersRef.current;
-		if (layers != null)
-		{
-			layers[x][y] = 1;
-			restoreTile(x, y);
-		}
+		layersRef.current[x][y] = {...toolbarSettings.tile};
+		restoreTile(x, y);
+
 	}
 
 	/**
@@ -148,12 +122,8 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 	 */
 	const removeTile = (x: number, y: number) =>
 	{
-		const layers = layersRef.current;
-		if (layers != null)
-		{
-			layers[x][y] = 0;
-			restoreTile(x, y);
-		}
+		layersRef.current[x][y] = {xCoord: -1, yCoord: -1, rotation: 0};
+		restoreTile(x, y);
 	}
 
 	/**
@@ -163,22 +133,47 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 	 */
 	const restoreTile = (x: number, y: number) =>
 	{
-		if (x === -1 && y === -1)
+		if (x === -1 || y === -1)
 		{
 			return;
 		}
 
 		const context = contextRef.current;
-		const layers = layersRef.current;
-		if (context != null && layers != null)
+		if (context != null)
 		{
-			// Remove tile in space
+			// replace tile
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			draw(layersRef.current[x][y], x, y);
+		}
+	}
 
-			if (layers[x][y] !== 0)
+	/**
+	 * draw completes a drawing of a single tile on the canvas
+	 * @param tile Tile being drawn onto the screen
+	 * @param x the x position in tileset coordinates
+	 * @param y the y position in tileset coordinates
+	 */
+	const draw = (tile: tileState, x: number, y: number) =>
+	{
+		if (tile.xCoord === -1 || tile.yCoord === -1)
+		{
+			return;
+		}
+
+		const context = canvasRef.current?.getContext("2d");
+		if (context)
+		{
+			const TO_RADIANS = Math.PI/180;
+			if (tile.rotation !== 0)
 			{
-				context.fillStyle = "white"; // REMOVE ME (For now drawn is white)
-				context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+				context.save();
+				context.translate(x * squareSize, y * squareSize);
+				context.rotate(tile.rotation * TO_RADIANS);
+			}
+			context.drawImage(image, tile.xCoord * squareSize, tile.yCoord * squareSize, squareSize, squareSize, x * squareSize, y * squareSize, squareSize, squareSize);
+			if (tile.rotation !== 0)
+			{
+				context.restore();
 			}
 		}
 	}

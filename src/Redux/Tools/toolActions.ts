@@ -3,11 +3,15 @@
  */
 export interface toolAction
 {
-	type: "SWITCHTOOL" | "SWITCHASSET" | "ROTATEASSET";
+	type: "SWITCHTOOL" | "SWITCHTILESET" | "SWITCHTILE" | "ROTATETILE";
 	payload: {
 		tool?: string;
-		asset?: ImageData;
-		rotation?: number;
+		tileset?: string;
+		tile?: {
+			xCoord?: number;
+			yCoord?: number;
+			rotation?: number;
+		}
 	};
 }
 
@@ -21,12 +25,24 @@ export const switchTool = (tool: string): toolAction =>
 	return {type: "SWITCHTOOL", payload: {tool: tool}};
 }
 
+// TODO: DOCS
+export const switchTileset = (tileset: string): toolAction =>
+{
+	return {type: "SWITCHTILESET", payload: {tileset: tileset}};
+}
+
 /**
  * switchAsset generates a action for switching assets in the toolReducer
  * @param asset ImageData object representing the asset being placed on the level
  * @returns returns a formatted action for the switchAsset action
  */
-export const switchAsset = (asset: ImageData): toolAction =>
+export const switchTile = (xCoord: number, yCoord: number): toolAction =>
 {
-	return {type: "SWITCHASSET", payload: {asset: asset}};
+	return {type: "SWITCHTILE", payload: {tile: {xCoord: xCoord, yCoord: yCoord}}};
+}
+
+// TODO: DOCS
+export const rotationTile = (rotation: number) =>
+{
+	return {type: "ROTATETILE", payload: {tile: {rotation: rotation}}};
 }
