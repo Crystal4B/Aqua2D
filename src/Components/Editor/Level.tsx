@@ -291,7 +291,10 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			return;
 		}
 
-		restoreTile(previewRef.current.x, previewRef.current.y);
+		if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
+		{
+			restoreTile(previewRef.current.x, previewRef.current.y);
+		}
 		resetDrawing();
 	}
 
