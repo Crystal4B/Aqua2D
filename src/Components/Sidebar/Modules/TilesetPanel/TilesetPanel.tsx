@@ -1,12 +1,17 @@
 import Toolbar from '../Toolbar';
 import './TilesetPanel.css'
 import {getCoords} from '../../../../Helpers/TileHelper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import React, { useRef, useState } from 'react';
 import { switchTile, switchTileset } from '../../../../Redux/Tools/toolActions';
+import { extractFilesAsURL } from '../../../../Helpers/InputHelper';
+import { rootState } from '../../../../Redux/store';
+import { toolState } from '../../../../Redux/Tools/toolReducer';
 
 const TilesetPanel = () =>
 {
+	const tilesetUrl = useSelector<rootState, toolState["tileset"]>(state => state.toolbar.tileset);
+
 	const assetRef = useRef<HTMLImageElement>(null);
 	const inputRef = useRef(null);
 	const [selection, setSelection] = useState({xPos: 0, yPos: 0, selected: false});
@@ -25,40 +30,17 @@ const TilesetPanel = () =>
 		e.stopPropagation();
 	}
 
-	const validateImage = (file: File) =>
-	{
-		const VALID_TYPES = ['image/jpeg', 'image/png'];
-		return VALID_TYPES.indexOf(file.type) !== -1;
-	}
-
 	const handleDrop = (e: React.DragEvent<HTMLInputElement>) =>
 	{
 		e.preventDefault();
 		e.stopPropagation();
 
 		const {dataTransfer} = e;
-		const files = dataTransfer.files;
-
-		if (files.length)
+		const url = extractFilesAsURL(dataTransfer);
+		if (url)
 		{
-			var file = files[0];
-			if (validateImage(file))
-			{
-				const url = URL.createObjectURL(file);
-				dispatch(switchTileset(url));
-
-				const image = assetRef.current;
-				if (image)
-				{
-					image.src = url;
-				}
-			}
+			dispatch(switchTileset(url));
 		}
-	}
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-	{
-		console.log(e);
 	}
 
 	return (
@@ -68,15 +50,11 @@ const TilesetPanel = () =>
 				<Toolbar />
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
-					<img ref={assetRef} onClick={handleOnClick}/>
 					<input
 						type={"file"}
-						id="tileset-input"
-						name="tileset"
-						ref={inputRef}
-						onDragOver={handleDragOver}
-						onDrop={handleDrop}
-						onChange={handleChange}/>
+						
+						onDrop={handleDrop}/>
+					<img ref={assetRef} onClick={handleOnClick} src={tilesetUrl}/>
 				</div>
 			</div>
 		</div> 
