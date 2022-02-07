@@ -12,6 +12,12 @@ export interface ILevelProps
 	selected: boolean;
 }
 
+interface tempLevelPosition
+{
+	xPos: number;
+	yPos: number;
+}
+
 interface ILevelSize
 {
 	width: number;
@@ -26,6 +32,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	const squareSize = 32;
 
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar)
+	const [position, setPosition] = useState<tempLevelPosition>({xPos: 200, yPos: 200});
 
 	// Prepare square
 	const canvas = document.createElement("canvas");
@@ -39,15 +46,10 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 		context?.putImageData(imageData, 0, 0);
 	}
 
-	// Initilise modes drawing modes
-	const DRAWING = 1;
-	const PREVIEW = 0;
-	const ERASING = -1;
-
 	// Initilise References for level
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
-	const modeRef = useRef(PREVIEW);
+	const mouseDownRef = useRef(false);
 	const layersRef = useRef<Number[][]>();
 	const previewRef = useRef({x: -1, y: -1});
 
@@ -171,7 +173,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const resetDrawing = () =>
 	{
-		modeRef.current = PREVIEW;
+		mouseDownRef.current = false;
 		previewRef.current.x = -1;
 		previewRef.current.y = -1;
 	}
@@ -188,16 +190,25 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 
 		event.stopPropagation();
 
+		if (event.button === 0 || event.button === 2)
+		{
+			mouseDownRef.current = true;
+		}
+
 		const [x, y] = getCoords(event);
 		switch(event.button)
 		{
 		case 0:
-			modeRef.current = DRAWING;
-			addTile(x, y);
+			if (toolbarSettings.tool === "Draw")
+			{
+				addTile(x, y);
+			}
 			break;
 		case 2:
-			modeRef.current = ERASING;
-			removeTile(x, y);
+			if (toolbarSettings.tool === "Erase")
+			{
+				removeTile(x, y);
+			}
 			break;
 		}
 	}
@@ -207,7 +218,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const handleMouseUp = (event: React.MouseEvent) =>
 	{
-		modeRef.current = PREVIEW;
+		mouseDownRef.current = false;
 	}
 
 	/**
@@ -229,29 +240,42 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			return;
 		}
 
-		switch(modeRef.current)
+		switch(toolbarSettings.tool)
 		{
-		case DRAWING:
-			addTile(x, y);
-			break;
-		case ERASING:
-			removeTile(x, y);
-			break;
-		case PREVIEW:
-			// Update preview only when mouse enters a new square
-			if (x !== previewRef.current.x || y !== previewRef.current.y)
+		case "Move":
+			if (mouseDownRef.current)
 			{
-				// Restore tile if preview is already drawn on canvas
-				if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
+				setPosition({xPos: position.xPos + event.movementX, yPos: position.yPos + event.movementY});
+			}
+			break;
+		case "Draw":
+			if (mouseDownRef.current)
+			{
+				addTile(x, y);
+			}
+			else
+			{
+				// Update preview only when mouse enters a new square
+				if (x !== previewRef.current.x || y !== previewRef.current.y)
 				{
-					restoreTile(previewRef.current.x, previewRef.current.y);
-				}
-	
-				// Update preview position
-				previewRef.current.x = x;
-				previewRef.current.y = y;
+					// Restore tile if preview is already drawn on canvas
+					if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
+					{
+						restoreTile(previewRef.current.x, previewRef.current.y);
+					}
 
-				previewTile(x, y);
+					// Update preview position
+					previewRef.current.x = x;
+					previewRef.current.y = y;
+
+					previewTile(x, y);
+				}
+			}
+			break;
+		case "Erase":
+			if (mouseDownRef.current)
+			{
+				removeTile(x, y);
 			}
 		}
 	}
@@ -285,7 +309,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			className={`level ${selected ? "selected" : ""}`}
 			width={size.width}
 			height={size.height}
-			style={{left: `${400 + xOffset}px`, top: `${400 + yOffset}px`, width: `${size.width * scale}px`, height: `${size.height * scale}px`}}
+			style={{left: `${position.xPos + xOffset}px`, top: `${position.yPos + yOffset}px`, width: `${size.width * scale}px`, height: `${size.height * scale}px`}}
 			ref={canvasRef}
 
 			onMouseDown={handleMouseDown}
