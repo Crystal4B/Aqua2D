@@ -9,14 +9,27 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { rootState } from '../../../Redux/store';
 import { toolState } from '../../../Redux/Tools/toolReducer';
-import { switchTool } from '../../../Redux/Tools/toolActions';
+import { switchTileset, switchTool } from '../../../Redux/Tools/toolActions';
+import { extractFilesAsURL } from '../../../Helpers/InputHelper';
 
-const Toolbar = () => {
+const Toolbar = () =>
+{
 	const tool = useSelector<rootState, toolState["tool"]>(state => state.toolbar.tool);
 	const dispatch = useDispatch();
 
-	const updateToolSelection = (tool: string) => {
+	const updateToolSelection = (tool: string) =>
+	{
 		dispatch(switchTool(tool));
+	}
+
+	const handleInput = ({target}: React.FormEvent<HTMLInputElement>) =>
+	{
+		const input = target as HTMLInputElement;
+		const url = extractFilesAsURL(input);
+		if (url)
+		{
+			dispatch(switchTileset(url));
+		}
 	}
 
 	return (
@@ -29,7 +42,10 @@ const Toolbar = () => {
 			<CgEditFlipV className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
 			<BiRotateRight className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
 			<BiRotateLeft className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
-			<AiOutlineFolderOpen className='button'/>
+			<input type={"file"} id="file" onChange={handleInput}/>
+			<label htmlFor='file'>
+				<AiOutlineFolderOpen className='button'/>
+			</label>
 		</div>
 	)
 }

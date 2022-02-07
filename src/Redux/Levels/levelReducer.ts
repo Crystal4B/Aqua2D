@@ -15,12 +15,13 @@ export interface levelState {
 	levelName: string;
 	levelSelected: boolean;
 	scenes: Array<sceneState>;
+	selectedIndex: number;
 }
 
 /**
  * Interface representing a scene in a level
  */
-interface sceneState {
+export interface sceneState {
 	sceneName: string;
 	sceneSelected: boolean;
 	xPos: number;
@@ -35,19 +36,20 @@ const createNewLevel = (name: string): levelState => {
 	return {
 		levelName: name,
 		levelSelected: true,
-		scenes: []
+		scenes: [],
+		selectedIndex: -1
 	}
 }
 
 /**
  * Create a scene with default parameters
  */
-const createNewScene = (name: string): sceneState => {
+const createNewScene = (name: string, x: number, y: number): sceneState => {
 	return {
 		sceneName: name,
 		sceneSelected: false,
-		xPos: -1,
-		yPos: -1
+		xPos: x,
+		yPos: y
 	}
 }
 
@@ -93,7 +95,14 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 				}
 			}
 
-			const newScene = createNewScene(sceneName);
+			var xPos = -1, yPos = -1;
+			if (payload.position !== undefined)
+			{
+				xPos = payload.position.xPos;
+				yPos = payload.position.yPos;
+			}
+
+			const newScene = createNewScene(sceneName, xPos, yPos);
 			return {
 				...state,
 				levels: state.levels.map(
@@ -101,15 +110,46 @@ const levelReducer = (state: levelsState = initialState, action: levelAction): l
 				)
 			}
 		}
-	case "SELECT":
+	case "MOVE":
+		var xPos = -1, yPos = -1;
+		if (payload.position !== undefined)
+		{
+			xPos = payload.position.xPos;
+			yPos = payload.position.yPos
+		}
 		return {
 			...state,
 			levels: state.levels.map(
-				(level) => level.levelName === payload.parent ? {...level, scenes: level.scenes.map(
-					(scene) => scene.sceneName === payload.target ? {...scene, sceneSelected: !scene.sceneSelected} : scene
+				(level, index) => index === state.selectedIndex ? {...level, scenes: level.scenes.map(
+					(scene) => scene.sceneName === payload.target ? {...scene, xPos: xPos, yPos: yPos} : scene
 				)} : level
 			)
 		};
+	case "SELECT":
+		if (payload.parent === "ROOT")
+		{
+			const newIndex = state.levels.findIndex((level) => level.levelName === payload.target);
+			return {
+				...state,
+				levels: state.levels.map(
+					(level, index) => index === state.selectedIndex ? {...level, scenes: level.scenes.map(
+						(scene) => scene.sceneSelected ? {...scene, sceneSelected: false} : scene
+					)
+				} : level),
+				selectedIndex: newIndex
+			};	
+		}
+		else
+		{
+			return {
+				...state,
+				levels: state.levels.map(
+					(level, index) => index === state.selectedIndex ? {...level, scenes: level.scenes.map(
+						(scene) => (scene.sceneName === payload.target) !== (scene.sceneSelected) ? {...scene, sceneSelected: !scene.sceneSelected} : scene
+					), selectedIndex: level.scenes.findIndex((scene) => scene.sceneName === payload.target && scene.sceneSelected == true)} : level
+				)
+			};
+		}
 	case "RENAME":
 		var target = payload.parent;
 		if (target === "ROOT")

@@ -1,21 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import React, {useEffect, useRef, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
-import { rootState } from "../../Redux/store";
-import { toolState } from "../../Redux/Tools/toolReducer";
+import {sceneState} from "../../Redux/Levels/levelReducer";
+import {moveScene, selectScene} from "../../Redux/Levels/levelsActions";
+import {rootState} from "../../Redux/store";
+import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
+	sceneIndex: number;
 	xOffset: number;
 	yOffset: number;
 	scale: number;
 	selected: boolean;
-}
-
-interface tempLevelPosition
-{
-	xPos: number;
-	yPos: number;
 }
 
 interface ILevelSize
@@ -27,31 +24,29 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
+export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelProps) =>
 {
 	const squareSize = 32;
 
-	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar)
-	const [position, setPosition] = useState<tempLevelPosition>({xPos: 200, yPos: 200});
+	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
+	const sceneData = useSelector<rootState, sceneState>(state => state.levels.levels[state.levels.selectedIndex].scenes[sceneIndex]);
+	const dispatch = useDispatch();
+
 	const [drag, setDrag] = useState(false);
+	const dragRef = useRef({x: 0, y: 0});
 
-	// Prepare square
-	const canvas = document.createElement("canvas");
-	canvas.width = squareSize;
-	canvas.height = squareSize;
-
-	const context = canvas.getContext("2d");
-	const imageData = toolbarSettings.tile.asset;
-	if (context !== undefined && imageData !== undefined)
+	// Load image
+	const image = new Image();
+	if (toolbarSettings.tileset)
 	{
-		context?.putImageData(imageData, 0, 0);
+		image.src = toolbarSettings.tileset;
 	}
 
 	// Initilise References for level
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 	const mouseDownRef = useRef(false);
-	const layersRef = useRef<Number[][]>();
+	const layersRef = useRef<tileState[][]>(Array(320).fill(0).map(row => new Array(320).fill({xCoord: -1, yCoord: -1, rotation: 0})));
 	const previewRef = useRef({x: -1, y: -1});
 
 	// Initialise States for level
@@ -68,17 +63,6 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 		const context = canvas.getContext("2d");
 		contextRef.current = context;
 
-		// Prepare level array
-		layersRef.current = new Array(size.width);
-		for (let i = 0; i < size.width; i++)
-		{
-			layersRef.current[i] = new Array(size.height);
-			for (let j = 0; j < size.height; j++)
-			{
-				layersRef.current[i][j] = 0;
-			}
-		}
-
 		const layers = layersRef.current;
 		if (context != null)
 		{
@@ -87,13 +71,12 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			{
 				for (let j = 0; j < layers[i].length; j++)
 				{
-					if (layers[i][j] === 0)
+					if (layers[i][j].xCoord === -1 || layers[i][j].yCoord === -1)
 					{
 						continue;
 					}
 
-					context.fillStyle = "white"; // REMOVE ME: For now drawn is white
-					context.fillRect(i * squareSize, j * squareSize, squareSize, squareSize);
+					draw(layers[i][j], i, j);
 				}
 			}
 		}
@@ -106,6 +89,9 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const previewTile = (x: number, y: number) =>
 	{
+		previewRef.current.x = x;
+		previewRef.current.y = y;
+
 		const context = contextRef.current;
 		if (context != null)
 		{
@@ -113,7 +99,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
 
 			// Draw preview tile
-			context.drawImage(canvas, x * squareSize, y * squareSize);
+			draw(toolbarSettings.tile, x, y);
 		}
 	}
 
@@ -124,12 +110,9 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const addTile = (x: number, y: number) =>
 	{
-		const layers = layersRef.current;
-		if (layers != null)
-		{
-			layers[x][y] = 1;
-			restoreTile(x, y);
-		}
+		layersRef.current[x][y] = {...toolbarSettings.tile};
+		restoreTile(x, y);
+
 	}
 
 	/**
@@ -139,12 +122,8 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const removeTile = (x: number, y: number) =>
 	{
-		const layers = layersRef.current;
-		if (layers != null)
-		{
-			layers[x][y] = 0;
-			restoreTile(x, y);
-		}
+		layersRef.current[x][y] = {xCoord: -1, yCoord: -1, rotation: 0};
+		restoreTile(x, y);
 	}
 
 	/**
@@ -154,17 +133,47 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const restoreTile = (x: number, y: number) =>
 	{
-		const context = contextRef.current;
-		const layers = layersRef.current;
-		if (context != null && layers != null)
+		if (x === -1 || y === -1)
 		{
-			// Remove tile in space
-			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			return;
+		}
 
-			if (layers[x][y] !== 0)
+		const context = contextRef.current;
+		if (context != null)
+		{
+			// replace tile
+			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			draw(layersRef.current[x][y], x, y);
+		}
+	}
+
+	/**
+	 * draw completes a drawing of a single tile on the canvas
+	 * @param tile Tile being drawn onto the screen
+	 * @param x the x position in tileset coordinates
+	 * @param y the y position in tileset coordinates
+	 */
+	const draw = (tile: tileState, x: number, y: number) =>
+	{
+		if (tile.xCoord === -1 || tile.yCoord === -1)
+		{
+			return;
+		}
+
+		const context = canvasRef.current?.getContext("2d");
+		if (context)
+		{
+			const TO_RADIANS = Math.PI/180;
+			if (tile.rotation !== 0)
 			{
-				context.fillStyle = "white"; // REMOVE ME (For now drawn is white)
-				context.fillRect(x * squareSize, y * squareSize, squareSize, squareSize);
+				context.save();
+				context.translate(x * squareSize, y * squareSize);
+				context.rotate(tile.rotation * TO_RADIANS);
+			}
+			context.drawImage(image, tile.xCoord * squareSize, tile.yCoord * squareSize, squareSize, squareSize, x * squareSize, y * squareSize, squareSize, squareSize);
+			if (tile.rotation !== 0)
+			{
+				context.restore();
 			}
 		}
 	}
@@ -172,16 +181,16 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	/**
 	 * Used to reset the drawing references for the level
 	 */
-	const resetDrawing = () =>
+	const resetDrawing = (hard: boolean = false) =>
 	{
-		if (drag)
-		{
-			setDrag(false);
-		}
-
 		mouseDownRef.current = false;
-		previewRef.current.x = -1;
-		previewRef.current.y = -1;
+		setDrag(false);
+		
+		if (hard)
+		{
+			previewRef.current.x = -1;
+			previewRef.current.y = -1;
+		}
 	}
 
 	/**
@@ -190,11 +199,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const handleMouseDown = (event: React.MouseEvent) =>
 	{
-		if (!selected) {
-			return;
-		}
-
-		event.stopPropagation();
+		dispatch(selectScene(sceneData.sceneName));
 
 		if (event.button === 0 || event.button === 2)
 		{
@@ -212,6 +217,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			else if (toolbarSettings.tool === "Move")
 			{
 				setDrag(true);
+				dragRef.current = {x: event.clientX, y: event.clientY};
 			}
 			break;
 		case 2:
@@ -228,11 +234,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const handleMouseUp = (event: React.MouseEvent) =>
 	{
-		mouseDownRef.current = false;
-		if (drag)
-		{
-			setDrag(false);
-		}
+		resetDrawing();
 	}
 
 	/**
@@ -259,17 +261,12 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 		case "Move":
 			if (mouseDownRef.current)
 			{
-				const parent = canvas.parentElement;
-				if (parent !== null)
-				{
-					const {x, y} = parent.getBoundingClientRect();
-					
-					const mouseX = event.clientX - x;
-					const mouseY = event.clientY - y;
-		
-					setPosition({xPos: mouseX, yPos: mouseY});
-				}
+				const {x, y} = dragRef.current;
+				const mouseX = event.clientX - x;
+				const mouseY = event.clientY - y;
+				dragRef.current = {x: event.clientX, y: event.clientY}
 
+				dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
 			}
 			break;
 		case "Draw":
@@ -283,15 +280,9 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 				if (x !== previewRef.current.x || y !== previewRef.current.y)
 				{
 					// Restore tile if preview is already drawn on canvas
-					if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
-					{
-						restoreTile(previewRef.current.x, previewRef.current.y);
-					}
+					restoreTile(previewRef.current.x, previewRef.current.y);
 
-					// Update preview position
-					previewRef.current.x = x;
-					previewRef.current.y = y;
-
+					// Update preview
 					previewTile(x, y);
 				}
 			}
@@ -315,11 +306,8 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			return;
 		}
 
-		if (previewRef.current.x !== -1 && previewRef.current.y !== -1)
-		{
-			restoreTile(previewRef.current.x, previewRef.current.y);
-		}
-		resetDrawing();
+		restoreTile(previewRef.current.x, previewRef.current.y);
+		resetDrawing(true);
 	}
 
 	/**
@@ -336,7 +324,12 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			className={`level ${selected ? "selected" : ""}`}
 			width={size.width}
 			height={size.height}
-			style={{left: `${position.xPos + xOffset}px`, top: `${position.yPos + yOffset}px`, width: `${size.width * scale}px`, height: `${size.height * scale}px`}}
+			style={{
+				left: `${(sceneData.xPos + xOffset)}px`,
+				top: `${(sceneData.yPos + yOffset)}px`,
+				width: `${size.width * scale}px`,
+				height: `${size.height * scale}px`
+			}}
 			ref={canvasRef}
 
 			onMouseDown={handleMouseDown}
@@ -348,5 +341,4 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	);
 }
 
-// Export the level class
 export default Level;

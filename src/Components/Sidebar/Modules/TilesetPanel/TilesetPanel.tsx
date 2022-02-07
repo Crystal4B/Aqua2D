@@ -1,13 +1,19 @@
 import Toolbar from '../Toolbar';
 import './TilesetPanel.css'
 import {getCoords} from '../../../../Helpers/TileHelper';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import React, { useRef, useState } from 'react';
-import { switchAsset } from '../../../../Redux/Tools/toolActions';
+import { switchTile, switchTileset } from '../../../../Redux/Tools/toolActions';
+import { extractFilesAsURL } from '../../../../Helpers/InputHelper';
+import { rootState } from '../../../../Redux/store';
+import { toolState } from '../../../../Redux/Tools/toolReducer';
 
 const TilesetPanel = () =>
 {
+	const tilesetUrl = useSelector<rootState, toolState["tileset"]>(state => state.toolbar.tileset);
+
 	const assetRef = useRef<HTMLImageElement>(null);
+	const inputRef = useRef(null);
 	const [selection, setSelection] = useState({xPos: 0, yPos: 0, selected: false});
 	const dispatch = useDispatch();
 
@@ -15,20 +21,25 @@ const TilesetPanel = () =>
 		const [x, y] = getCoords(e);
 		setSelection({xPos: x*32, yPos: y*32, selected: true});
 		
-		// MOVE TO FUNCTION
-		const canvas = document.createElement('canvas');
-		canvas.width = 32;
-		canvas.height = 32;
-		
-		// Prepare canvas for drawing
-		const context = canvas.getContext("2d");
-		// Get asset
-		const asset = assetRef.current;
-		if (asset !== null && context !== null)
+		dispatch(switchTile(x, y));
+	}
+
+	const handleDragOver = (e: React.MouseEvent) =>
+	{
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
+	const handleDrop = (e: React.DragEvent<HTMLInputElement>) =>
+	{
+		e.preventDefault();
+		e.stopPropagation();
+
+		const {dataTransfer} = e;
+		const url = extractFilesAsURL(dataTransfer);
+		if (url)
 		{
-			context.drawImage(asset, x * 32, y * 32, 32, 32, 0, 0, 32, 32);
-			const data = context.getImageData(0,0,32,32);
-			dispatch(switchAsset(data));
+			dispatch(switchTileset(url));
 		}
 	}
 
@@ -39,7 +50,11 @@ const TilesetPanel = () =>
 				<Toolbar />
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
-					<img ref={assetRef} onClick={handleOnClick} src={require("./TileEditorSpritesheet.png")}/>
+					<input
+						type={"file"}
+						
+						onDrop={handleDrop}/>
+					<img ref={assetRef} onClick={handleOnClick} src={tilesetUrl}/>
 				</div>
 			</div>
 		</div> 

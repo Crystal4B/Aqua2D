@@ -7,7 +7,7 @@ import { rootState } from '../../../../Redux/store';
 import { levelsState } from '../../../../Redux/Levels/levelReducer';
 import { setOptions } from '../../../../Redux/Menu/menuActions';
 import { optionState } from '../../../../Redux/Menu/menuReducer';
-import { addLevel, selectScene } from '../../../../Redux/Levels/levelsActions';
+import { addLevel, selectLevel, selectScene } from '../../../../Redux/Levels/levelsActions';
 
 const LevelsPanel = () =>
 {
@@ -34,7 +34,8 @@ const LevelsPanel = () =>
 
 	const onSelectScene = (level: string, scene: string) =>
 	{
-		dispatch(selectScene(level, scene));
+		dispatch(selectLevel(level));
+		dispatch(selectScene(scene));
 	}
 
 	const contextMenu: Array<optionState> = [{optionName: "Add Level", optionFunction: onAddLevel}, {optionName: "Add Scene", optionFunction: onAddScene}];

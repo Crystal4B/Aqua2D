@@ -17,3 +17,12 @@
 	height: 32px;
 	border: 2px dashed lightblue;
 }
+
+#file {
+	width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+}
