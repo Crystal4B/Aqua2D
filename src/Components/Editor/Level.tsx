@@ -1,11 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import React, {useEffect, useRef, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
-import { rootState } from "../../Redux/store";
-import { toolState } from "../../Redux/Tools/toolReducer";
+import {sceneState} from "../../Redux/Levels/levelReducer";
+import {moveScene, selectScene} from "../../Redux/Levels/levelsActions";
+import {rootState} from "../../Redux/store";
+import {toolState} from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
+	sceneIndex: number;
 	xOffset: number;
 	yOffset: number;
 	scale: number;
@@ -27,13 +30,16 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
+export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelProps) =>
 {
 	const squareSize = 32;
 
-	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar)
-	const [position, setPosition] = useState<tempLevelPosition>({xPos: 200, yPos: 200});
+	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
+	const sceneData = useSelector<rootState, sceneState>(state => state.levels.levels[state.levels.selectedIndex].scenes[sceneIndex]);
+	const dispatch = useDispatch();
+
 	const [drag, setDrag] = useState(false);
+	const dragRef = useRef({x: 0, y: 0});
 
 	// Prepare square
 	const canvas = document.createElement("canvas");
@@ -157,7 +163,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const restoreTile = (x: number, y: number) =>
 	{
-		if (x != -1 && y != -1)
+		if (x === -1 && y === -1)
 		{
 			return;
 		}
@@ -198,11 +204,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 	 */
 	const handleMouseDown = (event: React.MouseEvent) =>
 	{
-		if (!selected) {
-			return;
-		}
-
-		event.stopPropagation();
+		dispatch(selectScene(sceneData.sceneName));
 
 		if (event.button === 0 || event.button === 2)
 		{
@@ -220,6 +222,7 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			else if (toolbarSettings.tool === "Move")
 			{
 				setDrag(true);
+				dragRef.current = {x: event.clientX, y: event.clientY};
 			}
 			break;
 		case 2:
@@ -263,17 +266,12 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 		case "Move":
 			if (mouseDownRef.current)
 			{
-				const parent = canvas.parentElement;
-				if (parent !== null)
-				{
-					const {x, y} = parent.getBoundingClientRect();
-					
-					const mouseX = event.clientX - x;
-					const mouseY = event.clientY - y;
-		
-					setPosition({xPos: mouseX, yPos: mouseY});
-				}
+				const {x, y} = dragRef.current;
+				const mouseX = event.clientX - x;
+				const mouseY = event.clientY - y;
+				dragRef.current = {x: event.clientX, y: event.clientY}
 
+				dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
 			}
 			break;
 		case "Draw":
@@ -332,8 +330,8 @@ export const Level = ({xOffset, yOffset, scale, selected}: ILevelProps) =>
 			width={size.width}
 			height={size.height}
 			style={{
-				left: `${position.xPos + xOffset}px`,
-				top: `${position.yPos + yOffset}px`,
+				left: `${(sceneData.xPos + xOffset)}px`,
+				top: `${(sceneData.yPos + yOffset)}px`,
 				width: `${size.width * scale}px`,
 				height: `${size.height * scale}px`
 			}}

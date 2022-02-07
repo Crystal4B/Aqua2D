@@ -8,6 +8,7 @@ import { switchAsset } from '../../../../Redux/Tools/toolActions';
 const TilesetPanel = () =>
 {
 	const assetRef = useRef<HTMLImageElement>(null);
+	const inputRef = useRef(null);
 	const [selection, setSelection] = useState({xPos: 0, yPos: 0, selected: false});
 	const dispatch = useDispatch();
 
@@ -32,6 +33,22 @@ const TilesetPanel = () =>
 		}
 	}
 
+	const handleDragOver = (e: React.MouseEvent) =>
+	{
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
+	const handleDrop = (e: any) =>
+	{
+		console.log(e);
+	}
+
+	const handleChange = (e: any) =>
+	{
+
+	}
+
 	return (
 		<div className="panel">
 			<div className="header">Tileset</div>
@@ -39,7 +56,14 @@ const TilesetPanel = () =>
 				<Toolbar />
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
-					<img ref={assetRef} onClick={handleOnClick} src={require("./TileEditorSpritesheet.png")}/>
+					<input
+						type={"file"}
+						id="tileset-input"
+						name="tileset"
+						ref={inputRef}
+						onDragOver={handleDragOver}
+						onDrop={handleDrop}
+						onChange={handleChange}/>
 				</div>
 			</div>
 		</div> 
