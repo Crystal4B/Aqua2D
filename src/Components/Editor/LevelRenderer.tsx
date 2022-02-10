@@ -3,7 +3,7 @@ import {Level, ILevelProps} from './Level';
 import './Editor.css';
 import { setOptions } from '../../Redux/Menu/menuActions';
 import { optionState } from '../../Redux/Menu/menuReducer';
-import { addScene } from '../../Redux/Levels/levelsActions';
+import { addScene, moveScene } from '../../Redux/Levels/levelsActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../Redux/store';
 import { levelState } from '../../Redux/Levels/levelReducer';
@@ -90,6 +90,44 @@ const LevelRenderer = () =>
 		dispatch(setOptions(contextMenu));
 	}
 
+	const handleSceneMove = (sceneIndex: number, xPos: number, yPos: number) =>
+	{
+		const radius = 160;
+		const tolerance = 20;
+
+		for (let i = 0; i < level.scenes.length; i++)
+		{
+			if (i === sceneIndex)
+			{
+				continue;
+			}
+
+			const scene = level.scenes[i];
+			// Top
+			if (scene.yPos > yPos && yPos + radius > scene.yPos - radius - tolerance && (scene.xPos - radius - tolerance <= xPos && xPos <= scene.xPos + radius + tolerance))
+			{
+				yPos = scene.yPos - (radius * 2)
+			}
+			// Bottom
+			else if (scene.yPos < yPos && yPos - radius < scene.yPos + radius + tolerance && (scene.xPos - radius - tolerance <= xPos && xPos <= scene.xPos + radius + tolerance))
+			{
+				yPos = scene.yPos + (radius * 2)
+			}
+			// Left
+			else if (scene.xPos > xPos && xPos + radius >= scene.xPos - radius - tolerance && (scene.yPos - radius - tolerance <= yPos && yPos <= scene.yPos + radius + tolerance))
+			{
+				xPos = scene.xPos - (radius * 2)
+			}
+			// Right
+			else if (scene.xPos < xPos && xPos - radius <= scene.xPos + radius + tolerance && scene.yPos- radius - tolerance <= yPos && yPos <= scene.yPos + radius + tolerance)
+			{
+				xPos = scene.xPos + (radius * 2)
+			}
+		}
+
+		dispatch(moveScene(level.scenes[sceneIndex].sceneName,xPos, yPos));
+	}
+
 	return(
 		<div
 			ref={viewerRef}
@@ -102,7 +140,7 @@ const LevelRenderer = () =>
 			onMouseOut={handleMouseOut}>
 
 			{level.scenes.map((scene, index) => {
-				return <Level key={scene.sceneName} sceneIndex={index} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={scene.sceneSelected} />
+				return <Level key={scene.sceneName} sceneIndex={index} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={scene.sceneSelected} move={handleSceneMove}/>
 			})}
 		</div>
 	);

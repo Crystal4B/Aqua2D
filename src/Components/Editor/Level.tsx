@@ -13,6 +13,7 @@ export interface ILevelProps
 	yOffset: number;
 	scale: number;
 	selected: boolean;
+	move: (sceneIndex: number, xPos: number, yPos: number) => void;
 }
 
 interface ILevelSize
@@ -24,7 +25,7 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelProps) =>
+export const Level = ({sceneIndex, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
 {
 	const squareSize = 32;
 
@@ -266,7 +267,9 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 				const mouseY = event.clientY - y;
 				dragRef.current = {x: event.clientX, y: event.clientY}
 
-				dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
+				move(sceneIndex, sceneData.xPos + mouseX, sceneData.yPos + mouseY);
+
+				// dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
 			}
 			break;
 		case "Draw":
