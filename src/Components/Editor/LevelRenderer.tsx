@@ -6,15 +6,9 @@ import { optionState } from '../../Redux/Menu/menuReducer';
 import { addScene, moveScene } from '../../Redux/Levels/levelsActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../Redux/store';
-import { levelState } from '../../Redux/Levels/levelReducer';
+import { levelState, sceneState } from '../../Redux/Levels/levelReducer';
 import { getLocalizedCoords } from '../../Helpers/TileHelper';
-
-interface ILevel
-{
-	last: number;
-	names: string[];
-	props: ILevelProps[];
-}
+import { addIntent } from '../../Redux/Levels/levelsIntent';
 
 interface viewerSettings
 {
@@ -32,7 +26,8 @@ const LevelRenderer = () =>
 	const [drag, setDrag] = useState(false);
 	const [viewerSettings, setViewerSettings] = useState<viewerSettings>({xOffset: 0, yOffset: 0, scale: 1});
 	
-	const level = useSelector<rootState, levelState>(state => state.levels.levels[state.levels.selectedIndex]);
+	const level = useSelector<rootState, levelState>(state => state.levels.levels[state.levels.selectedLevelId]);
+	const scenes = useSelector<rootState, {[id: string]: sceneState}>(state => Object.fromEntries(Object.entries(state.levels.scenes).filter(([_, scene]) => scene.levelId === state.levels.selectedLevelId)))
 
 	const dispatch = useDispatch();
 
@@ -43,7 +38,7 @@ const LevelRenderer = () =>
 		if (viewer !== null)
 		{
 			const [xCoord, yCoord] = getLocalizedCoords(viewer, clientX, clientY);
-			dispatch(addScene("Level 1", "DEFAULT", xCoord, yCoord));
+			dispatch(addIntent("SCENE" ,level.id, "DEFAULT", undefined, xCoord, yCoord));
 		}
 	}
 	const contextMenu: Array<optionState> = [
@@ -90,42 +85,44 @@ const LevelRenderer = () =>
 		dispatch(setOptions(contextMenu));
 	}
 
-	const handleSceneMove = (sceneIndex: number, xPos: number, yPos: number) =>
+	const handleSceneMove = (sceneId: string, xPos: number, yPos: number) =>
 	{
 		const radius = 160;
 		const tolerance = 20;
 
-		for (let i = 0; i < level.scenes.length; i++)
+		for (let i = 0; i < Object.keys(scenes).length; i++)
 		{
-			if (i === sceneIndex)
+			const id = Object.keys(scenes)[i];
+
+			if (id === sceneId)
 			{
 				continue;
 			}
 
-			const scene = level.scenes[i];
+			const position = scenes[id].position;
 			// Top
-			if (scene.yPos > yPos && yPos + radius > scene.yPos - radius - tolerance && (scene.xPos - radius - tolerance <= xPos && xPos <= scene.xPos + radius + tolerance))
+			if (position.yPos > yPos && yPos + radius > position.yPos - radius - tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
 			{
-				yPos = scene.yPos - (radius * 2)
+				yPos = position.yPos - (radius * 2)
 			}
 			// Bottom
-			else if (scene.yPos < yPos && yPos - radius < scene.yPos + radius + tolerance && (scene.xPos - radius - tolerance <= xPos && xPos <= scene.xPos + radius + tolerance))
+			else if (position.yPos < yPos && yPos - radius < position.yPos + radius + tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
 			{
-				yPos = scene.yPos + (radius * 2)
+				yPos = position.yPos + (radius * 2)
 			}
 			// Left
-			else if (scene.xPos > xPos && xPos + radius >= scene.xPos - radius - tolerance && (scene.yPos - radius - tolerance <= yPos && yPos <= scene.yPos + radius + tolerance))
+			else if (position.xPos > xPos && xPos + radius >= position.xPos - radius - tolerance && (position.yPos - radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance))
 			{
-				xPos = scene.xPos - (radius * 2)
+				xPos = position.xPos - (radius * 2)
 			}
 			// Right
-			else if (scene.xPos < xPos && xPos - radius <= scene.xPos + radius + tolerance && scene.yPos- radius - tolerance <= yPos && yPos <= scene.yPos + radius + tolerance)
+			else if (position.xPos < xPos && xPos - radius <= position.xPos + radius + tolerance && position.yPos- radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance)
 			{
-				xPos = scene.xPos + (radius * 2)
+				xPos = position.xPos + (radius * 2)
 			}
 		}
 
-		dispatch(moveScene(level.scenes[sceneIndex].sceneName,xPos, yPos));
+		dispatch(moveScene(sceneId, xPos, yPos));
 	}
 
 	return(
@@ -139,8 +136,8 @@ const LevelRenderer = () =>
 			onMouseUp={handleMouseUp}
 			onMouseOut={handleMouseOut}>
 
-			{level.scenes.map((scene, index) => {
-				return <Level key={scene.sceneName} sceneIndex={index} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={scene.sceneSelected} move={handleSceneMove}/>
+			{Object.keys(scenes).map((sceneId) => {
+				return <Level key={scenes[sceneId].sceneName} sceneId={sceneId} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={scenes[sceneId].selected} move={handleSceneMove}/>
 			})}
 		</div>
 	);

@@ -1,19 +1,19 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
-import {sceneState} from "../../Redux/Levels/levelReducer";
-import {moveScene, selectScene} from "../../Redux/Levels/levelsActions";
+import { sceneState } from "../../Redux/Levels/levelReducer";
+import {selectScene} from "../../Redux/Levels/levelsActions";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
-	sceneIndex: number;
+	sceneId: string;
 	xOffset: number;
 	yOffset: number;
 	scale: number;
 	selected: boolean;
-	move: (sceneIndex: number, xPos: number, yPos: number) => void;
+	move: (sceneId: string, xPos: number, yPos: number) => void;
 }
 
 interface ILevelSize
@@ -25,12 +25,12 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({sceneIndex, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
+export const Level = ({sceneId, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
 {
 	const squareSize = 32;
 
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
-	const sceneData = useSelector<rootState, sceneState>(state => state.levels.levels[state.levels.selectedIndex].scenes[sceneIndex]);
+	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes[sceneId]);
 	const dispatch = useDispatch();
 
 	const [drag, setDrag] = useState(false);
@@ -200,7 +200,10 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected, move}: ILe
 	 */
 	const handleMouseDown = (event: React.MouseEvent) =>
 	{
-		dispatch(selectScene(sceneData.sceneName));
+		if (!sceneData.selected)
+		{
+			dispatch(selectScene(sceneData.id));
+		}
 
 		if (event.button === 0 || event.button === 2)
 		{
@@ -267,7 +270,7 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected, move}: ILe
 				const mouseY = event.clientY - y;
 				dragRef.current = {x: event.clientX, y: event.clientY}
 
-				move(sceneIndex, sceneData.xPos + mouseX, sceneData.yPos + mouseY);
+				move(sceneId, sceneData.position.xPos + mouseX, sceneData.position.yPos + mouseY);
 
 				// dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
 			}
@@ -328,8 +331,8 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected, move}: ILe
 			width={size.width}
 			height={size.height}
 			style={{
-				left: `${(sceneData.xPos + xOffset)}px`,
-				top: `${(sceneData.yPos + yOffset)}px`,
+				left: `${(sceneData.position.xPos + xOffset)}px`,
+				top: `${(sceneData.position.yPos + yOffset)}px`,
 				width: `${size.width * scale}px`,
 				height: `${size.height * scale}px`
 			}}

@@ -4,16 +4,17 @@ import {FaMap, FaMapMarkerAlt} from 'react-icons/fa';
 import {RiArrowDropDownLine, RiArrowDropUpLine} from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../../../Redux/store';
-import { levelsState } from '../../../../Redux/Levels/levelReducer';
+import { levelState, sceneState } from '../../../../Redux/Levels/levelReducer';
 import { setOptions } from '../../../../Redux/Menu/menuActions';
 import { optionState } from '../../../../Redux/Menu/menuReducer';
-import { addLevel, selectLevel, selectScene } from '../../../../Redux/Levels/levelsActions';
+import { addLevel, selectScene } from '../../../../Redux/Levels/levelsActions';
 
 const LevelsPanel = () =>
 {
 	const [expand, setExpand] = useState(true);
 
-	const levels = useSelector<rootState, levelsState["levels"]>(state => state.levels.levels)
+	const levels = useSelector<rootState, {[id: string]: levelState}>(state => state.levels.levels);
+	const scenes = useSelector<rootState, {[id: string]: sceneState}>(state => state.levels.scenes);
 
 	const handleOnClick = () =>
 	{
@@ -27,18 +28,12 @@ const LevelsPanel = () =>
 		dispatch(addLevel("DEFAULT"));
 	}
 
-	const onAddScene = () =>
+	const onSelectScene = (scene: string) =>
 	{
-
-	}
-
-	const onSelectScene = (level: string, scene: string) =>
-	{
-		dispatch(selectLevel(level));
 		dispatch(selectScene(scene));
 	}
 
-	const contextMenu: Array<optionState> = [{optionName: "Add Level", optionFunction: onAddLevel}, {optionName: "Add Scene", optionFunction: onAddScene}];
+	const contextMenu: Array<optionState> = [{optionName: "Add Level", optionFunction: onAddLevel}];
 
 	const handleContextMenu = () =>
 	{
@@ -50,11 +45,11 @@ const LevelsPanel = () =>
 			<div className="header">Levels</div>
 			<div className="levels-list" onContextMenu={handleContextMenu} style={{height: "50vh"}}>
 				<ul>
-					{levels.map((level) => (
-						<li key={level.levelName} className='menu-item'>
+					{Object.keys(levels).map((currentLevelId) => (
+						<li key={currentLevelId} className='menu-item'>
 							<div className='menu-title' onClick={handleOnClick}>
-								<FaMap className='icon' /> {level.levelName}
-								{level.scenes.length > 0
+								<FaMap className='icon' /> {levels[currentLevelId].levelName}
+								{Object.keys(Object.fromEntries(Object.entries(scenes).filter(([_, {levelId}]) => levelId === currentLevelId))).length > 0
 								?
 								<>
 									{expand  ? <RiArrowDropUpLine /> : <RiArrowDropDownLine />}
@@ -63,11 +58,11 @@ const LevelsPanel = () =>
 								null
 								}
 							</div>
-							{level.scenes.length > 0 && expand
+							{Object.keys(Object.fromEntries(Object.entries(scenes).filter(([_, {levelId}]) => levelId === currentLevelId))).length > 0 && expand
 								?
 								<ul className={`sub-menu active`}>
-									{level.scenes.map((scene) => (
-										<li key={scene.sceneName} className={`${scene.sceneSelected ? "active" : ""}`} onClick={() => {onSelectScene(level.levelName, scene.sceneName)}}><FaMapMarkerAlt className='icon'/> {scene.sceneName}</li>
+									{Object.keys(Object.fromEntries(Object.entries(scenes).filter(([_, {levelId}]) => levelId === currentLevelId))).map((currentSceneId) => (
+										<li key={currentSceneId} className={`${scenes[currentSceneId].selected ? "active" : ""}`} onClick={() => {onSelectScene(currentSceneId)}}><FaMapMarkerAlt className='icon'/> {scenes[currentSceneId].sceneName}</li>
 									))}
 								</ul>
 								:

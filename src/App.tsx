@@ -5,6 +5,7 @@ import TilesetPanel from './Components/Sidebar/Modules/TilesetPanel/TilesetPanel
 import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import Menu from './Components/Menu/Menu';
 import './App.css';
+import LayersPanel from './Components/Sidebar/Modules/LayersPanel/LayersPanel';
 
 const App = () =>
 {
@@ -13,6 +14,7 @@ const App = () =>
 			<div className='rowC'>
 				<Sidebar left={true}>
 					<PropertiesPanel />
+					<LayersPanel />
 				</Sidebar>
 				<LevelRenderer />
 				<Sidebar left={false}>
