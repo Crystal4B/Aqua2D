@@ -39,8 +39,19 @@ export interface layerAction
 	type: "ADD" | "RENAME" | "MOVE" | "SELECT" | "SHOW" | "LOCK" | "REMOVE" | "REMOVE_ALL";
 	payload: {
 		id: string,
-		name?: string
+		name?: string | string[]
 	}
+}
+// FIND NEW HOME
+/**
+ * convertNameToId converts a name of an object to the format required for ids
+ * @param name the name of the object being converted
+ * @returns the name of the object converted to id format
+ */
+const convertNameToId = (name: string): string =>
+{
+	const id = name.replaceAll(" ", "_");
+	return id;
 }
 
 /**
@@ -48,9 +59,16 @@ export interface layerAction
  * @param levelName the name of the level being added
  * @returns the formatted action ready for dispatch
  */
-export const addLevel = (levelName: string): levelAction =>
+export const addLevel = (levelName: string): levelsAction =>
 {
-	return {type: "ADD", payload: {id: levelName}};
+	const levelAction: levelAction = {type: "ADD", payload: {id: levelName}};
+	const {sceneAction, layerAction} = addScene(convertNameToId(levelName), "Scene 1", 150, 150);
+	return {
+		type: "levelsAction",
+		levelAction: levelAction,
+		sceneAction: sceneAction,
+		layerAction: layerAction
+	};
 }
 
 /**
@@ -69,9 +87,16 @@ export const renameLevel = (levelId: string, newLevelName: string): levelAction 
  * @param levelId the id of the level being removed
  * @returns the formatted action ready for dispatch
  */
-export const removeLevel = (levelId: string): levelAction =>
+export const removeLevel = (levelId: string): levelsAction =>
 {
-	return {type: "REMOVE", payload: {id: levelId}};
+	const levelAction: levelAction = {type: "REMOVE", payload: {id: levelId}};
+	const {sceneAction, layerAction} = removeAllScenes(levelId);
+	return {
+		type: "levelsAction",
+		levelAction: levelAction,
+		sceneAction: sceneAction,
+		layerAction: layerAction
+	};
 }
 
 /**
@@ -82,9 +107,15 @@ export const removeLevel = (levelId: string): levelAction =>
  * @param yPos the desired y position for the scene
  * @returns the formatted action ready for dispatch
  */
-export const addScene = (levelId: string, sceneName: string, xPos: number, yPos:number): sceneAction =>
+export const addScene = (levelId: string, sceneName: string, xPos: number, yPos:number): levelsAction =>
 {
-	return {type: "ADD", payload: {id: levelId, name: sceneName, position: {xPos: xPos, yPos: yPos}}};
+	const sceneAction: sceneAction = {type: "ADD", payload: {id: levelId, name: sceneName, position: {xPos: xPos, yPos: yPos}}};
+	const layerAction: layerAction = {type: "ADD", payload: {id: `${levelId}_${convertNameToId(sceneName)}`, name: ["Collisions", "Layer 1"]}}
+	return {
+		type: "levelsAction",
+		sceneAction: sceneAction,
+		layerAction: layerAction
+	}
 }
 
 /**
@@ -135,9 +166,15 @@ export const removeScene = (sceneId: string): sceneAction =>
  * @param levelId the id of the parent that is being cleared
  * @returns the formatted action ready for dispatch
  */
-export const removeAllScenes = (levelId: string): sceneAction =>
+export const removeAllScenes = (levelId: string): levelsAction =>
 {
-	return {type: "REMOVE_ALL", payload: {id: levelId}}
+	const sceneAction: sceneAction = {type: "REMOVE_ALL", payload: {id: levelId}};
+	const layerAction: layerAction = removeAllLayers(levelId);
+	return {
+		type: "levelsAction",
+		sceneAction: sceneAction,
+		layerAction: layerAction
+	}
 }
 
 /**
@@ -146,7 +183,7 @@ export const removeAllScenes = (levelId: string): sceneAction =>
  * @param layerName the name of the layer being added
  * @returns the formatted action ready for dispatch
  */
-export const addLayer = (sceneId: string, layerName: string): layerAction =>
+export const addLayer = (sceneId: string, layerName: string | string[]): layerAction =>
 {
 	return {type: "ADD", payload: {id: sceneId, name: layerName}};
 }
@@ -203,11 +240,11 @@ export const removeLayer = (layerId: string): layerAction =>
 }
 
 /**
- * removeAllLayers generates an action for removing all layers related to a specified scene
- * @param sceneId the id of the parent that is being cleared
+ * removeAllLayers generates an action for removing all layers related to a specified level
+ * @param levelId the id of the parent level that is being cleared
  * @returns the formatted action ready for dispatch
  */
- export const removeAllLayers = (sceneId: string): layerAction =>
+ export const removeAllLayers = (levelId: string): layerAction =>
  {
-	 return {type: "REMOVE_ALL", payload: {id: sceneId}};
+	 return {type: "REMOVE_ALL", payload: {id: levelId}};
  }

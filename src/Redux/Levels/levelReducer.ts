@@ -1,5 +1,4 @@
-import { addLayer, addLevel, addScene, layerAction, levelAction, levelsAction, removeAllLayers, removeAllScenes, removeLevel, removeScene, sceneAction, selectLayer } from "./levelsActions";
-import { levelsIntent } from "./levelsIntent";
+import {layerAction, levelAction, levelsAction, sceneAction} from "./levelsActions";
 
 /**
  * Interface for storing level & scene data
@@ -137,45 +136,13 @@ const initialState: levelsState =
  * @param action a levelsAction object being used to update the state
  * @returns The new state of the levels
  */
-const rootReducer = (state: levelsState = initialState, action: levelsIntent): levelsState =>
+const rootReducer = (state: levelsState = initialState, action: levelsAction): levelsState =>
 {
-	var levelAction, sceneAction, layerAction;
-	switch(action.type)
-	{
-	case "ADD":
-		switch(action.state)
-		{
-		case "LEVEL":
-			if (action.payload.levelName === undefined) return state; // broken action
-			levelAction = addLevel(action.payload.levelName);
-		case "SCENE":
-			if (action.payload.levelName === undefined || action.payload.sceneName === undefined) return state; // broken action
-			sceneAction = addScene(action.payload.levelName, action.payload.sceneName, 100, 100);
-		case "LAYER":
-			if (action.payload.sceneName === undefined || action.payload.layerName === undefined) return state; // broken action
-			layerAction = addLayer(action.payload.sceneName, action.payload.layerName);
-		}
-		break;
-	case "REMOVE":
-		switch(action.state)
-		{
-		case "LEVEL":
-			if (action.payload.levelName === undefined) return state; // broken action
-			levelAction = removeLevel(action.payload.levelName);
-		case "SCENE":
-			if (action.payload.levelName === undefined || action.payload.sceneName === undefined) return state; // broken action
-			sceneAction = removeAllScenes(action.payload.levelName);
-		case "LAYER":
-			if (action.payload.sceneName === undefined) return state; // broken action
-			layerAction = removeAllLayers(action.payload.sceneName);
-		}
-	}
-
 	return {
 		...state,
-		levels: levelReducer(state.levels, levelAction),
-		scenes: sceneReducer(state.scenes, state.selectedSceneId, sceneAction),
-		layers: layerReducer(state.layers, state.selectedLayerId, layerAction),
+		levels: levelReducer(state.levels, action.levelAction),
+		scenes: sceneReducer(state.scenes, state.selectedSceneId, action.sceneAction),
+		layers: layerReducer(state.layers, state.selectedLayerId, action.layerAction),
 	};
 }
 
