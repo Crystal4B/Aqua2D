@@ -277,24 +277,38 @@ const layerReducer = (state: {[id: string]: layerState}, selectedLayerId: string
 	switch(type)
 	{
 	case "ADD":
-		var name = payload.name;
-		if (name === undefined || name === "DEFAULT")
+		var newState = {...state};
+		if (Array.isArray(payload.name))
 		{
-			const length = Object.entries(state).filter(([_, layer]) => layer.sceneId === payload.id).length;
-			name = `Layer ${length+1}`;
+			payload.name.forEach((layer) => {
+				var name = layer;
+				if (name === "DEFAULT")
+				{
+					const length = Object.entries(state).filter(([_, layerData]) => layerData.sceneId === payload.id).length;
+					name = `Layer ${length+1}`;
+				}
+				var newLayer = createNewLayer(payload.id, name, false);
+				newState = {...state, [newLayer.id]: newLayer};
+			})
+		}
+		else
+		{
+			var name = payload.name;
+			if (name === undefined || name === "DEFAULT")
+			{
+				const length = Object.entries(state).filter(([_, layer]) => layer.sceneId === payload.id).length;
+				name = `Layer ${length+1}`;
+			}
+	
+			var newLayer = createNewLayer(payload.id, name, false);
+			newState = {...state, [newLayer.id]: newLayer};
 		}
 
-		const newLayer = createNewLayer(payload.id, name, false);
-		return {...state, [newLayer.id]: newLayer};
+		return newState;
 
 	case "RENAME":
-		var name = payload.name;
-		if (name === undefined)
-		{
-			name = "DEFAULT_NAME";
-		}
-		
-		state[payload.id] = {...state[payload.id], layerName: name};
+		if (Array.isArray(payload.name) || payload.name === undefined) return state;
+		state[payload.id] = {...state[payload.id], layerName: payload.name};
 		return state;
 
 	case "MOVE":

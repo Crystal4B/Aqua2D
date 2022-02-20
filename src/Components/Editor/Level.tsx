@@ -271,8 +271,6 @@ export const Level = ({sceneId, xOffset, yOffset, scale, selected, move}: ILevel
 				dragRef.current = {x: event.clientX, y: event.clientY}
 
 				move(sceneId, sceneData.position.xPos + mouseX, sceneData.position.yPos + mouseY);
-
-				// dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
 			}
 			break;
 		case "Draw":

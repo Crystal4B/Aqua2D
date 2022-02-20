@@ -8,7 +8,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../Redux/store';
 import { levelState, sceneState } from '../../Redux/Levels/levelReducer';
 import { getLocalizedCoords } from '../../Helpers/TileHelper';
-import { addIntent } from '../../Redux/Levels/levelsIntent';
 
 interface viewerSettings
 {
@@ -38,7 +37,7 @@ const LevelRenderer = () =>
 		if (viewer !== null)
 		{
 			const [xCoord, yCoord] = getLocalizedCoords(viewer, clientX, clientY);
-			dispatch(addIntent("SCENE" ,level.id, "DEFAULT", undefined, xCoord, yCoord));
+			dispatch(addScene(level.id, "DEFAULT", xCoord, yCoord));
 		}
 	}
 	const contextMenu: Array<optionState> = [

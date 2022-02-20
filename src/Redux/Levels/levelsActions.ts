@@ -77,9 +77,18 @@ export const addLevel = (levelName: string): levelsAction =>
  * @param newLevelName the desired name for the level being renamed
  * @returns the formatted action ready for dispatch
  */
-export const renameLevel = (levelId: string, newLevelName: string): levelAction =>
+export const renameLevel = (levelId: string, newLevelName: string): levelsAction =>
 {
-	return {type: "RENAME", payload: {id: levelId, name: newLevelName}};
+	return {
+		type: "levelsAction",
+		levelAction: {
+			type: "RENAME",
+			payload: {
+				id: levelId,
+				name: newLevelName
+			}
+		}
+	};
 }
 
 /**
@@ -123,9 +132,17 @@ export const addScene = (levelId: string, sceneName: string, xPos: number, yPos:
  * @param sceneId the id of the scene being selected
  * @returns the formatted action ready for dispatch
  */
-export const selectScene = (sceneId: string): sceneAction =>
+export const selectScene = (sceneId: string): levelsAction =>
 {
-	return {type: "SELECT", payload: {id: sceneId}};
+	return {
+		type: "levelsAction",
+		sceneAction: {
+			type: "SELECT",
+			payload: {
+				id: sceneId
+			}
+		}
+	}
 }
 
 /**
@@ -135,9 +152,21 @@ export const selectScene = (sceneId: string): sceneAction =>
  * @param yPos the desired position on the y-axis
  * @returns the formatted action ready for dispatch
  */
-export const moveScene = (sceneId: string, xPos: number, yPos: number): sceneAction =>
+export const moveScene = (sceneId: string, xPos: number, yPos: number): levelsAction =>
 {
-	return {type: "MOVE", payload: {id: sceneId, position:{xPos: xPos, yPos: yPos}}};
+	return {
+		type: "levelsAction",
+		sceneAction: {
+			type:"MOVE",
+			payload: {
+				id: sceneId,
+				position: {
+					xPos: xPos,
+					yPos: yPos
+				}
+			}
+		}
+	};
 }
 
 /**
@@ -146,9 +175,18 @@ export const moveScene = (sceneId: string, xPos: number, yPos: number): sceneAct
  * @param newSceneName the desired name of the scene being renamed
  * @returns the formatted action ready for dispatch
  */
-export const renameScene = (sceneId: string, newSceneName: string): sceneAction =>
+export const renameScene = (sceneId: string, newSceneName: string): levelsAction =>
 {
-	return {type: "RENAME", payload: {id: sceneId, name: newSceneName}};
+	return {
+		type: "levelsAction",
+		sceneAction: {
+			type: "RENAME",
+			payload: {
+				id: sceneId,
+				name: newSceneName
+			}
+		}
+	};
 }
 
 /**
@@ -156,9 +194,17 @@ export const renameScene = (sceneId: string, newSceneName: string): sceneAction 
  * @param sceneName the id of the scene being removed
  * @returns the formatted action ready for dispatch
  */
-export const removeScene = (sceneId: string): sceneAction =>
+export const removeScene = (sceneId: string): levelsAction =>
 {
-	return {type: "REMOVE", payload: {id: sceneId}};
+	return {
+		type: "levelsAction",
+		sceneAction: {
+			type: "REMOVE",
+			payload: {
+				id: sceneId
+			}
+		}
+	};
 }
 
 /**
@@ -169,7 +215,7 @@ export const removeScene = (sceneId: string): sceneAction =>
 export const removeAllScenes = (levelId: string): levelsAction =>
 {
 	const sceneAction: sceneAction = {type: "REMOVE_ALL", payload: {id: levelId}};
-	const layerAction: layerAction = removeAllLayers(levelId);
+	const {layerAction} = removeAllLayers(levelId);
 	return {
 		type: "levelsAction",
 		sceneAction: sceneAction,
@@ -183,9 +229,18 @@ export const removeAllScenes = (levelId: string): levelsAction =>
  * @param layerName the name of the layer being added
  * @returns the formatted action ready for dispatch
  */
-export const addLayer = (sceneId: string, layerName: string | string[]): layerAction =>
+export const addLayer = (sceneId: string, layerName: string | string[]): levelsAction =>
 {
-	return {type: "ADD", payload: {id: sceneId, name: layerName}};
+	return {
+		type: "levelsAction",
+		layerAction: {
+			type: "ADD",
+			payload: {
+				id: sceneId,
+				name: layerName
+			}
+		}
+	};
 }
 
 /**
@@ -194,9 +249,18 @@ export const addLayer = (sceneId: string, layerName: string | string[]): layerAc
  * @param layerName the desired name for the layer
  * @returns the formatted action ready for dispatch
  */
- export const renameLayer = (layerId: string, layerName: string): layerAction =>
+ export const renameLayer = (layerId: string, layerName: string): levelsAction =>
  {
-	return {type: "RENAME", payload: {id: layerId, name: layerName}};
+	return {
+		type: "levelsAction",
+		layerAction: {
+			type: "RENAME",
+			payload: {
+				id: layerId,
+				name: layerName
+			}
+		}
+	};
  }
 
 /**
@@ -204,9 +268,17 @@ export const addLayer = (sceneId: string, layerName: string | string[]): layerAc
  * @param layerId the id of the layer
  * @returns the formatted action ready for dispatch
  */
-export const selectLayer = (layerId: string): layerAction =>
+export const selectLayer = (layerId: string): levelsAction =>
 {
-	return {type: "SELECT", payload: {id: layerId}};
+	return {
+		type: "levelsAction",
+		layerAction: {
+			type: "SELECT",
+			payload: {
+				id: layerId
+			}
+		}
+	};
 }
 
 /**
@@ -214,9 +286,17 @@ export const selectLayer = (layerId: string): layerAction =>
  * @param layerId the id of the layer
  * @returns the formatted action ready for dispatch
  */
-export const showLayer = (layerId: string): layerAction =>
+export const showLayer = (layerId: string): levelsAction =>
 {
-	return {type: "SHOW", payload: {id: layerId}};
+	return {
+		type: "levelsAction",
+		layerAction: {
+			type: "SHOW",
+			payload: {
+				id: layerId
+			}
+		}
+	};
 }
 
 /**
@@ -224,9 +304,17 @@ export const showLayer = (layerId: string): layerAction =>
  * @param layerId the id of the layer
  * @returns the formatted action ready for dispatch
  */
- export const lockLayer = (layerId: string): layerAction =>
+ export const lockLayer = (layerId: string): levelsAction =>
 {
-	return {type: "LOCK", payload: {id: layerId}};
+	return {
+		type: "levelsAction",
+		layerAction: {
+			type: "LOCK",
+			payload: {
+				id: layerId
+			}
+		}
+	};
 }
 
 /**
@@ -234,9 +322,17 @@ export const showLayer = (layerId: string): layerAction =>
  * @param layerId the id of the layer
  * @returns the formatted action ready for dispatch
  */
-export const removeLayer = (layerId: string): layerAction =>
+export const removeLayer = (layerId: string): levelsAction =>
 {
-	return {type: "REMOVE", payload: {id: layerId}};
+	return {
+		type: "levelsAction",
+		layerAction: {
+			type: "REMOVE",
+			payload: {
+				id: layerId
+			}
+		}
+	};
 }
 
 /**
@@ -244,7 +340,15 @@ export const removeLayer = (layerId: string): layerAction =>
  * @param levelId the id of the parent level that is being cleared
  * @returns the formatted action ready for dispatch
  */
- export const removeAllLayers = (levelId: string): layerAction =>
+ export const removeAllLayers = (levelId: string): levelsAction =>
  {
-	 return {type: "REMOVE_ALL", payload: {id: levelId}};
+	 return {
+		type: "levelsAction",
+		layerAction: {
+			type: "REMOVE_ALL",
+			payload: {
+				id: levelId
+			}
+		}
+	}
  }
