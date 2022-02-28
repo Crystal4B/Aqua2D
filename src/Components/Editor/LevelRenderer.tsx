@@ -36,8 +36,11 @@ const LevelRenderer = () =>
 		const viewer = viewerRef.current;
 		if (viewer !== null)
 		{
+			var numberOfScenes = Object.keys(scenes).length;
+			var name = `Scene ${numberOfScenes+1}`;
+
 			const [xCoord, yCoord] = getLocalizedCoords(viewer, clientX, clientY);
-			dispatch(addScene(level.id, "DEFAULT", xCoord, yCoord));
+			dispatch(addScene(level.id, name, xCoord, yCoord));
 		}
 	}
 	const contextMenu: Array<optionState> = [

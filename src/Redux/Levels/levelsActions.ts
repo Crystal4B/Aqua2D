@@ -119,7 +119,7 @@ export const removeLevel = (levelId: string): levelsAction =>
 export const addScene = (levelId: string, sceneName: string, xPos: number, yPos:number): levelsAction =>
 {
 	const sceneAction: sceneAction = {type: "ADD", payload: {id: levelId, name: sceneName, position: {xPos: xPos, yPos: yPos}}};
-	const layerAction: layerAction = {type: "ADD", payload: {id: `${levelId}_${convertNameToId(sceneName)}`, name: ["Collisions", "Layer 1"]}}
+	const layerAction: layerAction = {type: "ADD", payload: {id: `${levelId}_${convertNameToId(sceneName)}`, name: ["Collision", "Layer 1"]}}
 	return {
 		type: "levelsAction",
 		sceneAction: sceneAction,

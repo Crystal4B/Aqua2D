@@ -124,10 +124,10 @@ const initialState: levelsState =
 	scenes: {Level_1_Scene_1: createNewScene("Level_1", "Scene 1", true, {xPos: 150, yPos: 150})},
 	selectedSceneId: "Level_1_Scene_1",
 	layers: {
-		Scene_1_Collision: createNewLayer("Level_1_Scene_1", "Collision", false),
-		Scene_1_Layer_1: createNewLayer("Level_1_Scene_1", "Layer 1", true),
+		Level_1_Scene_1_Collision: createNewLayer("Level_1_Scene_1", "Collision", false),
+		Level_1_Scene_1_Layer_1: createNewLayer("Level_1_Scene_1", "Layer 1", true),
 	},
-	selectedLayerId: "Scene_1_Layer_1"
+	selectedLayerId: "Level_1_Scene_1_Layer_1"
 }
 
 /**
@@ -138,11 +138,27 @@ const initialState: levelsState =
  */
 const rootReducer = (state: levelsState = initialState, action: levelsAction): levelsState =>
 {
+	var newSelectedScene = state.selectedSceneId;
+	if (action.sceneAction?.type === "SELECT")
+	{
+		newSelectedScene = action.sceneAction.payload.id;
+		console.log(newSelectedScene);
+	}
+
+	var newSelectedLayer = state.selectedSceneId;
+	if (action.layerAction?.type === "SELECT")
+	{
+		newSelectedLayer = action.layerAction.payload.id;
+		console.log(newSelectedLayer);
+	}
+
 	return {
 		...state,
 		levels: levelReducer(state.levels, action.levelAction),
 		scenes: sceneReducer(state.scenes, state.selectedSceneId, action.sceneAction),
+		selectedSceneId: newSelectedScene,
 		layers: layerReducer(state.layers, state.selectedLayerId, action.layerAction),
+		selectedLayerId: newSelectedLayer,
 	};
 }
 
@@ -288,7 +304,7 @@ const layerReducer = (state: {[id: string]: layerState}, selectedLayerId: string
 					name = `Layer ${length+1}`;
 				}
 				var newLayer = createNewLayer(payload.id, name, false);
-				newState = {...state, [newLayer.id]: newLayer};
+				newState = {...newState, [newLayer.id]: newLayer};
 			})
 		}
 		else

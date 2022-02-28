@@ -164,15 +164,19 @@ export const Level = ({sceneId, xOffset, yOffset, scale, selected, move}: ILevel
 		const context = canvasRef.current?.getContext("2d");
 		if (context)
 		{
-			const TO_RADIANS = Math.PI/180;
-			if (tile.rotation !== 0)
+			if (tile.rotation % 360 !== 0 && tile.rotation !== 0)
 			{
+				const TO_RADIANS = Math.PI/180;
+				const cx = x * squareSize + squareSize / 2;
+				const cy = y * squareSize +  squareSize / 2;
+
 				context.save();
-				context.translate(x * squareSize, y * squareSize);
+				context.translate(cx, cy);
 				context.rotate(tile.rotation * TO_RADIANS);
+				context.translate(-cx, -cy);
 			}
 			context.drawImage(image, tile.xCoord * squareSize, tile.yCoord * squareSize, squareSize, squareSize, x * squareSize, y * squareSize, squareSize, squareSize);
-			if (tile.rotation !== 0)
+			if (tile.rotation % 360 !== 0 || tile.rotation !== 0)
 			{
 				context.restore();
 			}

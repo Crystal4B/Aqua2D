@@ -6,11 +6,13 @@ import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import Menu from './Components/Menu/Menu';
 import './App.css';
 import LayersPanel from './Components/Sidebar/Modules/LayersPanel/LayersPanel';
+import ControlPanel from './Components/ControlPanel/ControlPanel';
 
 const App = () =>
 {
 	return (
 		<>
+			<ControlPanel />
 			<div className='rowC'>
 				<Sidebar left={true}>
 					<PropertiesPanel />
