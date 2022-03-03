@@ -1,18 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
-import {sceneState} from "../../Redux/Levels/levelReducer";
-import {moveScene, selectScene} from "../../Redux/Levels/levelsActions";
+import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
+import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
-	sceneIndex: number;
+	levelId: string;
+	sceneId: string;
 	xOffset: number;
 	yOffset: number;
 	scale: number;
 	selected: boolean;
+	move: (sceneId: string, xPos: number, yPos: number) => void;
 }
 
 interface ILevelSize
@@ -24,12 +26,12 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelProps) =>
+export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
 {
 	const squareSize = 32;
 
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
-	const sceneData = useSelector<rootState, sceneState>(state => state.levels.levels[state.levels.selectedIndex].scenes[sceneIndex]);
+	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes.byId[levelId].data[sceneId]);
 	const dispatch = useDispatch();
 
 	const [drag, setDrag] = useState(false);
@@ -163,15 +165,19 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 		const context = canvasRef.current?.getContext("2d");
 		if (context)
 		{
-			const TO_RADIANS = Math.PI/180;
-			if (tile.rotation !== 0)
+			if (tile.rotation % 360 !== 0 && tile.rotation !== 0)
 			{
+				const TO_RADIANS = Math.PI/180;
+				const cx = x * squareSize + squareSize / 2;
+				const cy = y * squareSize +  squareSize / 2;
+
 				context.save();
-				context.translate(x * squareSize, y * squareSize);
+				context.translate(cx, cy);
 				context.rotate(tile.rotation * TO_RADIANS);
+				context.translate(-cx, -cy);
 			}
 			context.drawImage(image, tile.xCoord * squareSize, tile.yCoord * squareSize, squareSize, squareSize, x * squareSize, y * squareSize, squareSize, squareSize);
-			if (tile.rotation !== 0)
+			if (tile.rotation % 360 !== 0 || tile.rotation !== 0)
 			{
 				context.restore();
 			}
@@ -199,7 +205,10 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 	 */
 	const handleMouseDown = (event: React.MouseEvent) =>
 	{
-		dispatch(selectScene(sceneData.sceneName));
+		if (!sceneData.selected)
+		{
+			dispatch(selectScene(levelId, sceneData.id));
+		}
 
 		if (event.button === 0 || event.button === 2)
 		{
@@ -266,7 +275,7 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 				const mouseY = event.clientY - y;
 				dragRef.current = {x: event.clientX, y: event.clientY}
 
-				dispatch(moveScene(sceneData.sceneName, sceneData.xPos + mouseX, sceneData.yPos + mouseY));
+				move(sceneId, sceneData.position.xPos + mouseX, sceneData.position.yPos + mouseY);
 			}
 			break;
 		case "Draw":
@@ -325,8 +334,8 @@ export const Level = ({sceneIndex, xOffset, yOffset, scale, selected}: ILevelPro
 			width={size.width}
 			height={size.height}
 			style={{
-				left: `${(sceneData.xPos + xOffset)}px`,
-				top: `${(sceneData.yPos + yOffset)}px`,
+				left: `${(sceneData.position.xPos + xOffset)}px`,
+				top: `${(sceneData.position.yPos + yOffset)}px`,
 				width: `${size.width * scale}px`,
 				height: `${size.height * scale}px`
 			}}

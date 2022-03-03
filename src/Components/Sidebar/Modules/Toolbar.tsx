@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { rootState } from '../../../Redux/store';
 import { toolState } from '../../../Redux/Tools/toolReducer';
-import { switchTileset, switchTool } from '../../../Redux/Tools/toolActions';
+import { rotationTile, switchTileset, switchTool } from '../../../Redux/Tools/toolActions';
 import { extractFilesAsURL } from '../../../Helpers/InputHelper';
 
 const Toolbar = () =>
@@ -20,6 +20,11 @@ const Toolbar = () =>
 	const updateToolSelection = (tool: string) =>
 	{
 		dispatch(switchTool(tool));
+	}
+
+	const updateTileRotation = (rotation: number) =>
+	{
+		dispatch(rotationTile(rotation));
 	}
 
 	const handleInput = ({target}: React.FormEvent<HTMLInputElement>) =>
@@ -40,8 +45,8 @@ const Toolbar = () =>
 			<GiFoundryBucket onClick={() => updateToolSelection("Fill")} className={`button ${tool === "Fill" ? "active" : ""}`}/>
 			<CgEditFlipH className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
 			<CgEditFlipV className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
-			<BiRotateRight className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
-			<BiRotateLeft className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
+			<BiRotateRight onClick={() => updateTileRotation(90)} className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
+			<BiRotateLeft onClick={() => updateTileRotation(-90)} className={`button ${tool !== "Draw" ? "inactive" : ""}`}/>
 			<input type={"file"} id="file" onChange={handleInput}/>
 			<label htmlFor='file'>
 				<AiOutlineFolderOpen className='button'/>

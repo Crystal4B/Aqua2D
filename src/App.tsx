@@ -5,14 +5,19 @@ import TilesetPanel from './Components/Sidebar/Modules/TilesetPanel/TilesetPanel
 import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import Menu from './Components/Menu/Menu';
 import './App.css';
+import LayersPanel from './Components/Sidebar/Modules/LayersPanel/LayersPanel';
+import ControlPanel from './Components/ControlPanel/ControlPanel';
+import GameRenderer from './Components/Renderer/GameRenderer';
 
 const App = () =>
 {
 	return (
 		<>
+			<ControlPanel />
 			<div className='rowC'>
 				<Sidebar left={true}>
 					<PropertiesPanel />
+					<LayersPanel />
 				</Sidebar>
 				<LevelRenderer />
 				<Sidebar left={false}>

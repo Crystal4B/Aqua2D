@@ -1,0 +1,39 @@
+.content .icon
+{
+	float: right;
+}
+
+.content .layer-depth
+{
+	float: left;
+}
+
+.content .layer-name
+{
+	text-align: center;
+}
+
+.content
+{
+	color: #F7F7F7;
+	padding-left: 10px;
+	padding-right: 10px;
+	text-decoration: none;
+	font-size: 18px;
+}
+
+.content li
+{
+	margin-top: 4px;
+	cursor: pointer;
+}
+
+.content li:hover
+{
+	background: #919191;
+}
+
+.content li.selected
+{
+	background: #939393;
+}

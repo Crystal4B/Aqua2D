@@ -3,18 +3,12 @@ import {Level, ILevelProps} from './Level';
 import './Editor.css';
 import { setOptions } from '../../Redux/Menu/menuActions';
 import { optionState } from '../../Redux/Menu/menuReducer';
-import { addScene } from '../../Redux/Levels/levelsActions';
 import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../Redux/store';
-import { levelState } from '../../Redux/Levels/levelReducer';
+import { levelsState, levelState } from '../../Redux/Levels/Levels/levelReducer';
 import { getLocalizedCoords } from '../../Helpers/TileHelper';
-
-interface ILevel
-{
-	last: number;
-	names: string[];
-	props: ILevelProps[];
-}
+import { addScene, moveScene } from '../../Redux/Levels/Scenes/sceneActions';
+import { scenesState, sceneState } from '../../Redux/Levels/Scenes/sceneReducer';
 
 interface viewerSettings
 {
@@ -31,8 +25,10 @@ const LevelRenderer = () =>
 	const viewerRef = useRef<HTMLDivElement>(null);
 	const [drag, setDrag] = useState(false);
 	const [viewerSettings, setViewerSettings] = useState<viewerSettings>({xOffset: 0, yOffset: 0, scale: 1});
+
 	
-	const level = useSelector<rootState, levelState>(state => state.levels.levels[state.levels.selectedIndex]);
+	const levelId = useSelector<rootState, levelsState["selectedId"]>(state => state.levels.levels.selectedId);
+	const {data, selectedId} = useSelector<rootState, {data: {[layerId: string]: sceneState}, selectedId: string}>(state => state.levels.scenes.byId[levelId]);
 
 	const dispatch = useDispatch();
 
@@ -42,8 +38,11 @@ const LevelRenderer = () =>
 		const viewer = viewerRef.current;
 		if (viewer !== null)
 		{
+			var numberOfScenes = Object.keys(data).length;
+			var name = `Scene ${numberOfScenes+1}`;
+
 			const [xCoord, yCoord] = getLocalizedCoords(viewer, clientX, clientY);
-			dispatch(addScene("Level 1", "DEFAULT", xCoord, yCoord));
+			dispatch(addScene(levelId, name, xCoord, yCoord));
 		}
 	}
 	const contextMenu: Array<optionState> = [
@@ -90,6 +89,46 @@ const LevelRenderer = () =>
 		dispatch(setOptions(contextMenu));
 	}
 
+	const handleSceneMove = (sceneId: string, xPos: number, yPos: number) =>
+	{
+		const radius = 160;
+		const tolerance = 20;
+
+		for (let i = 0; i < Object.keys(data).length; i++)
+		{
+			const id = Object.keys(data)[i];
+			
+			if (id === sceneId)
+			{
+				continue;
+			}
+
+			const position = data[id].position;
+			// Top
+			if (position.yPos > yPos && yPos + radius > position.yPos - radius - tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
+			{
+				yPos = position.yPos - (radius * 2)
+			}
+			// Bottom
+			else if (position.yPos < yPos && yPos - radius < position.yPos + radius + tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
+			{
+				yPos = position.yPos + (radius * 2)
+			}
+			// Left
+			else if (position.xPos > xPos && xPos + radius >= position.xPos - radius - tolerance && (position.yPos - radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance))
+			{
+				xPos = position.xPos - (radius * 2)
+			}
+			// Right
+			else if (position.xPos < xPos && xPos - radius <= position.xPos + radius + tolerance && position.yPos- radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance)
+			{
+				xPos = position.xPos + (radius * 2)
+			}
+		}
+
+		dispatch(moveScene(levelId, sceneId, xPos, yPos));
+	}
+
 	return(
 		<div
 			ref={viewerRef}
@@ -101,8 +140,8 @@ const LevelRenderer = () =>
 			onMouseUp={handleMouseUp}
 			onMouseOut={handleMouseOut}>
 
-			{level.scenes.map((scene, index) => {
-				return <Level key={scene.sceneName} sceneIndex={index} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={scene.sceneSelected} />
+			{Object.keys(data).map((sceneId) => {
+				return <Level key={data[sceneId].sceneName} levelId={levelId} sceneId={sceneId} xOffset={viewerSettings.xOffset} yOffset={viewerSettings.yOffset} scale={viewerSettings.scale} selected={sceneId === selectedId} move={handleSceneMove}/>
 			})}
 		</div>
 	);

@@ -67,7 +67,7 @@ const toolReducer = (state: toolState = initialState, action: toolAction): toolS
 		var rotation = state.tile.rotation;
 		if (action.payload.tile?.rotation)
 		{
-			rotation = action.payload.tile.rotation;
+			rotation += action.payload.tile.rotation;
 		}
 		return {...state, tile: {...state.tile, rotation: rotation}};
 	default:
