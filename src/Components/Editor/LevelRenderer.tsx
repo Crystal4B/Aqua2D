@@ -97,13 +97,13 @@ const LevelRenderer = () =>
 		for (let i = 0; i < Object.keys(data).length; i++)
 		{
 			const id = Object.keys(data)[i];
-
+			
 			if (id === sceneId)
 			{
 				continue;
 			}
 
-			const position = data[sceneId].position;
+			const position = data[id].position;
 			// Top
 			if (position.yPos > yPos && yPos + radius > position.yPos - radius - tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
 			{
