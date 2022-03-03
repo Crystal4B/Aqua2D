@@ -5,22 +5,24 @@ import { useDispatch, useSelector } from "react-redux";
 import { setOptions } from "../../../../Redux/Menu/menuActions";
 import { optionState } from "../../../../Redux/Menu/menuReducer";
 import { rootState } from "../../../../Redux/store";
-import { layerState, levelsState } from "../../../../Redux/Levels/levelReducer";
-import { addLayer, lockLayer, selectLayer, showLayer } from "../../../../Redux/Levels/levelsActions";
+import { addLayer, lockLayer, selectLayer, showLayer } from "../../../../Redux/Levels/Layers/layerActions";
+import { layerState } from "../../../../Redux/Levels/Layers/layerReducer";
 
 const LayersPanel = () =>
 {
-	const layers = useSelector<rootState, {[id: string]: layerState}>((state) => Object.fromEntries(Object.entries(state.levels.layers).filter(([_, layer]) => layer.sceneId === state.levels.selectedSceneId)));
-	const sceneId = useSelector<rootState, levelsState["selectedSceneId"]>(state => state.levels.selectedSceneId);
+	const sceneId = useSelector<rootState, string>(state => state.levels.scenes.byId[state.levels.levels.selectedId].selectedId);
+	const {data, order, selectedId} = useSelector<rootState, {data: {[layerId: string]: layerState}, order: string[], selectedId: string}>(state => state.levels.layers.byId[sceneId]);
 
 	const onAddLayerTop = () =>
 	{
-		dispatch(addLayer(sceneId, "DEFAULT"));
+		var counter = Object.keys(data).length;
+		dispatch(addLayer(sceneId, `Layer ${counter}`, "TOP"));
 	}
 	
 	const onAddLayerBottom = () =>
 	{
-		dispatch(addLayer(sceneId, "DEFAULT"));
+		var counter = Object.keys(data).length;
+		dispatch(addLayer(sceneId, `Layer ${counter}`, "BOTTOM"));
 	}
 
 	// TODO: CLEAN THIS UP
@@ -34,17 +36,17 @@ const LayersPanel = () =>
 
 	const handleChangeVisibility = (id: string) =>
 	{
-		dispatch(showLayer(id));
+		dispatch(showLayer(sceneId, id));
 	}
 
 	const handleChangeLocking = (id: string) =>
 	{
-		dispatch(lockLayer(id));
+		dispatch(lockLayer(sceneId, id));
 	}
 	
 	const handleChangeSelection = (id: string) =>
 	{
-		dispatch(selectLayer(id));
+		dispatch(selectLayer(sceneId, id));
 	}
 
 	return (
@@ -52,13 +54,13 @@ const LayersPanel = () =>
 			<div className="header">Layers</div>
 			<div className="content" style={{height: "50vh"}} onContextMenu={handleContextMenu}>
 				<ul>
-					{Object.keys(layers).map((layerId) => 
-						{return <li key={layerId} className={layers[layerId].selected ? "selected" : ""}>
-							<span onClick={() => handleChangeSelection(layerId)}>{layers[layerId].layerName}</span>
-							{layers[layerId].visible ? <AiFillEye className="icon" onClick={() => handleChangeVisibility(layerId)}/> : <AiFillEyeInvisible className="icon" onClick={() => handleChangeVisibility(layerId)}/>}
-							{layers[layerId].locked ? <AiFillLock className="icon" onClick={() => handleChangeLocking(layerId)}/> : <AiFillUnlock className="icon" onClick={() => handleChangeLocking(layerId)}/>}
-						</li>}
-					)}
+					{order.map((layerId) => {
+						return <li key={layerId} className={layerId === selectedId ? "selected" : ""}>
+							<span onClick={() => handleChangeSelection(layerId)}>{data[layerId].layerName}</span>
+							{data[layerId].visible ? <AiFillEye className="icon" onClick={() => handleChangeVisibility(layerId)}/> : <AiFillEyeInvisible className="icon" onClick={() => handleChangeVisibility(layerId)}/>}
+							{data[layerId].locked ? <AiFillLock className="icon" onClick={() => handleChangeLocking(layerId)}/> : <AiFillUnlock className="icon" onClick={() => handleChangeLocking(layerId)}/>}
+						</li>
+					})}
 				</ul>
 			</div>
 		</div>

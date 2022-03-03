@@ -1,13 +1,14 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
-import { sceneState } from "../../Redux/Levels/levelReducer";
-import {selectScene} from "../../Redux/Levels/levelsActions";
+import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
+import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
 export interface ILevelProps
 {
+	levelId: string;
 	sceneId: string;
 	xOffset: number;
 	yOffset: number;
@@ -25,12 +26,12 @@ interface ILevelSize
 /**
  * Level class will contain details about the level being rendered by the renderer
  */
-export const Level = ({sceneId, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
+export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
 {
 	const squareSize = 32;
 
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
-	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes[sceneId]);
+	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes.byId[levelId].data[sceneId]);
 	const dispatch = useDispatch();
 
 	const [drag, setDrag] = useState(false);
@@ -206,7 +207,7 @@ export const Level = ({sceneId, xOffset, yOffset, scale, selected, move}: ILevel
 	{
 		if (!sceneData.selected)
 		{
-			dispatch(selectScene(sceneData.id));
+			dispatch(selectScene(levelId, sceneData.id));
 		}
 
 		if (event.button === 0 || event.button === 2)

@@ -1,12 +1,12 @@
 import {combineReducers} from "redux";
 import toolReducer from "./Tools/toolReducer";
-import levelReducer from "./Levels/levelReducer";
 import menuReducer from "./Menu/menuReducer";
+import combinedLevelReducer from "./Levels/combinedLevelsReducer";
 
 // Putting all reducers into one for the store
 const allReducers = combineReducers({
 	toolbar: toolReducer,
-	levels: levelReducer,
+	levels: combinedLevelReducer,
 	menu: menuReducer
 });
 
