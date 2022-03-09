@@ -51,6 +51,10 @@ const createNewScene = (levelId: string, sceneName: string, selected: boolean, p
 	}
 }
 
+/**
+ * Method to create a initial / default state for the reducer
+ * @returns a default scenesState
+ */
 const createDefaultState = (): scenesState =>
 {
 	return {

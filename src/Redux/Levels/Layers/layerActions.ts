@@ -1,3 +1,6 @@
+/**
+ * TODO: COMMENT
+ */
 export interface layerAction
 {
 	type: "ADD_LEVEL" | "ADD_SCENE" | "ADD_LAYER" | "RENAME_LAYER" | "MOVE_LAYER" | "SELECT_LAYER" | "SHOW_LAYER" | "LOCK_LAYER" | "REMOVE_LAYER" | "REMOVE_ALL_LAYERS";

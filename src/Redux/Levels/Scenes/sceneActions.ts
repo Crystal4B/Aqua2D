@@ -1,3 +1,6 @@
+/**
+ * TODO: COMMENT
+ */
 export interface sceneAction
 {
 	type: "ADD_LEVEL" | "ADD_SCENE" | "RENAME_SCENE" | "MOVE_SCENE" | "SELECT_SCENE" | "REMOVE_SCENE" | "REMOVE_ALL_SCENES";

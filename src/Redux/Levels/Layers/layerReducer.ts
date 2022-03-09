@@ -1,6 +1,9 @@
 import { convertNameToId, DEFAULT_SCENE_ID } from "../../../Helpers/LevelsReduxHelper";
 import { layerAction } from "./layerActions";
 
+/**
+ * TODO: COMMENT
+ */
 export interface layersState
 {
 	byId: {
@@ -43,17 +46,20 @@ const createNewLayer = (sceneId: string, layerName: string): layerState =>
 	}
 }
 
+/**
+ * TODO: COMMENT
+ */
 const createDefaultState = (): layersState =>
 {
 	return {
 		byId: {
 			[DEFAULT_SCENE_ID]: {
 				data: {
-					[`${DEFAULT_SCENE_ID}_COLLISION`]: createNewLayer(DEFAULT_SCENE_ID, "Collision"),
-					[`${DEFAULT_SCENE_ID}_LAYER_1`]: createNewLayer(DEFAULT_SCENE_ID, "Layer 1")
+					[`${DEFAULT_SCENE_ID}_Collision`]: createNewLayer(DEFAULT_SCENE_ID, "Collision"),
+					[`${DEFAULT_SCENE_ID}_Layer_1`]: createNewLayer(DEFAULT_SCENE_ID, "Layer 1")
 				},
-				order: [`${DEFAULT_SCENE_ID}_LAYER_1`, `${DEFAULT_SCENE_ID}_COLLISION`],
-				selectedId: `${DEFAULT_SCENE_ID}_LAYER_1`
+				order: [`${DEFAULT_SCENE_ID}_Layer_1`, `${DEFAULT_SCENE_ID}_Collision`],
+				selectedId: `${DEFAULT_SCENE_ID}_Layer_1`
 			}
 		}
 	}
