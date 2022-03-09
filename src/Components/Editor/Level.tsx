@@ -1,11 +1,9 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
-import { layerState } from "../../Redux/Levels/Layers/layerReducer";
 import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
 import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
 import { resetTile, setTile } from "../../Redux/Levels/Tilemap/tilemapActions";
-import { tilemapsState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
@@ -18,12 +16,6 @@ export interface ILevelProps
 	scale: number;
 	selected: boolean;
 	move: (sceneId: string, xPos: number, yPos: number) => void;
-}
-
-interface ILevelSize
-{
-	width: number;
-	height: number;
 }
 
 /**
