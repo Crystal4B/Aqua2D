@@ -1,8 +1,11 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
+import { layerState } from "../../Redux/Levels/Layers/layerReducer";
 import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
 import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
+import { resetTile, setTile } from "../../Redux/Levels/Tilemap/tilemapActions";
+import { tilemapsState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
@@ -32,6 +35,9 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
 	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes.byId[levelId].data[sceneId]);
+	const order = useSelector<rootState, string[]>(state => state.levels.layers.byId[sceneId].order);
+	const selectedLayerId = useSelector<rootState, string>(state => state.levels.layers.byId[sceneId].selectedId);
+	const tilemapData = useSelector<rootState, {[layerId: string]: tileState[][]}>(state => state.levels.tilemaps.byId[sceneId].data);
 	const dispatch = useDispatch();
 
 	const [drag, setDrag] = useState(false);
@@ -48,11 +54,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 	const mouseDownRef = useRef(false);
-	const layersRef = useRef<tileState[][]>(Array(320).fill(0).map(row => new Array(320).fill({xCoord: -1, yCoord: -1, rotation: 0})));
 	const previewRef = useRef({x: -1, y: -1});
-
-	// Initialise States for level
-	const [size, setSize] = useState<ILevelSize>({width: 320, height: 320});
 
 	useEffect(() =>
 	{
@@ -65,24 +67,28 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		const context = canvas.getContext("2d");
 		contextRef.current = context;
 
-		const layers = layersRef.current;
 		if (context != null)
 		{
 			// Draw level
-			for (let i = 0; i < layers.length; i++)
+			for (let i = order.length-1; i >= 0; i--)
 			{
-				for (let j = 0; j < layers[i].length; j++)
-				{
-					if (layers[i][j].xCoord === -1 || layers[i][j].yCoord === -1)
-					{
-						continue;
-					}
+				const layerData = tilemapData[order[i]]
 
-					draw(layers[i][j], i, j);
+				for (let i = 0; i < layerData.length; i++)
+				{
+					for (let j = 0; j < layerData[i].length; j++)
+					{
+						if (layerData[i][j].xCoord === -1 || layerData[i][j].yCoord === -1)
+						{
+							continue;
+						}
+	
+						draw(layerData[i][j], i, j);
+					}
 				}
 			}
 		}
-	}, []);
+	}, [tilemapData]);
 
 	/**
 	 * Renders a preview of the selected tile on the canvas
@@ -112,9 +118,8 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 */
 	const addTile = (x: number, y: number) =>
 	{
-		layersRef.current[x][y] = {...toolbarSettings.tile};
+		dispatch(setTile(sceneId, selectedLayerId, x, y, toolbarSettings.tile));
 		restoreTile(x, y);
-
 	}
 
 	/**
@@ -124,7 +129,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 */
 	const removeTile = (x: number, y: number) =>
 	{
-		layersRef.current[x][y] = {xCoord: -1, yCoord: -1, rotation: 0};
+		dispatch(resetTile(sceneId, selectedLayerId, x, y));
 		restoreTile(x, y);
 	}
 
@@ -145,7 +150,12 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		{
 			// replace tile
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
-			draw(layersRef.current[x][y], x, y);
+
+			for (let i = order.length-1; i >= 0; i--)
+			{
+				const layerData = tilemapData[order[i]]
+				draw(layerData[x][y], x, y);
+			}
 		}
 	}
 
@@ -331,13 +341,13 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	return (
 		<canvas
 			className={`level ${selected ? "selected" : ""}`}
-			width={size.width}
-			height={size.height}
+			width={sceneData.size.width}
+			height={sceneData.size.height}
 			style={{
 				left: `${(sceneData.position.xPos + xOffset)}px`,
 				top: `${(sceneData.position.yPos + yOffset)}px`,
-				width: `${size.width * scale}px`,
-				height: `${size.height * scale}px`
+				width: `${sceneData.size.width * scale}px`,
+				height: `${sceneData.size.height * scale}px`
 			}}
 			ref={canvasRef}
 
