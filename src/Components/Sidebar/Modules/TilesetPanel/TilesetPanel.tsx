@@ -24,8 +24,7 @@ const TilesetPanel = () =>
 	}
 
 	return (
-		<div className="panel">
-			<div className="header">Tileset</div>
+		<>
 			<div className="content">
 				<Toolbar />
 				<div className="tileset" style={{height: "50vh"}}>
@@ -33,7 +32,7 @@ const TilesetPanel = () =>
 					<img ref={assetRef} onClick={handleOnClick} src={tilesetUrl}/>
 				</div>
 			</div>
-		</div> 
+		</> 
 	)
 }
 

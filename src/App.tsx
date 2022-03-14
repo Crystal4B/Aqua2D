@@ -1,13 +1,11 @@
+import './App.css';
 import LevelRenderer from './Components/Editor/LevelRenderer';
 import Sidebar from './Components/Sidebar/Sidebar';
 import PropertiesPanel from './Components/Sidebar/Modules/PropertiesPanel/PropertiesPanel';
-import TilesetPanel from './Components/Sidebar/Modules/TilesetPanel/TilesetPanel';
 import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import Menu from './Components/Menu/Menu';
-import './App.css';
-import LayersPanel from './Components/Sidebar/Modules/LayersPanel/LayersPanel';
 import ControlPanel from './Components/ControlPanel/ControlPanel';
-import GameRenderer from './Components/Renderer/GameRenderer';
+import TabbedPanel from './Components/Sidebar/Modules/TabbedPanel/TabbedPanel';
 
 const App = () =>
 {
@@ -17,12 +15,11 @@ const App = () =>
 			<div className='rowC'>
 				<Sidebar left={true}>
 					<PropertiesPanel />
-					<LayersPanel />
 				</Sidebar>
 				<LevelRenderer />
 				<Sidebar left={false}>
 					<LevelsPanel />
-					<TilesetPanel />
+					<TabbedPanel />
 				</Sidebar>
 			</div>
 			<Menu />
