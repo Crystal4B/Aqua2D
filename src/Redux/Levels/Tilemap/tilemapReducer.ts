@@ -19,7 +19,7 @@ export interface tilemapsState
  */
 function createNewTilemap(): tileState[][]
 {
-	return Array(320).fill(0).map(row => new Array(320).fill(createDefaultTile()));
+	return Array(320/32).fill(0).map(row => new Array(320/32).fill(createDefaultTile()));
 }
 
 /**
