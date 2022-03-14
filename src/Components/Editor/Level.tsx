@@ -63,6 +63,9 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 		if (context != null)
 		{
+			// Clear scene
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
 			// Draw level
 			for (let i = order.length-1; i >= 0; i--)
 			{
@@ -109,8 +112,12 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 				if (layerId === selectedLayerId)
 				{
-					// Draw preview tile
-					draw(toolbarSettings.tile, x, y);
+					console.log(toolbarSettings.tool);
+					if (toolbarSettings.tool === "Draw")
+					{
+						// Draw preview tile
+						draw(toolbarSettings.tile, x, y);
+					}
 				}
 				else
 				{
@@ -254,16 +261,14 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			{
 				addTile(x, y);
 			}
+			else if (toolbarSettings.tool === "Erase")
+			{
+				removeTile(x, y);
+			}
 			else if (toolbarSettings.tool === "Move")
 			{
 				setDrag(true);
 				dragRef.current = {x: event.clientX, y: event.clientY};
-			}
-			break;
-		case 2:
-			if (toolbarSettings.tool === "Erase")
-			{
-				removeTile(x, y);
 			}
 			break;
 		}
@@ -331,6 +336,18 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			if (mouseDownRef.current)
 			{
 				removeTile(x, y);
+			}
+			else
+			{
+				// Update preview only when mouse enters a new square
+				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== 10 && y !== 10)) //TODO: get tile length programmatically
+				{
+					// Restore tile if preview is already drawn on canvas
+					restoreTile(previewRef.current.x, previewRef.current.y);
+
+					// Update preview
+					previewTile(x, y);
+				}
 			}
 		}
 	}

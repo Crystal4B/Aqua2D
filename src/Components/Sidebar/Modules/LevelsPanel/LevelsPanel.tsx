@@ -24,8 +24,6 @@ const LevelsPanel = () =>
 
 	const updateExpand = (index: number) =>
 	{
-		console.log(expand.length, index);
-
 		setExpand(expand.map((_, valueIndex) => {
 			if (valueIndex === index)
 			{

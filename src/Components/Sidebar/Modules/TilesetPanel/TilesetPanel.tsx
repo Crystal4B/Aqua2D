@@ -19,7 +19,6 @@ const TilesetPanel = () =>
 	const handleOnClick = (e: React.MouseEvent) => {
 		const [x, y] = getCoords(e);
 		setSelection({xPos: x*32, yPos: y*32, selected: true});
-		console.log(x*32, y*32);
 		
 		dispatch(switchTile(x, y));
 	}

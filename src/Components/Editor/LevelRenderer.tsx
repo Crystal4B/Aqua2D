@@ -1,14 +1,14 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Level, ILevelProps} from './Level';
 import './Editor.css';
+import {useRef, useState} from 'react';
+import {Level} from './Level';
 import { setOptions } from '../../Redux/Menu/menuActions';
 import { optionState } from '../../Redux/Menu/menuReducer';
 import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../Redux/store';
-import { levelsState, levelState } from '../../Redux/Levels/Levels/levelReducer';
+import { levelsState } from '../../Redux/Levels/Levels/levelReducer';
 import { getLocalizedCoords } from '../../Helpers/TileHelper';
 import { addScene, moveScene } from '../../Redux/Levels/Scenes/sceneActions';
-import { scenesState, sceneState } from '../../Redux/Levels/Scenes/sceneReducer';
+import { sceneState } from '../../Redux/Levels/Scenes/sceneReducer';
 
 interface viewerSettings
 {
