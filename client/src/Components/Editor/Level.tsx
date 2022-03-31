@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCoords} from "../../Helpers/TileHelper";
+import { layerState } from "../../Redux/Levels/Layers/layerReducer";
 import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
 import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
 import { resetTile, setTile } from "../../Redux/Levels/Tilemap/tilemapActions";
@@ -29,6 +30,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes.byId[levelId].data[sceneId]);
 	const order = useSelector<rootState, string[]>(state => state.levels.layers.byId[sceneId].order);
 	const selectedLayerId = useSelector<rootState, string>(state => state.levels.layers.byId[sceneId].selectedId);
+	const layerData = useSelector<rootState, {[layerId: string]: layerState}>(state => state.levels.layers.byId[sceneId].data)
 	const tilemapData = useSelector<rootState, {[layerId: string]: tileState[][]}>(state => state.levels.tilemaps.byId[sceneId].data);
 	const dispatch = useDispatch();
 
@@ -61,26 +63,35 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 		if (context != null)
 		{
+			// Clear scene
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
 			// Draw level
 			for (let i = order.length-1; i >= 0; i--)
 			{
-				const layerData = tilemapData[order[i]]
-
-				for (let i = 0; i < layerData.length; i++)
+				const layer = layerData[order[i]];
+				if (!layer.visible)
 				{
-					for (let j = 0; j < layerData[i].length; j++)
+					continue;
+				}
+
+				const layerTileData = tilemapData[order[i]]
+
+				for (let i = 0; i < layerTileData.length; i++)
+				{
+					for (let j = 0; j < layerTileData[i].length; j++)
 					{
-						if (layerData[i][j].xCoord === -1 || layerData[i][j].yCoord === -1)
+						if (layerTileData[i][j].xCoord === -1 || layerTileData[i][j].yCoord === -1)
 						{
 							continue;
 						}
 	
-						draw(layerData[i][j], i, j);
+						draw(layerTileData[i][j], i, j);
 					}
 				}
 			}
 		}
-	}, [tilemapData]);
+	}, [tilemapData, layerData]);
 
 	/**
 	 * Renders a preview of the selected tile on the canvas
@@ -89,18 +100,37 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 */
 	const previewTile = (x: number, y: number) =>
 	{
-		previewRef.current.x = x;
-		previewRef.current.y = y;
-
 		const context = contextRef.current;
 		if (context != null)
 		{
 			// Remove tile in space
 			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
 
-			// Draw preview tile
-			draw(toolbarSettings.tile, x, y);
+			for (let i = order.length-1; i >= 0; i--)
+			{
+				const layerId = order[i];
+
+				if (layerId === selectedLayerId)
+				{
+					console.log(toolbarSettings.tool);
+					if (toolbarSettings.tool === "Draw")
+					{
+						// Draw preview tile
+						draw(toolbarSettings.tile, x, y);
+					}
+				}
+				else
+				{
+					const layerData = tilemapData[order[i]]
+					draw(layerData[x][y], x, y);
+				}
+
+			}
+
 		}
+
+		previewRef.current.x = x;
+		previewRef.current.y = y;
 	}
 
 	/**
@@ -145,8 +175,14 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 			for (let i = order.length-1; i >= 0; i--)
 			{
-				const layerData = tilemapData[order[i]]
-				draw(layerData[x][y], x, y);
+				const layer = layerData[order[i]];
+				if (!layer.visible)
+				{
+					continue;
+				}
+
+				const layerTileData = tilemapData[order[i]]
+				draw(layerTileData[x][y], x, y);
 			}
 		}
 	}
@@ -225,16 +261,14 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			{
 				addTile(x, y);
 			}
+			else if (toolbarSettings.tool === "Erase")
+			{
+				removeTile(x, y);
+			}
 			else if (toolbarSettings.tool === "Move")
 			{
 				setDrag(true);
 				dragRef.current = {x: event.clientX, y: event.clientY};
-			}
-			break;
-		case 2:
-			if (toolbarSettings.tool === "Erase")
-			{
-				removeTile(x, y);
 			}
 			break;
 		}
@@ -288,7 +322,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			else
 			{
 				// Update preview only when mouse enters a new square
-				if (x !== previewRef.current.x || y !== previewRef.current.y)
+				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== 10 && y !== 10)) //TODO: get tile length programmatically
 				{
 					// Restore tile if preview is already drawn on canvas
 					restoreTile(previewRef.current.x, previewRef.current.y);
@@ -302,6 +336,18 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			if (mouseDownRef.current)
 			{
 				removeTile(x, y);
+			}
+			else
+			{
+				// Update preview only when mouse enters a new square
+				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== 10 && y !== 10)) //TODO: get tile length programmatically
+				{
+					// Restore tile if preview is already drawn on canvas
+					restoreTile(previewRef.current.x, previewRef.current.y);
+
+					// Update preview
+					previewTile(x, y);
+				}
 			}
 		}
 	}

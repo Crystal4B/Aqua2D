@@ -1,0 +1,19 @@
+.horizontal-list
+{
+	list-style: none;
+}
+
+.horizontal-list li
+{
+	display: inline;
+}
+
+.tab-button
+{
+	background: #4f4f4f;
+	border: none;
+	color: white;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+}

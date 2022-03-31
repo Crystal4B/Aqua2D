@@ -1,5 +1,5 @@
 {
-  "name": "Aqua2D",
+  "name": "aqua-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/Crystal4B/Aqua2D/issues"
   },
-  "homepage": "https://github.com/Crystal4B/Aqua2D#readme"
+  "homepage": "https://github.com/Crystal4B/Aqua2D#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "express-graphql": "^0.12.0",
+    "graphql": "^16.3.0"
+  }
 }

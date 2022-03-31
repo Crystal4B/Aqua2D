@@ -51,7 +51,6 @@ const LayersPanel = () =>
 
 	return (
 		<div className="panel">
-			<div className="header">Layers</div>
 			<div className="content" style={{height: "50vh"}} onContextMenu={handleContextMenu}>
 				<ul>
 					{order.map((layerId) => {

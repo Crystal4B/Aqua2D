@@ -19,14 +19,12 @@ const TilesetPanel = () =>
 	const handleOnClick = (e: React.MouseEvent) => {
 		const [x, y] = getCoords(e);
 		setSelection({xPos: x*32, yPos: y*32, selected: true});
-		console.log(x*32, y*32);
 		
 		dispatch(switchTile(x, y));
 	}
 
 	return (
-		<div className="panel">
-			<div className="header">Tileset</div>
+		<>
 			<div className="content">
 				<Toolbar />
 				<div className="tileset" style={{height: "50vh"}}>
@@ -34,7 +32,7 @@ const TilesetPanel = () =>
 					<img ref={assetRef} onClick={handleOnClick} src={tilesetUrl}/>
 				</div>
 			</div>
-		</div> 
+		</> 
 	)
 }
 
