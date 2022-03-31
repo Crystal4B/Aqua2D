@@ -1,56 +1,20 @@
 {
-  "name": "aqua-editor",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.4.0",
-    "@types/node": "^17.0.15",
-    "@types/react": "^17.0.38",
-    "@types/react-dom": "^17.0.11",
-    "@types/react-redux": "^7.1.22",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-draggable": "^4.4.4",
-    "react-icons": "^4.3.1",
-    "react-redux": "^7.2.6",
-    "react-scripts": "5.0.0",
-    "redux": "^4.1.2",
-    "typescript": "^4.5.4",
-    "web-vitals": "^2.1.2"
-  },
+  "name": "Aqua2D",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start:web": "react-scripts start",
-    "start:desktop": "npm run build:all && electron ./build/electron.js",
-    "build:all": "npm run build:web && npm run build:desktop",
-    "build:web": "PUBLIC_URL=./ react-scripts build",
-    "build:desktop": "tsc -p electron/tsconfig.json",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Crystal4B/Aqua2D.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Crystal4B/Aqua2D/issues"
   },
-  "devDependencies": {
-    "electron": "^17.0.0",
-	"postcss": ">=8.2.13",
-	"nth-check": ">=2.0.1"
-  }
+  "homepage": "https://github.com/Crystal4B/Aqua2D#readme"
 }
