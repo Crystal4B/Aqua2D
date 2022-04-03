@@ -10,6 +10,7 @@ import { addLevel } from '../../../../Redux/Levels/Levels/levelsActions';
 import { scenesState } from '../../../../Redux/Levels/Scenes/sceneReducer';
 import { selectScene } from '../../../../Redux/Levels/Scenes/sceneActions';
 import { levelsState } from '../../../../Redux/Levels/Levels/levelReducer';
+import { createLevel } from '../../../../Helpers/databaseHelper';
 
 const LevelsPanel = () =>
 {
@@ -38,6 +39,8 @@ const LevelsPanel = () =>
 	const onAddLevel = () =>
 	{
 		const counter = Object.keys(byId).length;
+		createLevel({name: `Level ${counter + 1}`});
+
 		dispatch(addLevel(`Level ${counter + 1}`));
 	}
 
