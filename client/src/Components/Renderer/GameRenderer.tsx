@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom"
 import { useSelector } from "react-redux";
+import { objectState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import { rootState } from "../../Redux/store";
 import { tileState, toolState } from "../../Redux/Tools/toolReducer";
 
@@ -18,7 +19,7 @@ const GameRenderer: React.FC<Props> = ({container}) =>
 
 	const tileset = useSelector<rootState, toolState['tileset']>(state => state.toolbar.tileset);
 	const order = useSelector<rootState, string[]>(state => state.levels.layers.byId["Level_1_Scene_1"].order);
-	const tilemapData = useSelector<rootState, {[layerId: string]: tileState[][]}>(state => state.levels.tilemaps.byId["Level_1_Scene_1"].data);
+	const tilemapData = useSelector<rootState, {[layerId: string]: {tilemap: tileState[][], objects: objectState[]}}>(state => state.levels.tilemaps.byId["Level_1_Scene_1"].data);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D>();
@@ -75,17 +76,25 @@ const GameRenderer: React.FC<Props> = ({container}) =>
 			{
 				const layerData = tilemapData[order[i]]
 
-				for (let i = 0; i < layerData.length; i++)
+				for (let i = 0; i < layerData.tilemap.length; i++)
 				{
-					for (let j = 0; j < layerData[i].length; j++)
+					for (let j = 0; j < layerData.tilemap[i].length; j++)
 					{
-						if (layerData[i][j].xCoord === -1 || layerData[i][j].yCoord === -1)
+						if (layerData.tilemap[i][j].xCoord === -1 || layerData.tilemap[i][j].yCoord === -1)
 						{
 							continue;
 						}
-	
-						draw(layerData[i][j], i, j);
+
+						draw(layerData.tilemap[i][j], i, j);
 					}
+				}
+
+				for (let i = 0; i < layerData.objects.length; i++)
+				{
+					let image = new Image();
+					image.src = layerData.objects[i].image;
+
+					context.drawImage(image, layerData.objects[i].x, layerData.objects[i].y, layerData.objects[i].width, layerData.objects[i].height);
 				}
 			}
 		}

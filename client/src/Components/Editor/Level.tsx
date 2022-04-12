@@ -1,10 +1,11 @@
 import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {getCoords} from "../../Helpers/TileHelper";
+import {getCanvasCoords, getGridCoords} from "../../Helpers/TileHelper";
 import { layerState } from "../../Redux/Levels/Layers/layerReducer";
 import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
 import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
-import { resetTile, setTile } from "../../Redux/Levels/Tilemap/tilemapActions";
+import { addObject, moveObject, resetTile, setTile } from "../../Redux/Levels/Tilemap/tilemapActions";
+import { objectState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
@@ -31,11 +32,13 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	const order = useSelector<rootState, string[]>(state => state.levels.layers.byId[sceneId].order);
 	const selectedLayerId = useSelector<rootState, string>(state => state.levels.layers.byId[sceneId].selectedId);
 	const layerData = useSelector<rootState, {[layerId: string]: layerState}>(state => state.levels.layers.byId[sceneId].data)
-	const tilemapData = useSelector<rootState, {[layerId: string]: tileState[][]}>(state => state.levels.tilemaps.byId[sceneId].data);
+	const tilemapData = useSelector<rootState, {[layerId: string]: {tilemap: tileState[][], objects: objectState[]}}>(state => state.levels.tilemaps.byId[sceneId].data);
 	const dispatch = useDispatch();
 
-	const [drag, setDrag] = useState(false);
+	const [redraw, setRedraw] = useState(false);
+	const [drag, setDrag] = useState<number | null>(null);
 	const dragRef = useRef({x: 0, y: 0});
+	const locationRef = useRef({x: sceneData.position.xPos, y: sceneData.position.yPos});
 
 	// Load image
 	const image = new Image();
@@ -77,21 +80,26 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 				const layerTileData = tilemapData[order[i]]
 
-				for (let i = 0; i < layerTileData.length; i++)
+				for (let i = 0; i < layerTileData.tilemap.length; i++)
 				{
-					for (let j = 0; j < layerTileData[i].length; j++)
+					for (let j = 0; j < layerTileData.tilemap[i].length; j++)
 					{
-						if (layerTileData[i][j].xCoord === -1 || layerTileData[i][j].yCoord === -1)
+						if (layerTileData.tilemap[i][j].xCoord === -1 || layerTileData.tilemap[i][j].yCoord === -1)
 						{
 							continue;
 						}
 	
-						draw(layerTileData[i][j], i, j);
+						draw(layerTileData.tilemap[i][j], i, j);
 					}
+				}
+
+				for (let i = 0; i < layerTileData.objects.length; i++)
+				{
+					drawObject(layerTileData.objects[i])
 				}
 			}
 		}
-	}, [tilemapData, layerData]);
+	}, [tilemapData, layerData, redraw]);
 
 	/**
 	 * Renders a preview of the selected tile on the canvas
@@ -112,7 +120,6 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 				if (layerId === selectedLayerId)
 				{
-					console.log(toolbarSettings.tool);
 					if (toolbarSettings.tool === "Draw")
 					{
 						// Draw preview tile
@@ -122,7 +129,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				else
 				{
 					const layerData = tilemapData[order[i]]
-					draw(layerData[x][y], x, y);
+					draw(layerData.tilemap[x][y], x, y);
 				}
 
 			}
@@ -182,7 +189,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				}
 
 				const layerTileData = tilemapData[order[i]]
-				draw(layerTileData[x][y], x, y);
+				draw(layerTileData.tilemap[x][y], x, y);
 			}
 		}
 	}
@@ -222,13 +229,23 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		}
 	}
 
+	const drawObject = (object: objectState) =>
+	{
+		const context = canvasRef.current?.getContext("2d");
+		if (!context)
+			return;
+
+		let image = new Image();
+		image.src = object.image;
+		context.drawImage(image, object.x, object.y, object.width, object.height);
+	}
+
 	/**
 	 * Used to reset the drawing references for the level
 	 */
 	const resetDrawing = (hard: boolean = false) =>
 	{
 		mouseDownRef.current = false;
-		setDrag(false);
 		
 		if (hard)
 		{
@@ -241,20 +258,20 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 * Handles mouse down events. For a level mouse downn means that the user is
 	 * interacting with the level
 	 */
-	const handleMouseDown = (event: React.MouseEvent) =>
+	const handleMouseDown = ({target, clientX, clientY, button}: React.MouseEvent) =>
 	{
 		if (!sceneData.selected)
 		{
 			dispatch(selectScene(levelId, sceneData.id));
 		}
 
-		if (event.button === 0 || event.button === 2)
+		if (button === 0 || button === 2)
 		{
 			mouseDownRef.current = true;
 		}
 
-		const [x, y] = getCoords(event);
-		switch(event.button)
+		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY);
+		switch(button)
 		{
 		case 0:
 			if (toolbarSettings.tool === "Draw")
@@ -267,8 +284,10 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			}
 			else if (toolbarSettings.tool === "Move")
 			{
-				setDrag(true);
-				dragRef.current = {x: event.clientX, y: event.clientY};
+				const [xCoord, yCoord] = getCanvasCoords(target as HTMLElement, clientX, clientY);
+				imageHit(xCoord, yCoord);
+
+				dragRef.current = {x: clientX, y: clientY};
 			}
 			break;
 		}
@@ -286,7 +305,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 * Handles mouse move events. For a level mouse move means drawing
 	 * as well as previews of tiles
 	 */
-	const handleMouseMove = (event: React.MouseEvent) =>
+	const handleMouseMove = ({target, clientX, clientY}: React.MouseEvent) =>
 	{
 		if (!selected)
 		{
@@ -295,7 +314,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 		const canvas = canvasRef.current;
 		const context = contextRef.current;
-		const [x, y] = getCoords(event);
+		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY);
 		if (canvas == null || context == null)
 		{
 			return;
@@ -307,11 +326,20 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			if (mouseDownRef.current)
 			{
 				const {x, y} = dragRef.current;
-				const mouseX = event.clientX - x;
-				const mouseY = event.clientY - y;
-				dragRef.current = {x: event.clientX, y: event.clientY}
+				const mouseX = clientX - x;
+				const mouseY = clientY - y;
 
-				move(sceneId, sceneData.position.xPos + mouseX, sceneData.position.yPos + mouseY);
+				dragRef.current = {x: clientX, y: clientY}
+
+				if (drag !== null)
+				{
+					const layerTileData = tilemapData[selectedLayerId]
+					dispatch(moveObject(sceneId, selectedLayerId, drag, layerTileData.objects[drag].x + mouseX, layerTileData.objects[drag].y + mouseY));
+					setRedraw(!redraw);
+				} else {
+					move(sceneId, locationRef.current.x + mouseX, locationRef.current.y + mouseY);
+					locationRef.current = {x: locationRef.current.x + mouseX, y: locationRef.current.y + mouseY}
+				}
 			}
 			break;
 		case "Draw":
@@ -376,6 +404,53 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		event.stopPropagation();
 	}
 
+	const handleDragOver = (event: React.DragEvent) =>
+	{
+		event.preventDefault();
+	}
+
+	const handleDrop = ({dataTransfer, target, clientX, clientY}: React.DragEvent) =>
+	{
+		let imageLink = dataTransfer.getData('drag-item');
+		const [xCoord, yCoord] = getCanvasCoords(target as HTMLElement, clientX, clientY);
+
+		drawObject({x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink});
+		dispatch(addObject(sceneId, selectedLayerId, {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink}));
+	}
+
+	const checkObjectArea = (object: objectState) =>
+	{
+		const canvas = canvasRef.current;
+		if (!canvas)
+			return;
+
+		const [x, y] = getGridCoords(canvas, object.x, object.y);
+		const [x2, y2] = getGridCoords(canvas, object.x + object.width, object.y + object.height);
+
+		return [x, y, x2, y2]
+	}
+
+	const imageHit = (x: number, y: number) =>
+	{
+		let hitImage = null;
+
+		const layerTileData = tilemapData[selectedLayerId]
+		for (let i = 0; i < layerTileData.objects.length; i++)
+		{
+			let image = layerTileData.objects[i];
+			let imageXHit = x > image.x && x < image.x + image.width;
+			let imageYHit = y > image.y && y < image.y + image.height;
+
+			if (imageXHit && imageYHit)
+			{
+				hitImage = i;
+				break;
+			}
+		}
+
+		setDrag(hitImage);
+	}
+
 	return (
 		<canvas
 			className={`level ${selected ? "selected" : ""}`}
@@ -388,6 +463,9 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				height: `${sceneData.size.height * scale}px`
 			}}
 			ref={canvasRef}
+
+			onDragOver={handleDragOver}
+			onDrop={handleDrop}
 
 			onMouseDown={handleMouseDown}
 			onMouseUp={handleMouseUp}

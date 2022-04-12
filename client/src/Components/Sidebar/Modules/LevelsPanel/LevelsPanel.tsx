@@ -10,7 +10,6 @@ import { addLevel } from '../../../../Redux/Levels/Levels/levelsActions';
 import { scenesState } from '../../../../Redux/Levels/Scenes/sceneReducer';
 import { selectScene } from '../../../../Redux/Levels/Scenes/sceneActions';
 import { levelsState } from '../../../../Redux/Levels/Levels/levelReducer';
-import { createLevel } from '../../../../Helpers/databaseHelper';
 
 const LevelsPanel = () =>
 {
@@ -39,8 +38,6 @@ const LevelsPanel = () =>
 	const onAddLevel = () =>
 	{
 		const counter = Object.keys(byId).length;
-		createLevel({name: `Level ${counter + 1}`});
-
 		dispatch(addLevel(`Level ${counter + 1}`));
 	}
 
@@ -65,21 +62,19 @@ const LevelsPanel = () =>
 						<li key={currentLevelId} className='menu-item'>
 							<div className='menu-title' onClick={() => updateExpand(index)}>
 								<FaMap className='icon' /> {byId[currentLevelId].levelName}
-								{Object.keys(scenes[currentLevelId].data).length > 0
-									? 
+								{Object.keys(scenes[currentLevelId].data).length > 0 ?
 									expand[index]  ? <RiArrowDropUpLine /> : <RiArrowDropDownLine />
-									:
+								:
 									null
 								}
 							</div>
-							{Object.keys(scenes[currentLevelId].data).length > 0 && expand[index]
-								?
+							{Object.keys(scenes[currentLevelId].data).length > 0 && expand[index] ?
 								<ul className={`sub-menu active`}>
 									{Object.keys(scenes[currentLevelId].data).map((currentSceneId) => (
 										<li key={currentSceneId} className={`${scenes[currentLevelId].selectedId === currentSceneId && currentLevelId === selectedId ? "active" : ""}`} onClick={() => {onSelectScene(currentLevelId, currentSceneId)}}><FaMapMarkerAlt className='icon'/> {scenes[currentLevelId].data[currentSceneId].sceneName}</li>
 									))}
 								</ul>
-								:
+							:
 								null
 							}
 						</li>
