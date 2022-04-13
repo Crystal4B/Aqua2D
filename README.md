@@ -19,16 +19,16 @@
 <h3 align="center">Aqua2D</h3>
 
   <p align="center">
-    project_description
+    2D Top-down game creation tool using HTML5
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/Crystal4B/Aqua2D"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
+    <a href="https://github.com/Crystal4B/Aqua2D">View Demo</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
+    <a href="https://github.com/Crystal4B/Aqua2D/issues">Report Bug</a>
     ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
+    <a href="https://github.com/Crystal4B/Aqua2D/issues">Request Feature</a>
   </p>
 </div>
 
