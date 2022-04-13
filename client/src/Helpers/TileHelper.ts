@@ -16,10 +16,10 @@ export const getCanvasCoords = (target: HTMLElement, clientX: number, clientY: n
 	return [xCoord, yCoord];
 }
 
-export const getGridCoords = (target: HTMLElement, clientX: number, clientY: number) =>
+export const getGridCoords = (target: HTMLElement, clientX: number, clientY: number, tileWidth: number, tileHeight: number) =>
 {
 	const [xCoord, yCoord] = getCanvasCoords(target, clientX, clientY);
-	return [Math.floor(xCoord / 32), Math.floor(yCoord / 32)];
+	return [Math.floor(xCoord / tileWidth), Math.floor(yCoord / tileHeight)];
 }
 
 /**

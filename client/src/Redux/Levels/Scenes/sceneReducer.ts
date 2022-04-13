@@ -28,6 +28,11 @@ export interface sceneState
 		width: number;
 		height: number;
 	}
+	tileset: {
+		image?: string | undefined;
+		tileWidth: number,
+		tileHeight: number
+	}
 }
 
 /**
@@ -47,7 +52,11 @@ const createNewScene = (levelId: string, sceneName: string, selected: boolean, p
 		sceneName: sceneName,
 		selected: selected,
 		position: position,
-		size: size
+		size: size,
+		tileset: {
+			tileWidth: 32,
+			tileHeight: 32
+		}
 	}
 }
 
@@ -142,11 +151,44 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 		var name = payload.name;
 		if (!name)
 		{
-			name = "Default_Name";
+			name = "";
 		}
 
-		state.byId[payload.levelId].data[payload.levelId] = {...state.byId[payload.levelId].data[payload.sceneId], sceneName: name}; // Take levelId also
-		return state;
+		return {
+			byId: {
+				...state.byId,
+				[payload.levelId]: {
+					...state.byId[payload.levelId],
+					data: {
+						...state.byId[payload.levelId].data,
+						[payload.sceneId]: {
+							...state.byId[payload.levelId].data[payload.sceneId],
+							sceneName: name
+						}
+					}
+				}
+			}
+		};
+	case "RESIZE_SCENE":
+		var size = payload.size;
+		if (!payload.sceneId || !size)
+			return state;
+
+		return {
+			byId: {
+				...state.byId,
+				[payload.levelId]: {
+					...state.byId[payload.levelId],
+					data: {
+						...state.byId[payload.levelId].data,
+						[payload.sceneId]: {
+							...state.byId[payload.levelId].data[payload.sceneId],
+							size: size
+						}
+					}
+				}
+			}
+		}
 	case "MOVE_SCENE":
 		if (!payload.sceneId)
 		{
@@ -169,6 +211,51 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 						[payload.sceneId]: {
 							...state.byId[payload.levelId].data[payload.sceneId],
 							position: position
+						}
+					}
+				}
+			}
+		};
+	case "SWITCH_TILESET":
+		if (!payload.sceneId || !payload.tileset?.image)
+			return state;
+	
+		return {
+			byId: {
+				...state.byId,
+				[payload.levelId]: {
+					...state.byId[payload.levelId],
+					data: {
+						...state.byId[payload.levelId].data,
+						[payload.sceneId]: {
+							...state.byId[payload.levelId].data[payload.sceneId],
+							tileset: {
+								...state.byId[payload.levelId].data[payload.sceneId].tileset,
+								image: payload.tileset.image
+							}
+						}
+					}
+				}
+			}
+		};
+	case "RESIZE_TILES":
+		if (!payload.sceneId || !payload.tileset?.tileWidth || !payload.tileset.tileHeight)
+			return state;
+
+		return {
+			byId: {
+				...state.byId,
+				[payload.levelId]: {
+					...state.byId[payload.levelId],
+					data: {
+						...state.byId[payload.levelId].data,
+						[payload.sceneId]: {
+							...state.byId[payload.levelId].data[payload.sceneId],
+							tileset: {
+								...state.byId[payload.levelId].data[payload.sceneId].tileset,
+								tileWidth: payload.tileset.tileWidth,
+								tileHeight: payload.tileset.tileHeight
+							}
 						}
 					}
 				}

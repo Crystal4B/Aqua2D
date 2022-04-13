@@ -7,7 +7,7 @@ const ObjectPanel = () => {
 			<div className="header">Objects</div>
 			<Toolbar type='objects'/>
 			<br></br>
-			<div className="properties-list" style={{height: "50vh"}}>
+			<div className="object-list" style={{height: "50vh"}}>
 				<ImageBox image='/clipart4773647.png'/>
 				<ImageBox image='/Young_Link_2D (1).png'/>
 				<ImageBox image='/Zombie_back_sprite.png'/>

@@ -88,23 +88,29 @@ To get a copy of the project locally and start up the application follow these s
 ### Prerequisites
 
 * npm
-  ```sh
+  ```
   npm install npm@latest -g
   ```
 
 ### Installation
 
 1. Clone the repo
-   ```sh
+   ```
    git clone https://github.com/Crystal4B/Aqua2D.git
    ```
 2. Install NPM packages
-   ```sh
+   ```
    npm install
    ```
 3. Run Application
-   - Web: `npm run start:web`
-   - Desktop: `npm run start:desktop`
+   - Web
+      ```
+      npm run start:web
+      ```
+   - Desktop
+      ```
+      npm run start:desktop
+      ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

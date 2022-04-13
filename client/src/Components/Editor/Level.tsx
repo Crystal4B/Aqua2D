@@ -25,8 +25,6 @@ export interface ILevelProps
  */
 export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move}: ILevelProps) =>
 {
-	const squareSize = 32;
-
 	const toolbarSettings = useSelector<rootState, toolState>(state => state.toolbar);
 	const sceneData = useSelector<rootState, sceneState>(state => state.levels.scenes.byId[levelId].data[sceneId]);
 	const order = useSelector<rootState, string[]>(state => state.levels.layers.byId[sceneId].order);
@@ -42,9 +40,9 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 	// Load image
 	const image = new Image();
-	if (toolbarSettings.tileset)
+	if (sceneData.tileset.image)
 	{
-		image.src = toolbarSettings.tileset;
+		image.src = sceneData.tileset.image;
 	}
 
 	// Initilise References for level
@@ -112,7 +110,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		if (context != null)
 		{
 			// Remove tile in space
-			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			context.clearRect(x * sceneData.tileset.tileWidth, y * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
 
 			for (let i = order.length-1; i >= 0; i--)
 			{
@@ -178,7 +176,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		if (context != null)
 		{
 			// replace tile
-			context.clearRect(x * squareSize, y * squareSize, squareSize, squareSize);
+			context.clearRect(x * sceneData.tileset.tileWidth, y * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
 
 			for (let i = order.length-1; i >= 0; i--)
 			{
@@ -213,15 +211,15 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			if (tile.rotation % 360 !== 0 && tile.rotation !== 0)
 			{
 				const TO_RADIANS = Math.PI/180;
-				const cx = x * squareSize + squareSize / 2;
-				const cy = y * squareSize +  squareSize / 2;
+				const cx = x * sceneData.tileset.tileWidth + sceneData.tileset.tileWidth / 2;
+				const cy = y * sceneData.tileset.tileHeight +  sceneData.tileset.tileHeight / 2;
 
 				context.save();
 				context.translate(cx, cy);
 				context.rotate(tile.rotation * TO_RADIANS);
 				context.translate(-cx, -cy);
 			}
-			context.drawImage(image, tile.xCoord * squareSize, tile.yCoord * squareSize, squareSize, squareSize, x * squareSize, y * squareSize, squareSize, squareSize);
+			context.drawImage(image, tile.xCoord * sceneData.tileset.tileWidth, tile.yCoord * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight, x * sceneData.tileset.tileWidth, y * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
 			if (tile.rotation % 360 !== 0 || tile.rotation !== 0)
 			{
 				context.restore();
@@ -229,6 +227,11 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		}
 	}
 
+	/**
+	 * Function for drawing objects on the canvas
+	 * @param object Object being drawn
+	 * @returns null if canvas context is not defined yet
+	 */
 	const drawObject = (object: objectState) =>
 	{
 		const context = canvasRef.current?.getContext("2d");
@@ -270,7 +273,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			mouseDownRef.current = true;
 		}
 
-		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY);
+		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
 		switch(button)
 		{
 		case 0:
@@ -314,7 +317,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 		const canvas = canvasRef.current;
 		const context = contextRef.current;
-		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY);
+		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
 		if (canvas == null || context == null)
 		{
 			return;
@@ -350,7 +353,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			else
 			{
 				// Update preview only when mouse enters a new square
-				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== 10 && y !== 10)) //TODO: get tile length programmatically
+				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== tilemapData[selectedLayerId].tilemap.length && y !== tilemapData[selectedLayerId].tilemap[0].length && x >= 0 && y >= 0))
 				{
 					// Restore tile if preview is already drawn on canvas
 					restoreTile(previewRef.current.x, previewRef.current.y);
@@ -368,7 +371,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			else
 			{
 				// Update preview only when mouse enters a new square
-				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== 10 && y !== 10)) //TODO: get tile length programmatically
+				if ((x !== previewRef.current.x || y !== previewRef.current.y) && (x !== tilemapData[selectedLayerId].tilemap.length && y !== tilemapData[selectedLayerId].tilemap[0].length && x >= 0 && y >= 0))
 				{
 					// Restore tile if preview is already drawn on canvas
 					restoreTile(previewRef.current.x, previewRef.current.y);
@@ -404,11 +407,19 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		event.stopPropagation();
 	}
 
+	/**
+	 * Function for handling the dragOver event. preventing default to capture the data
+	 * @param event drag event being fired
+	 */
 	const handleDragOver = (event: React.DragEvent) =>
 	{
 		event.preventDefault();
 	}
 
+	/**
+	 * Function for handling the drop event for transfering objects into a scene
+	 * @param event drag event being fired broken down into dataTransfer, target, clientX, clientY
+	 */
 	const handleDrop = ({dataTransfer, target, clientX, clientY}: React.DragEvent) =>
 	{
 		let imageLink = dataTransfer.getData('drag-item');
@@ -418,18 +429,11 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		dispatch(addObject(sceneId, selectedLayerId, {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink}));
 	}
 
-	const checkObjectArea = (object: objectState) =>
-	{
-		const canvas = canvasRef.current;
-		if (!canvas)
-			return;
-
-		const [x, y] = getGridCoords(canvas, object.x, object.y);
-		const [x2, y2] = getGridCoords(canvas, object.x + object.width, object.y + object.height);
-
-		return [x, y, x2, y2]
-	}
-
+	/**
+	 * Image hit updates the drag section to a image if its clicked
+	 * @param x The x location being checked
+	 * @param y The y location being checked
+	 */
 	const imageHit = (x: number, y: number) =>
 	{
 		let hitImage = null;

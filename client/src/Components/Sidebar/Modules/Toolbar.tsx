@@ -9,8 +9,9 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { rootState } from '../../../Redux/store';
 import { toolState } from '../../../Redux/Tools/toolReducer';
-import { rotationTile, switchTileset, switchTool } from '../../../Redux/Tools/toolActions';
+import { rotationTile, switchTool } from '../../../Redux/Tools/toolActions';
 import { extractFilesAsURL } from '../../../Helpers/InputHelper';
+import { switchTileset } from '../../../Redux/Levels/Scenes/sceneActions';
 
 interface toolbarProps
 {
@@ -19,6 +20,18 @@ interface toolbarProps
 
 const Toolbar = (props: toolbarProps) =>
 {
+	const tileset = useSelector<rootState, {levelId: string, sceneId: string, tileset: {image?: string, tileWidth: number, tileHeight: number}}>(state => {
+		const levelId = state.levels.levels.selectedId;
+		const sceneId = state.levels.scenes.byId[levelId].selectedId;
+		const tileset = state.levels.scenes.byId[levelId].data[sceneId].tileset;
+
+		return {
+			levelId: levelId,
+			sceneId: sceneId,
+			tileset: tileset
+		}
+	})
+
 	const tool = useSelector<rootState, toolState["tool"]>(state => state.toolbar.tool);
 	const dispatch = useDispatch();
 
@@ -38,7 +51,7 @@ const Toolbar = (props: toolbarProps) =>
 		const url = extractFilesAsURL(input);
 		if (url)
 		{
-			dispatch(switchTileset(url));
+			dispatch(switchTileset(tileset.levelId, tileset.sceneId, url));
 		}
 	}
 

@@ -25,12 +25,6 @@ export const switchTool = (tool: string): toolAction =>
 	return {type: "SWITCHTOOL", payload: {tool: tool}};
 }
 
-// TODO: DOCS
-export const switchTileset = (tileset: string): toolAction =>
-{
-	return {type: "SWITCHTILESET", payload: {tileset: tileset}};
-}
-
 /**
  * switchAsset generates a action for switching assets in the toolReducer
  * @param asset ImageData object representing the asset being placed on the level

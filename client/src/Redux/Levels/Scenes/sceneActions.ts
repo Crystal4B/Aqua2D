@@ -3,7 +3,7 @@
  */
 export interface sceneAction
 {
-	type: "ADD_LEVEL" | "ADD_SCENE" | "RENAME_SCENE" | "MOVE_SCENE" | "SELECT_SCENE" | "REMOVE_SCENE" | "REMOVE_ALL_SCENES";
+	type: "ADD_LEVEL" | "ADD_SCENE" | "RENAME_SCENE" | "RESIZE_SCENE" | "MOVE_SCENE" | "SWITCH_TILESET" | "RESIZE_TILES" | "SELECT_SCENE" | "REMOVE_SCENE" | "REMOVE_ALL_SCENES";
 	payload: {
 		levelId: string,
 		sceneId?: string,
@@ -15,6 +15,11 @@ export interface sceneAction
 		size?: {
 			width: number,
 			height: number,
+		}
+		tileset?: {
+			image?: string,
+			tileWidth?: number,
+			tileHeight?: number
 		}
 	}
 }
@@ -81,6 +86,29 @@ export const moveScene = (levelId: string, sceneId: string, xPos: number, yPos: 
 }
 
 /**
+ * TODO:
+ * @param levelId 
+ * @param sceneId 
+ * @param width 
+ * @param height 
+ * @returns 
+ */
+export const resizeScene = (levelId: string, sceneId: string, width: number, height: number): sceneAction =>
+{
+	return {
+		type: "RESIZE_SCENE",
+		payload: {
+			levelId: levelId,
+			sceneId: sceneId,
+			size: {
+				width: width,
+				height: height
+			}
+		}
+	}
+}
+
+/**
  * renameScene generates an action for renaming a scene from a level in the state
  * @param sceneId the id of the scene being renamed
  * @param newSceneName the desired name of the scene being renamed
@@ -94,6 +122,35 @@ export const renameScene = (levelId: string, sceneId: string, newSceneName: stri
 			levelId: levelId,
 			sceneId: sceneId,
 			name: newSceneName
+		}
+	};
+}
+
+export const switchTileset = (levelId: string, sceneId: string, tileset: string): sceneAction =>
+{
+	return {
+		type: "SWITCH_TILESET",
+		payload: {
+			levelId: levelId,
+			sceneId: sceneId,
+			tileset: {
+				image: tileset
+			}
+		}
+	};
+}
+
+export const resizeTiles = (levelId: string, sceneId: string, tileWidth: number, tileHeight: number): sceneAction =>
+{
+	return {
+		type: "RESIZE_TILES",
+		payload: {
+			levelId: levelId,
+			sceneId: sceneId,
+			tileset: {
+				tileWidth: tileWidth,
+				tileHeight: tileHeight
+			}
 		}
 	};
 }

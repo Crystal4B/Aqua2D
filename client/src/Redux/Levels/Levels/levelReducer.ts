@@ -1,6 +1,4 @@
 import {convertNameToId, DEFAULT_LEVEL_ID} from "../../../Helpers/LevelsReduxHelper";
-import { layerAction } from "../Layers/layerActions";
-import { sceneAction } from "../Scenes/sceneActions";
 import {levelAction} from "./levelsActions";
 
 /**

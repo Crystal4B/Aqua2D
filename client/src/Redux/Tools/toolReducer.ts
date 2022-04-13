@@ -6,7 +6,6 @@ import { toolAction } from "./toolActions";
 export interface toolState
 {
 	tool: string;
-	tileset: string | undefined;
 	tile: tileState;
 };
 
@@ -23,7 +22,6 @@ export interface tileState
 const initialState: toolState =
 {
 	tool: "Move",
-	tileset: undefined,
 	tile: {
 		xCoord: -1,
 		yCoord: -1,
@@ -46,13 +44,6 @@ const toolReducer = (state: toolState = initialState, action: toolAction): toolS
 			return {...state, tool: action.payload.tool};
 		}
 		return state;
-	case "SWITCHTILESET":
-		if (state.tileset)
-		{
-			URL.revokeObjectURL(state.tileset);
-		}
-
-		return {...state, tileset: action.payload.tileset};
 	case "SWITCHTILE":
 		var xCoord = state.tile.xCoord;
 		var yCoord = state.tile.yCoord;

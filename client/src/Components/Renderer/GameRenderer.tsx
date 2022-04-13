@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {createPortal} from "react-dom"
 import { useSelector } from "react-redux";
+import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
 import { objectState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import { rootState } from "../../Redux/store";
 import { tileState, toolState } from "../../Redux/Tools/toolReducer";
@@ -15,9 +16,13 @@ const GameRenderer: React.FC<Props> = ({container}) =>
 	// Initialise States for level
 	const [size, setSize] = useState({width: 320, height: 320});
 
-	const squareSize = 32;
+	const tileset = useSelector<rootState, sceneState['tileset']>(state => {
+		const levelId = state.levels.levels.selectedId;
+		const sceneId = state.levels.scenes.byId[levelId].selectedId;
+		const tileset = state.levels.scenes.byId[levelId].data[sceneId].tileset;
 
-	const tileset = useSelector<rootState, toolState['tileset']>(state => state.toolbar.tileset);
+		return tileset
+	});
 	const order = useSelector<rootState, string[]>(state => state.levels.layers.byId["Level_1_Scene_1"].order);
 	const tilemapData = useSelector<rootState, {[layerId: string]: {tilemap: tileState[][], objects: objectState[]}}>(state => state.levels.tilemaps.byId["Level_1_Scene_1"].data);
 
@@ -27,9 +32,9 @@ const GameRenderer: React.FC<Props> = ({container}) =>
 
 	// Load image
 	const image = new Image();
-	if (tileset)
+	if (tileset.image)
 	{
-		image.src = tileset;
+		image.src = tileset.image;
 	}
 
 	/**
@@ -51,15 +56,15 @@ const GameRenderer: React.FC<Props> = ({container}) =>
 			if (tile.rotation % 360 !== 0 && tile.rotation !== 0)
 			{
 				const TO_RADIANS = Math.PI/180;
-				const cx = x * squareSize + squareSize / 2;
-				const cy = y * squareSize +  squareSize / 2;
+				const cx = x * tileset.tileWidth + tileset.tileWidth / 2;
+				const cy = y * tileset.tileHeight +  tileset.tileHeight / 2;
 
 				context.save();
 				context.translate(cx, cy);
 				context.rotate(tile.rotation * TO_RADIANS);
 				context.translate(-cx, -cy);
 			}
-			context.drawImage(image, tile.xCoord * squareSize, tile.yCoord * squareSize, squareSize, squareSize, x * squareSize, y * squareSize, squareSize, squareSize);
+			context.drawImage(image, tile.xCoord * tileset.tileWidth, tile.yCoord * tileset.tileHeight, tileset.tileWidth, tileset.tileHeight, x * tileset.tileHeight, y * tileset.tileHeight, tileset.tileWidth, tileset.tileHeight);
 			if (tile.rotation % 360 !== 0 || tile.rotation !== 0)
 			{
 				context.restore();

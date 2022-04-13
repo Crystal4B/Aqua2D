@@ -21,6 +21,10 @@ export interface tilemapsState
 			data: {[layerId: string]: {
 					tilemap: tileState[][]
 					objects: objectState[]
+					tileSize: {
+						tileWidth: number,
+						tileHeight: number
+					}
 				}
 			}
 		}
@@ -55,16 +59,64 @@ const createDefaultState = (): tilemapsState =>
 				data: {
 					[`${DEFAULT_SCENE_ID}_Collision`]: {
 						tilemap: createNewTilemap(),
-						objects: []
+						objects: [],
+						tileSize: {
+							tileWidth: 32,
+							tileHeight: 32
+						}
 					},
 					[`${DEFAULT_SCENE_ID}_Layer_1`]: {
 						tilemap: createNewTilemap(),
-						objects: []
+						objects: [],
+						tileSize: {
+							tileWidth: 32,
+							tileHeight: 32
+						}
 					}
 				}
 			}
 		}
 	}
+}
+
+const resizeArray = (array: tileState[][], newWidth: number, newHeight: number): tileState[][] =>
+{
+	let heightDelta = array[0].length - newHeight;
+	if (heightDelta !== 0)
+	{
+		for (let i = 0; i < array.length; i++)
+		{
+			if (heightDelta > 0)
+			{
+				array[i].length = newHeight;
+			}
+			else
+			{
+				let deltaClone = heightDelta;
+				while (deltaClone < 0)
+				{
+					array[i].push(createDefaultTile());
+					deltaClone++;
+				}
+			}
+		}
+	}
+
+	let widthDelta = array.length - newWidth;
+	if (widthDelta > 0)
+	{
+		array.length = newWidth;
+	}
+	else
+	{
+		while (widthDelta < 0)
+		{
+			array.push(new Array(newHeight).fill(createDefaultTile()));
+			widthDelta++;
+		}
+	}
+
+	return array;
 }
 
 /**
@@ -85,14 +137,14 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 			return state;
 
 		// Handle levelId
-		var levelId = payload.levelId;
+		let levelId = payload.levelId;
 		if (type === "ADD_LEVEL")
 		{
 			levelId = convertNameToId(levelId);
 		}
 
 		// Handle sceneName
-		var sceneName = "Scene_1";
+		let sceneName = "Scene_1";
 		if (type === "ADD_SCENE")
 		{
 			if (!payload.name)
@@ -102,7 +154,7 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 		}
 		
 		const sceneId = `${levelId}_${sceneName}`;
-		var layerIds = [`${sceneId}_Collision`, `${sceneId}_Layer_1`];
+		let layerIds = [`${sceneId}_Collision`, `${sceneId}_Layer_1`];
 
 		return {
 			byId: {
@@ -111,11 +163,19 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 					data: {
 						[layerIds[0]]: {
 							tilemap: createNewTilemap(),
-							objects: []
+							objects: [],
+							tileSize: {
+								tileWidth: 32,
+								tileHeight: 32
+							}
 						},
 						[layerIds[1]]: {
 							tilemap: createNewTilemap(),
-							objects: []
+							objects: [],
+							tileSize: {
+								tileWidth: 32,
+								tileHeight: 32
+							}
 						}
 					}
 				}
@@ -135,20 +195,24 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 						...state.byId[payload.sceneId].data,
 						[layerId]: {
 							tilemap: createNewTilemap(),
-							objects: []
+							objects: [],
+							tileSize: {
+								tileWidth: 32,
+								tileHeight: 32
+							}
 						}
 					}
 				}
 			}
 		}
 	case "ADD_TILE":
-		if (!payload.tile || !payload.xPos || !payload.yPos)
+		if (!payload.tile || payload.xPos === undefined || payload.yPos === undefined)
 			return state;
 
 		state.byId[payload.sceneId].data[payload.layerId].tilemap[payload.xPos][payload.yPos] = {...payload.tile};
 		return state;
 	case "REMOVE_TILE":
-		if (!payload.xPos || !payload.yPos)
+		if (payload.xPos === undefined || payload.yPos === undefined)
 			return state;
 
 		state.byId[payload.sceneId].data[payload.layerId].tilemap[payload.xPos][payload.yPos] = createDefaultTile();
@@ -160,7 +224,7 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 		state.byId[payload.sceneId].data[payload.layerId].objects = [...state.byId[payload.sceneId].data[payload.layerId].objects, payload.object];
 		return state;
 	case "MOVE_OBJECT":
-		if (payload.objectIndex === undefined || !payload.xPos || !payload.yPos)
+		if (payload.objectIndex === undefined || payload.xPos === undefined || payload.yPos === undefined)
 			return state;
 		
 		state.byId[payload.sceneId].data[payload.layerId].objects[payload.objectIndex] = {
@@ -169,6 +233,50 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 			y: payload.yPos
 		}
 		return state;
+	case "RESIZE_SCENE":
+		const width = payload.size?.width;
+		const height = payload.size?.height;
+		if (width === undefined || height === undefined)
+			return state;
+
+		let resizeScene = state.byId[payload.sceneId].data;
+		Object.keys(resizeScene).map((key) => {
+			let layer = resizeScene[key];
+			let tileSize = layer.tileSize;
+
+			let tilemap = resizeArray(layer.tilemap, width/tileSize.tileWidth, height/tileSize.tileHeight);
+
+			layer.tilemap = tilemap;
+
+			resizeScene[key] = layer;
+		});
+
+		state.byId[payload.sceneId].data = resizeScene;
+		return state;
+	case "RESIZE_TILES":
+		let tileWidth = payload.tileset?.tileWidth;
+		let tileHeight = payload.tileset?.tileHeight;
+		if (tileWidth === undefined || tileHeight === undefined)
+			return state;
+
+		// TODO: resize the scene
+		let resizeTilesScene = state.byId[payload.sceneId].data[payload.layerId];
+
+		Object.keys(resizeTilesScene).map((key) => {
+			let layer = resizeScene[key];
+			let tileSize = layer.tileSize;
+			let originalWidthRatio = layer.tilemap.length / tileSize.tileWidth;
+			let originalHeightRatio = layer.tilemap.length / tileSize.tileWidth;
+
+		// 	let tilemap = resizeArray(layer.tilemap, tileWidth * originalWidthRatio, tileHeight/originalHeightRatio);
+		// 	layer.tilemap = tilemap;
+		// 	layer.tileSize = {tileWidth: tileWidth, tileHeight: tileHeight}
+		// 	resizeScene[key] = layer;
+		});
+		// let originalWidth = resizeTile
+		// resizeTileslayer.tileSize = payload.tileset;
+
+		
 	default:
 		return state;
 	}
