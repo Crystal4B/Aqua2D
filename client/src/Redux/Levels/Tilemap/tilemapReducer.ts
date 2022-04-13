@@ -2,6 +2,15 @@ import { convertNameToId, DEFAULT_SCENE_ID } from "../../../Helpers/LevelsReduxH
 import { tileState } from "../../Tools/toolReducer"
 import { tilemapAction } from "./tilemapActions"
 
+export interface objectState
+{
+	x: number
+	y: number
+	width: number
+	height: number
+	image: string
+}
+
 /**
  * TODO: COMMENT
  */
@@ -9,7 +18,11 @@ export interface tilemapsState
 {
 	byId: {
 		[sceneId: string]: {
-			data: {[layerId: string]: tileState[][]}
+			data: {[layerId: string]: {
+					tilemap: tileState[][]
+					objects: objectState[]
+				}
+			}
 		}
 	}
 }
@@ -40,8 +53,14 @@ const createDefaultState = (): tilemapsState =>
 		byId: {
 			[DEFAULT_SCENE_ID]: {
 				data: {
-					[`${DEFAULT_SCENE_ID}_Collision`]: createNewTilemap(),
-					[`${DEFAULT_SCENE_ID}_Layer_1`]: createNewTilemap()
+					[`${DEFAULT_SCENE_ID}_Collision`]: {
+						tilemap: createNewTilemap(),
+						objects: []
+					},
+					[`${DEFAULT_SCENE_ID}_Layer_1`]: {
+						tilemap: createNewTilemap(),
+						objects: []
+					}
 				}
 			}
 		}
@@ -90,8 +109,14 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 				...state.byId,
 				[sceneId]: {
 					data: {
-						[layerIds[0]]: createNewTilemap(),
-						[layerIds[1]]: createNewTilemap()
+						[layerIds[0]]: {
+							tilemap: createNewTilemap(),
+							objects: []
+						},
+						[layerIds[1]]: {
+							tilemap: createNewTilemap(),
+							objects: []
+						}
 					}
 				}
 			}
@@ -108,19 +133,41 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 				[payload.sceneId]: {
 					data: {
 						...state.byId[payload.sceneId].data,
-						[layerId]: createNewTilemap()
+						[layerId]: {
+							tilemap: createNewTilemap(),
+							objects: []
+						}
 					}
 				}
 			}
 		}
 	case "ADD_TILE":
-		if (!payload.tile)
+		if (!payload.tile || !payload.xPos || !payload.yPos)
 			return state;
 
-		state.byId[payload.sceneId].data[payload.layerId][payload.xPos][payload.yPos] = {...payload.tile};
+		state.byId[payload.sceneId].data[payload.layerId].tilemap[payload.xPos][payload.yPos] = {...payload.tile};
 		return state;
 	case "REMOVE_TILE":
-		state.byId[payload.sceneId].data[payload.layerId][payload.xPos][payload.yPos] = createDefaultTile();
+		if (!payload.xPos || !payload.yPos)
+			return state;
+
+		state.byId[payload.sceneId].data[payload.layerId].tilemap[payload.xPos][payload.yPos] = createDefaultTile();
+		return state;
+	case "ADD_OBJECT":
+		if (!payload.object)
+			return state;
+
+		state.byId[payload.sceneId].data[payload.layerId].objects = [...state.byId[payload.sceneId].data[payload.layerId].objects, payload.object];
+		return state;
+	case "MOVE_OBJECT":
+		if (payload.objectIndex === undefined || !payload.xPos || !payload.yPos)
+			return state;
+		
+		state.byId[payload.sceneId].data[payload.layerId].objects[payload.objectIndex] = {
+			...state.byId[payload.sceneId].data[payload.layerId].objects[payload.objectIndex],
+			x: payload.xPos,
+			y: payload.yPos
+		}
 		return state;
 	default:
 		return state;

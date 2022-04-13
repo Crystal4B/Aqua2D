@@ -1,22 +1,24 @@
-import React from "react";
-
 /**
  * Converts mouse coordinates to canvas coordinates
  * @param event Mouse event being broken down to clientX and clientY
  * @returns [x,y] coordinates of the mouse on the canvas or [-1, -1] if an error occurred
  */
-export const getCoords = ({target, clientX, clientY}: React.MouseEvent): [xCoord: number, yCoord: number] =>
+export const getCanvasCoords = (target: HTMLElement, clientX: number, clientY: number): [xCoord: number, yCoord: number] =>
 {
-	const targetCanvas = target as HTMLCanvasElement;
-	
 	// Get screen coordinates in relation to canvas
-	var [xCoord, yCoord] = getLocalizedCoords(targetCanvas, clientX, clientY);
+	var [xCoord, yCoord] = getLocalizedCoords(target, clientX, clientY);
 
 	// Convert to canvas coordinates
-	const [xRatio, yRatio] = getRatio(targetCanvas);
+	const [xRatio, yRatio] = getRatio(target as HTMLCanvasElement);
 	xCoord *= xRatio;
 	yCoord *= yRatio;
 
+	return [xCoord, yCoord];
+}
+
+export const getGridCoords = (target: HTMLElement, clientX: number, clientY: number) =>
+{
+	const [xCoord, yCoord] = getCanvasCoords(target, clientX, clientY);
 	return [Math.floor(xCoord / 32), Math.floor(yCoord / 32)];
 }
 

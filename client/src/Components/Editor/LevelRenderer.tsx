@@ -92,7 +92,7 @@ const LevelRenderer = () =>
 	const handleSceneMove = (sceneId: string, xPos: number, yPos: number) =>
 	{
 		const radius = 160;
-		const tolerance = 20;
+		const tolerance = 40;
 
 		for (let i = 0; i < Object.keys(data).length; i++)
 		{
@@ -107,22 +107,26 @@ const LevelRenderer = () =>
 			// Top
 			if (position.yPos > yPos && yPos + radius > position.yPos - radius - tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
 			{
+				xPos = position.xPos
 				yPos = position.yPos - (radius * 2)
 			}
 			// Bottom
 			else if (position.yPos < yPos && yPos - radius < position.yPos + radius + tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
 			{
+				xPos = position.xPos
 				yPos = position.yPos + (radius * 2)
 			}
 			// Left
 			else if (position.xPos > xPos && xPos + radius >= position.xPos - radius - tolerance && (position.yPos - radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance))
 			{
 				xPos = position.xPos - (radius * 2)
+				yPos = position.yPos
 			}
 			// Right
 			else if (position.xPos < xPos && xPos - radius <= position.xPos + radius + tolerance && position.yPos- radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance)
 			{
 				xPos = position.xPos + (radius * 2)
+				yPos = position.yPos
 			}
 		}
 

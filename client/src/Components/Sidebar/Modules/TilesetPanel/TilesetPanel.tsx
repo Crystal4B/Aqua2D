@@ -1,6 +1,6 @@
 import Toolbar from '../Toolbar';
 import './TilesetPanel.css'
-import {getCoords} from '../../../../Helpers/TileHelper';
+import {getGridCoords} from '../../../../Helpers/TileHelper';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useRef, useState } from 'react';
 import { switchTile, switchTileset } from '../../../../Redux/Tools/toolActions';
@@ -16,8 +16,8 @@ const TilesetPanel = () =>
 	const [selection, setSelection] = useState({xPos: 0, yPos: 0, selected: false});
 	const dispatch = useDispatch();
 
-	const handleOnClick = (e: React.MouseEvent) => {
-		const [x, y] = getCoords(e);
+	const handleOnClick = ({target, clientX, clientY}: React.MouseEvent) => {
+		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY);
 		setSelection({xPos: x*32, yPos: y*32, selected: true});
 		
 		dispatch(switchTile(x, y));
@@ -26,7 +26,7 @@ const TilesetPanel = () =>
 	return (
 		<>
 			<div className="content">
-				<Toolbar />
+				<Toolbar type='tileset'/>
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
 					<img ref={assetRef} onClick={handleOnClick} src={tilesetUrl}/>

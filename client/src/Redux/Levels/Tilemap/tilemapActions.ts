@@ -1,19 +1,48 @@
 import { tileState } from "../../Tools/toolReducer"
+import { objectState } from "./tilemapReducer"
 
 /**
  * TODO: COMMENT
  */
 export interface tilemapAction
 {
-	type: "ADD_LEVEL" | "ADD_SCENE" | "ADD_LAYER" | "ADD_TILE" | "REMOVE_TILE"
+	type: "ADD_LEVEL" | "ADD_SCENE" | "ADD_LAYER" | "ADD_TILE" | "REMOVE_TILE" | "ADD_OBJECT" | "MOVE_OBJECT" | "REMOVE_OBJECT"
 	payload: {
-		levelId?: string,
-		name?: string,
-		sceneId: string,
-		layerId: string,
-		xPos: number,
-		yPos: number,
+		levelId?: string
+		name?: string
+		sceneId: string
+		layerId: string
+		xPos?: number
+		yPos?: number
 		tile?: tileState
+		objectIndex?: number
+		object?: objectState
+	}
+}
+
+export const addObject = (sceneId: string, layerId: string, object: objectState): tilemapAction =>
+{
+	return {
+		type: "ADD_OBJECT",
+		payload: {
+			sceneId: sceneId,
+			layerId: layerId,
+			object: object
+		}
+	};
+}
+
+export const moveObject = (sceneId: string, layerId: string, objectIndex: number, xPos: number, yPos: number) =>
+{
+	return {
+		type: "MOVE_OBJECT",
+		payload: {
+			sceneId: sceneId,
+			layerId: layerId,
+			objectIndex: objectIndex,
+			xPos: xPos,
+			yPos: yPos
+		}
 	}
 }
 

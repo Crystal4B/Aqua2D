@@ -6,6 +6,7 @@ import LevelsPanel from './Components/Sidebar/Modules/LevelsPanel/LevelsPanel';
 import Menu from './Components/Menu/Menu';
 import ControlPanel from './Components/ControlPanel/ControlPanel';
 import TabbedPanel from './Components/Sidebar/Modules/TabbedPanel/TabbedPanel';
+import ObjectPanel from './Components/Sidebar/Modules/ObjectPanel/ObjectPanel';
 
 const App = () =>
 {
@@ -15,6 +16,7 @@ const App = () =>
 			<div className='rowC'>
 				<Sidebar left={true}>
 					<PropertiesPanel />
+					<ObjectPanel />
 				</Sidebar>
 				<LevelRenderer />
 				<Sidebar left={false}>
