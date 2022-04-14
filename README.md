@@ -1,12 +1,5 @@
 <div id="top"></div>
 
-<!-- PROJECT SHIELDS -->
-[![Contributors][contributors-shield]][contributors-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
-
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -162,19 +155,8 @@ Project Link: [https://github.com/Crystal4B/Aqua2D/](https://github.com/Crystal4
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
-* [Img Shields](https://shields.io)
 * [React Icons](https://react-icons.github.io/react-icons/search)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/Crystal4B/Aqua2D/graphs/contributors
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/Crystal4B/Aqua2D/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/Crystal4B/Aqua2D/blob/main/LICENSE.md
 [product-screenshot]: images/screenshot.png
