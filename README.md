@@ -56,7 +56,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+<img src="images/logo.png" alt="Logo" width="80" height="80">
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -122,11 +122,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 <!-- ROADMAP -->
 ## Roadmap
-
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
 
 See the [open issues](https://github.com/Crystal4B/Aqua2D/issues) for a full list of proposed features (and known issues).
 
