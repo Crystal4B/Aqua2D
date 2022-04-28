@@ -49,14 +49,11 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		return memoImage;
 	}, [sceneData.tileset.image]);
 
-	const collisionImage = useMemo(() => {
-		var memoImage = new Image();
-		if (selectedLayerId.includes("Collision"))
-		{
-			memoImage.src = "/collider.png";
-		}
-		return memoImage;
-	}, [])
+	const collisionImage = new Image();
+	if (selectedLayerId.includes("Collision"))
+	{
+		collisionImage.src = "/collider.png";
+	}
 
 	// Initilise References for level
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -479,8 +476,6 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			let image = layerTileData.objects[i];
 			let imageXHit = x > image.x && x < image.x + image.width;
 			let imageYHit = y > image.y && y < image.y + image.height;
-
-			console.log(image, x, y);
 
 			if (imageXHit && imageYHit)
 			{

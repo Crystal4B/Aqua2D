@@ -16,6 +16,7 @@ class Character extends EntityTemplate
     {
         super(object, index);
 
+        console.log(object.controller.control);
         if ('up' in object.controller.control)
         {
             this.control = object.controller.control;
@@ -27,7 +28,7 @@ class Character extends EntityTemplate
     {
         if (this.control)
         {
-            if (Input.keys[this.control.up])
+            if (Input.keys[this.control.up.toUpperCase()])
             {
                 this.y -= Character.speed;
                 let collider = checkCollision(this);
@@ -42,7 +43,7 @@ class Character extends EntityTemplate
                     this.y += Character.speed;
                 }
             }
-            if (Input.keys[this.control.down])
+            if (Input.keys[this.control.down.toUpperCase()])
             {
                 this.y += Character.speed;
                 let collider = checkCollision(this);
@@ -57,7 +58,7 @@ class Character extends EntityTemplate
                     this.y -= Character.speed;
                 }
             }
-            if (Input.keys[this.control.left])
+            if (Input.keys[this.control.left.toUpperCase()])
             {
                 this.x -= Character.speed;
                 let collider = checkCollision(this);
@@ -72,7 +73,7 @@ class Character extends EntityTemplate
                     this.x += Character.speed;
                 }
             }
-            if (Input.keys[this.control.right])
+            if (Input.keys[this.control.right.toUpperCase()])
             {
                 this.x += Character.speed;
                 let collider = checkCollision(this);
@@ -87,7 +88,7 @@ class Character extends EntityTemplate
                     this.x -= Character.speed;
                 }
             }
-            if (Input.keys[this.control.attack])
+            if (Input.keys[this.control.attack.toUpperCase()])
             {
                 this.attack();
             }

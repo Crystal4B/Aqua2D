@@ -11,10 +11,12 @@ class Input
 
     static registerKeys(keys: keyboardState)
     {
+        console.log('setting keys');
         for (const key of Object.values(keys))
         {
             Input.keys[key.toUpperCase()] = false;
         }
+        console.log(Input.keys);
     }
 
     static handleKeyDown(event: KeyboardEvent)

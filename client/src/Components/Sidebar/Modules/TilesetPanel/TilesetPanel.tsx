@@ -46,7 +46,7 @@ const TilesetPanel = () =>
 				<Toolbar type='tileset'/>
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
-					<img ref={assetRef} alt={"tileset"} onClick={handleOnClick} src={imageSrc}/>
+					<img ref={assetRef} onClick={handleOnClick} src={imageSrc}/>
 				</div>
 			</div>
 		</> 
