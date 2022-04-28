@@ -41,11 +41,13 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 	// Load image
 	const image = new Image();
+	const collisionImage = new Image();
 	if (selectedLayerId.includes("Collision"))
 	{
-		image.src = "/collider.png";
+		collisionImage.src = "/collider.png";
 	}
-	else if (sceneData.tileset.image)
+	
+	if (sceneData.tileset.image)
 	{
 		image.src = sceneData.tileset.image;
 	}
@@ -91,8 +93,13 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 						{
 							continue;
 						}
-	
-						draw(layerTileData.tilemap[i][j], i, j);
+
+						if (layer.id.includes("Collision"))
+						{
+							draw(collisionImage, layerTileData.tilemap[i][j], i, j);
+						} else {
+							draw(image, layerTileData.tilemap[i][j], i, j);
+						}
 					}
 				}
 
@@ -126,13 +133,23 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 					if (toolbarSettings.tool === "Draw")
 					{
 						// Draw preview tile
-						draw(toolbarSettings.tile, x, y);
+						if (selectedLayerId.includes("Collision"))
+						{
+							draw(collisionImage, toolbarSettings.tile, x, y);
+						} else {
+							draw(image, toolbarSettings.tile, x, y);
+						}
 					}
 				}
 				else
 				{
 					const layerData = tilemapData[order[i]]
-					draw(layerData.tilemap[x][y], x, y);
+					if (selectedLayerId.includes("Collision"))
+					{
+						continue;
+					} else {
+						draw(image, layerData.tilemap[x][y], x, y);
+					}
 				}
 
 			}
@@ -182,7 +199,6 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		{
 			// replace tile
 			context.clearRect(x * sceneData.tileset.tileWidth, y * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
-
 			for (let i = order.length-1; i >= 0; i--)
 			{
 				const layer = layerData[order[i]];
@@ -192,8 +208,19 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				}
 
 				const layerTileData = tilemapData[order[i]]
-				draw(layerTileData.tilemap[x][y], x, y);
+				if (layer.id.includes("Collision"))
+				{
+					draw(collisionImage, layerTileData.tilemap[x][y], x, y);
+				} else {
+					draw(image, layerTileData.tilemap[x][y], x, y);
+				}
+
+				for (const object of layerTileData.objects)
+				{
+					drawObject(object);
+				}
 			}
+
 		}
 	}
 
@@ -203,7 +230,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 * @param x the x position in tileset coordinates
 	 * @param y the y position in tileset coordinates
 	 */
-	const draw = (tile: tileState, x: number, y: number) =>
+	const draw = (image: HTMLImageElement, tile: tileState, x: number, y: number) =>
 	{
 		if (tile.xCoord === -1 || tile.yCoord === -1)
 		{
@@ -448,6 +475,8 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 			let image = layerTileData.objects[i];
 			let imageXHit = x > image.x && x < image.x + image.width;
 			let imageYHit = y > image.y && y < image.y + image.height;
+
+			console.log(image, x, y);
 
 			if (imageXHit && imageYHit)
 			{

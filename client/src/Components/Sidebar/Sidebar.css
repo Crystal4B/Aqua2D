@@ -7,6 +7,7 @@
 	border-radius: 5px;
 	background: #474747;
 	margin-bottom: 4px;
+	overflow: auto;
 }
 
 .sidebar .panel:last-child {

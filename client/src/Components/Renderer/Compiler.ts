@@ -79,7 +79,7 @@ const compile = (data: CombinedState<{
             }
         }
     }
-
+    console.log(gameData);
     return gameData;
 }
 

@@ -100,6 +100,9 @@ export const resetTile = (sceneId: string, layerId: string, xPos: number, yPos: 
 
 export const updateObject = (sceneId: string, layerId: string, objectIndex: number, object: objectState): tilemapAction =>
 {
+	object.x = object.x as number;
+	object.y = object.y as number;
+
 	return {
 		type: "UPDATE_OBJECT",
 		payload: {

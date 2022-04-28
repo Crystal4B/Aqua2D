@@ -29,7 +29,9 @@ const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 		let name = (event.target as HTMLInputElement).name;
 		let value = (event.target as HTMLInputElement).value;
 
-		dispatch(updateObject(selectedSceneId, selectedLayerId, +focusedId, {...object, [name]: value}));
+		let val: number = +value;
+
+		dispatch(updateObject(selectedSceneId, selectedLayerId, +focusedId, {...object, [name]: val}));
 	}
 
 	const handleControlChange = (event: React.ChangeEvent) =>
@@ -67,7 +69,7 @@ const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 				value = value.substring(0, i) + value.substring(i+1, value.length);
 			}
 		}
-
+		
 		dispatch(updateObject(selectedSceneId, selectedLayerId, +focusedId, {...object, controller: {...object.controller, control: {...object.controller.control, [name]: value}}}));
 	}
 

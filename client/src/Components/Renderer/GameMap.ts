@@ -54,8 +54,15 @@ class GameMap
     {
         if (preload)
         {
-            for (const layer of Object.values(this.scene.layers))
+            for (const layerKey of Object.keys(this.scene.layers))
             {
+                if (layerKey === "collisions")
+                {
+                    continue;
+                }
+
+                const layer = this.scene.layers[layerKey];
+
                 for (let i = 0; i < layer.tilemap.length; i++)
                 {
                     for (let j = 0; j < layer.tilemap[i].length; j++)

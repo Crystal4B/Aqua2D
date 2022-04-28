@@ -10,6 +10,7 @@ const ObjectPanel = () => {
 			<div className="object-list" style={{height: "50vh"}}>
 				<ImageBox image='/zombie.png'/>
 				<ImageBox image='/player.png'/>
+				<ImageBox image='/squidy.png'/>
 			</div>
 		</div>
 	)
