@@ -8,9 +8,8 @@ const ObjectPanel = () => {
 			<Toolbar type='objects'/>
 			<br></br>
 			<div className="object-list" style={{height: "50vh"}}>
-				<ImageBox image='/clipart4773647.png'/>
-				<ImageBox image='/Young_Link_2D (1).png'/>
-				<ImageBox image='/Zombie_back_sprite.png'/>
+				<ImageBox image='/zombie.png'/>
+				<ImageBox image='/player.png'/>
 			</div>
 		</div>
 	)

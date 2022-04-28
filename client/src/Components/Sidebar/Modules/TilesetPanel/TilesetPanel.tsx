@@ -16,6 +16,19 @@ const TilesetPanel = () =>
 		return tileset
 	});
 
+	const layerId = useSelector<rootState, string>(state => {
+		const levelId = state.levels.levels.selectedId;
+		const sceneId = state.levels.scenes.byId[levelId].selectedId;
+		
+		return state.levels.layers.byId[sceneId].selectedId;
+	})
+
+	var imageSrc = tileset.image;
+	if (layerId.includes("Collision"))
+	{
+		imageSrc = "/collider.png";
+	}
+
 	const assetRef = useRef<HTMLImageElement>(null);
 	const [selection, setSelection] = useState({xPos: 0, yPos: 0, selected: false});
 	const dispatch = useDispatch();
@@ -33,7 +46,7 @@ const TilesetPanel = () =>
 				<Toolbar type='tileset'/>
 				<div className="tileset" style={{height: "50vh"}}>
 					{selection.selected ? <div className='selection' style={{left:`${selection.xPos}px`, top:`${selection.yPos}px`}}></div> : null}
-					<img ref={assetRef} onClick={handleOnClick} src={tileset.image}/>
+					<img ref={assetRef} onClick={handleOnClick} src={imageSrc}/>
 				</div>
 			</div>
 		</> 

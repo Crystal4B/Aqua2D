@@ -20,6 +20,12 @@ export interface GameScene
             tilemap: tileState[][]
         }
     }
+    connections: {
+        up?: string,
+        down?: string,
+        left?: string,
+        right?: string   
+    }
     objects: objectState[]
 }
 
@@ -54,12 +60,12 @@ class Data
 
     setConfig(newConfig: Config)
     {
-        this.config = newConfig;
+        this.config = {...newConfig};
     }
 
     setGameData(newGameData: GameData)
     {
-        this.gameData = newGameData;
+        this.gameData = {...newGameData};
     }
 
     static getInstance()

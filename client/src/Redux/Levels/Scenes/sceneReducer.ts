@@ -32,6 +32,12 @@ export interface sceneState
 		image?: string | undefined;
 		tileWidth: number,
 		tileHeight: number
+	},
+	connections: {
+		up?: string,
+		down?: string,
+		left?: string,
+		right?: string
 	}
 }
 
@@ -56,6 +62,9 @@ const createNewScene = (levelId: string, sceneName: string, selected: boolean, p
 		tileset: {
 			tileWidth: 32,
 			tileHeight: 32
+		},
+		connections: {
+
 		}
 	}
 }
@@ -75,6 +84,21 @@ const createDefaultState = (): scenesState =>
 				selectedId: DEFAULT_SCENE_ID
 			}
 		}
+	}
+}
+
+const invertDir = (dir: "up" | "down" | "left" | "right") =>
+{
+	switch(dir)
+	{
+	case "up":
+		return "down";
+	case "down":
+		return "up";
+	case "left":
+		return "right";
+	default:
+		return "left";
 	}
 }
 
@@ -138,6 +162,35 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 					data: {
 						...state.byId[payload.levelId].data,
 						[newScene.id]: newScene
+					}
+				}
+			}
+		}
+	case "CONNECT_SCENE":
+		if (!payload.sceneId || !payload.connection)
+			return state;
+
+		return {
+			byId: {
+				...state.byId,
+				[payload.levelId]: {
+					...state.byId[payload.levelId],
+					data: {
+						...state.byId[payload.levelId].data,
+						[payload.sceneId]: {
+							...state.byId[payload.levelId].data[payload.sceneId],
+							connections: {
+								...state.byId[payload.levelId].data[payload.sceneId].connections,
+								[invertDir(payload.connection.dir)]: payload.connection.sceneId
+							}
+						},
+						[payload.connection.sceneId]: {
+							...state.byId[payload.levelId].data[payload.connection.sceneId],
+							connections: {
+								...state.byId[payload.levelId].data[payload.connection.sceneId].connections,
+								[payload.connection.dir]: payload.sceneId
+							}
+						}
 					}
 				}
 			}

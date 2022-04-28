@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { rootState } from '../../Redux/store';
 import { levelsState } from '../../Redux/Levels/Levels/levelReducer';
 import { getLocalizedCoords } from '../../Helpers/TileHelper';
-import { addScene, moveScene } from '../../Redux/Levels/Scenes/sceneActions';
+import { addScene, connectScene, moveScene } from '../../Redux/Levels/Scenes/sceneActions';
 import { sceneState } from '../../Redux/Levels/Scenes/sceneReducer';
 
 interface viewerSettings
@@ -93,6 +93,13 @@ const LevelRenderer = () =>
 	{
 		const radius = 160;
 		const tolerance = 40;
+		var connection: {
+			dir: "up" | "down" | "left" | "right",
+			sceneId: string
+		} = {
+			dir: "up",
+			sceneId: ""
+		}
 
 		for (let i = 0; i < Object.keys(data).length; i++)
 		{
@@ -109,26 +116,41 @@ const LevelRenderer = () =>
 			{
 				xPos = position.xPos
 				yPos = position.yPos - (radius * 2)
+				connection.dir = 'up';
+				connection.sceneId = id;
+				break;
 			}
 			// Bottom
 			else if (position.yPos < yPos && yPos - radius < position.yPos + radius + tolerance && (position.xPos - radius - tolerance <= xPos && xPos <= position.xPos + radius + tolerance))
 			{
 				xPos = position.xPos
 				yPos = position.yPos + (radius * 2)
+				connection.dir = 'down';
+				connection.sceneId = id;
+				break;
 			}
 			// Left
 			else if (position.xPos > xPos && xPos + radius >= position.xPos - radius - tolerance && (position.yPos - radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance))
 			{
 				xPos = position.xPos - (radius * 2)
 				yPos = position.yPos
+				connection.dir = 'left';
+				connection.sceneId = id;
+				break;
 			}
 			// Right
 			else if (position.xPos < xPos && xPos - radius <= position.xPos + radius + tolerance && position.yPos- radius - tolerance <= yPos && yPos <= position.yPos + radius + tolerance)
 			{
 				xPos = position.xPos + (radius * 2)
 				yPos = position.yPos
+				connection.dir = 'right';
+				connection.sceneId = id;
+				break;
 			}
 		}
+
+		if (connection.sceneId !== "")
+			dispatch(connectScene(levelId, sceneId, connection));
 
 		dispatch(moveScene(levelId, sceneId, xPos, yPos));
 	}

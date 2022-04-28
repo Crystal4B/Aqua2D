@@ -1,5 +1,8 @@
 import { tileState } from "../../../Redux/Tools/toolReducer";
 import Data from "../Data/Data";
+import Collidable from "../Entities/Collidable";
+import EntityTemplate from "../Entities/EntityTemplate";
+import Game from "../Game";
 
 export interface Coordinates
 {
@@ -192,9 +195,9 @@ export function selectRandomLocation(range: number, originX: number, originY: nu
 
     // Find candidates
     let candidates = [];
-    for (let i = xMin; i <= xMax; i++)
+    for (let i = xMin; i < xMax; i++)
     {
-        for (let j = yMin; j <= yMax; j++)
+        for (let j = yMin; j < yMax; j++)
         {
             if (collisionMap[i][j].xCoord === -1 && collisionMap[i][j].yCoord === -1)
             {
@@ -222,3 +225,79 @@ export function canvasCoordsToTileCoords(x: number, y: number): Coordinates | un
 
     return {x: Math.floor(x / tileWidth), y: Math.floor(y / tileHeight)}
 }
+
+export function checkRange(map: tileState[][], coords: Coordinates)
+{
+    // Make sure they are within reach
+    if (coords.x >= map.length)
+    {
+        coords.x = map.length-1;
+    }
+    else if (coords.x < 0)
+    {
+        coords.x = 0;
+    }
+    if (coords.y >= map[coords.x].length)
+    {
+        coords.y = map[coords.x].length-1;
+    }
+    else if (coords.y < 0)
+    {
+        coords.y = 0;
+    }
+
+    return coords;
+}
+
+export function checkCollision(entity: Collidable)
+{
+    // Grab current map
+    let data = Data.getInstance();
+    let gameData = data.getGameData();
+    let config = data.getConfig();
+    if (!gameData || !config)
+        return undefined;
+
+    let collisionMap = gameData[config.currentLevelId][config.currentSceneId].layers.collisions;
+
+    // Wide Phase
+    let topLeft = canvasCoordsToTileCoords(entity.x, entity.y);
+    let bottomRight = canvasCoordsToTileCoords(entity.x + entity.width, entity.y + entity.height);
+
+    if (!topLeft || !bottomRight)
+        return false;
+    
+    // Make sure they are within reach
+    topLeft = checkRange(collisionMap.tilemap, topLeft);
+    bottomRight = checkRange(collisionMap.tilemap, bottomRight);
+
+    // Check walls
+    for (let i = topLeft.x; i <= bottomRight.x; i++)
+    {
+        for (let j = topLeft.y; j <= bottomRight.y; j++)
+        {
+            if (collisionMap.tilemap[i][j].xCoord !== -1 || collisionMap.tilemap[i][j].yCoord !== -1)
+            {
+                return true;
+            }
+        }
+    }
+
+    let game = Game.getInstance();
+    if (!game)
+        return false;
+
+    for (const otherEntity of game.entities)
+    {
+        if ((entity as EntityTemplate).index === (otherEntity as EntityTemplate).index)
+        {
+            continue;
+        }
+
+        if (entity.AABB(otherEntity))
+        {
+            return otherEntity;
+        }
+    }
+}
+

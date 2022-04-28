@@ -5,10 +5,13 @@ abstract class EntityTemplate extends Collidable
 {
     image: HTMLImageElement;
 
-    public constructor(object: objectState)
+    index: number;
+
+    public constructor(object: objectState, index: number)
     {
         super(object.x, object.y, object.width, object.height);
 
+        this.index = index;
         this.image = new Image();
         this.image.src = object.image;
     }

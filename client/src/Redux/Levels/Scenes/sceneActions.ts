@@ -3,7 +3,7 @@
  */
 export interface sceneAction
 {
-	type: "ADD_LEVEL" | "ADD_SCENE" | "RENAME_SCENE" | "RESIZE_SCENE" | "MOVE_SCENE" | "SWITCH_TILESET" | "RESIZE_TILES" | "SELECT_SCENE" | "REMOVE_SCENE" | "REMOVE_ALL_SCENES";
+	type: "ADD_LEVEL" | "ADD_SCENE" | "RENAME_SCENE" | "CONNECT_SCENE" | "RESIZE_SCENE" | "MOVE_SCENE" | "SWITCH_TILESET" | "RESIZE_TILES" | "SELECT_SCENE" | "REMOVE_SCENE" | "REMOVE_ALL_SCENES";
 	payload: {
 		levelId: string,
 		sceneId?: string,
@@ -20,6 +20,10 @@ export interface sceneAction
 			image?: string,
 			tileWidth?: number,
 			tileHeight?: number
+		}
+		connection?: {
+			dir: "up" | "down" | "left" | "right",
+			sceneId: string
 		}
 	}
 }
@@ -59,6 +63,19 @@ export const selectScene = (levelId: string, sceneId: string): sceneAction =>
 		payload: {
 			levelId: levelId,
 			sceneId: sceneId
+		}
+	}
+}
+
+export const connectScene = (levelId: string, sceneId: string, connection: {dir: "up" | "down" | "left" | "right",
+sceneId: string}): sceneAction => 
+{
+	return {
+		type: "CONNECT_SCENE",
+		payload: {
+			levelId: levelId,
+			sceneId: sceneId,
+			connection: connection
 		}
 	}
 }

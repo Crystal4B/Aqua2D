@@ -125,7 +125,7 @@ const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 					:
 						(<>
 							<p>
-								This needs more work
+								This is a simple zombie model. The zombie behaviour causes the character to roam around the map mindlessly while searching for the player. If the player is nearby it attacks
 							</p>
 						</>)
 					}

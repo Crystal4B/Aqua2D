@@ -7,6 +7,15 @@ import EntityTemplate from "./Entities/EntityTemplate";
 import GameMap from "./GameMap";
 import Input from "./Input";
 
+interface GameEvent
+{
+    type: "SCENE_CHANGE"
+    payload: {
+        direction: "up" | "down" | "left" | "right"
+        target: EntityTemplate;
+    }
+}
+
 class Game
 {
     static game: Game | undefined;
@@ -36,15 +45,17 @@ class Game
 
         this.map = new GameMap(gameData[config.currentLevelId][config.currentSceneId]);
         
-        for (const object of gameData[config.currentLevelId][config.currentSceneId].objects)
+        for (let i = 0; i < gameData[config.currentLevelId][config.currentSceneId].objects.length; i++)
         {
+            const object = gameData[config.currentLevelId][config.currentSceneId].objects[i];
+
             switch(object.controller.type)
             {
             case "player":
-                this.entities.push(new Character(object));
+                this.entities.push(new Character(object, i));
                 break;
             case "npc":
-                this.entities.push(new Enemy(object, this.checkSurroundings));
+                this.entities.push(new Enemy(object, i));
                 break;
             }
         }
@@ -54,12 +65,25 @@ class Game
         this.render();
     }
 
-    getInstance()
+    static getInstance()
     {
         if (Game.game)
         {
             return Game.game;
         }
+    }
+
+    removeEntity(index: number)
+    {
+        // Grab current map
+        let data = Data.getInstance();
+        let gameData = data.getGameData();
+        let config = data.getConfig();
+        if (!gameData || !config)
+            return undefined;
+
+        gameData[config.currentLevelId][config.currentSceneId].objects.splice(index, 1);
+        this.entities.splice(index, 1);
     }
 
     checkSurroundings(range: number, originX: number, originY: number)
@@ -82,6 +106,126 @@ class Game
         }
 
         return surroundingEntities;
+    }
+
+    updateMap()
+    {
+        // Grab current map
+        let data = Data.getInstance();
+        let gameData = data.getGameData();
+        let config = data.getConfig();
+        if (!gameData || !config)
+            return undefined;
+
+        this.map = new GameMap(gameData[config.currentLevelId][config.currentSceneId]);
+
+        this.entities = [];
+        for (let i = 0; i < gameData[config.currentLevelId][config.currentSceneId].objects.length; i++)
+        {
+            const object = gameData[config.currentLevelId][config.currentSceneId].objects[i];
+
+            switch(object.controller.type)
+            {
+            case "player":
+                this.entities.push(new Character(object, i));
+                break;
+            case "npc":
+                this.entities.push(new Enemy(object, i));
+                break;
+            }
+        }
+    }
+
+    sceneEvent(event: GameEvent)
+    {
+        // Grab current map
+        let data = Data.getInstance();
+        let gameData = data.getGameData();
+        let config = data.getConfig();
+        if (!gameData || !config)
+            return undefined;
+
+        let connections = gameData[config.currentLevelId][config.currentSceneId].connections;
+
+        switch(event.payload.direction)
+        {
+        case "up":
+            if (connections.up)
+            {
+                data.setConfig({
+                    ...config,
+                    currentSceneId: connections.up,
+                })
+                let character = gameData[config.currentLevelId][config.currentSceneId].objects[(event.payload.target as Character).index];
+                character.x = event.payload.target.x
+                character.y = event.payload.target.y
+
+                // Move character to new scene
+                gameData[config.currentLevelId][config.currentSceneId].objects.splice((event.payload.target as Character).index, 1);
+                gameData[config.currentLevelId][connections.up].objects.push(character);
+                data.setGameData({...gameData});
+
+                this.updateMap();
+            }
+            break;
+        case "down":
+            if (connections.down)
+            {
+                data.setConfig({
+                    ...config,
+                    currentSceneId: connections.down,
+                })
+                let character = gameData[config.currentLevelId][config.currentSceneId].objects[(event.payload.target as Character).index];
+                character.x = event.payload.target.x
+                character.y = event.payload.target.y
+
+                // Move character to new scene
+                gameData[config.currentLevelId][config.currentSceneId].objects.splice((event.payload.target as Character).index, 1);
+                gameData[config.currentLevelId][connections.down].objects.push(character);
+                data.setGameData({...gameData});
+
+                this.updateMap();
+            }
+            break;
+        case "left":
+            if (connections.left)
+            {
+                data.setConfig({
+                    ...config,
+                    currentSceneId: connections.left,
+                })
+                let character = gameData[config.currentLevelId][config.currentSceneId].objects[(event.payload.target as Character).index];
+                character.x = event.payload.target.x
+                character.y = event.payload.target.y
+
+                // Move character to new scene
+                gameData[config.currentLevelId][config.currentSceneId].objects.splice((event.payload.target as Character).index, 1);
+                gameData[config.currentLevelId][connections.left].objects.push(character);
+                data.setGameData({...gameData});
+
+                this.updateMap();
+            }
+            break;
+        case "right":
+            if (connections.right)
+            {
+                data.setConfig({
+                    ...config,
+                    currentSceneId: connections.right,
+                })
+                let character = gameData[config.currentLevelId][config.currentSceneId].objects[(event.payload.target as Character).index];
+                character.x = event.payload.target.x
+                character.y = event.payload.target.y
+
+                // Move character to new scene
+                gameData[config.currentLevelId][config.currentSceneId].objects.splice((event.payload.target as Character).index, 1);
+                gameData[config.currentLevelId][connections.right].objects.push(character);
+                data.setGameData({...gameData});
+
+                this.updateMap();
+            }
+            break;
+        }
     }
 
     render()

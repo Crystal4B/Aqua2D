@@ -16,6 +16,8 @@ class GameMap
         this.scene = scene;
             
         this.preloadedCavnas = document.createElement("canvas");
+        this.preloadedCavnas.width = scene.size.width;
+        this.preloadedCavnas.height = scene.size.height;
         let context = this.preloadedCavnas.getContext('2d');
         if (context)
             this.render(context, true);

@@ -1,7 +1,7 @@
 import { objectState } from "../../../Redux/Levels/Tilemap/tilemapReducer";
 import Data from "../Data/Data";
 import Game from "../Game";
-import { aStar, canvasCoordsToTileCoords, Coordinates, node, selectRandomLocation } from "../Utils/Algorithms";
+import { aStar, canvasCoordsToTileCoords, checkCollision, Coordinates, node, selectRandomLocation } from "../Utils/Algorithms";
 import Character from "./Character";
 import EntityTemplate from "./EntityTemplate";
 
@@ -34,18 +34,13 @@ class Enemy extends EntityTemplate
     static thinkTime: number = 8000;
     static speed: number = 0.8;
 
-    vision: Game["checkSurroundings"];
-
-    public constructor(object: objectState, vision: Game["checkSurroundings"])
+    public constructor(object: objectState, index: number)
     {
-        super(object);
+        super(object, index);
 
         this.state = Enemy.THINK_STATE;
         this.range = 4;
         this.roamingRange = 4;
-
-        this.vision = vision;
-
     }
 
     public update(): void
@@ -103,11 +98,19 @@ class Enemy extends EntityTemplate
                 break;
             }
 
-            let targetX = this.target.x;
-            let targetY = this.target.y;
+            let targetLocation = canvasCoordsToTileCoords(this.target.x, this.target.y);
+            if (!targetLocation)
+                return;
 
-            // Update path
-            // Continue moving
+            this.currentPath = aStar(this.x, this.y, targetLocation.x, targetLocation.y);
+            if ((this.currentPath && this.currentPath.length > 0))
+            {
+                this.moveAlongPath();
+            } else {
+                this.state = Enemy.THINK_STATE;
+                this.lastTime = window.performance.now();
+                this.timeout = Enemy.thinkTime;
+            }
             break;
         }
     }
@@ -156,6 +159,14 @@ class Enemy extends EntityTemplate
         }
         this.walked += Enemy.speed;
 
+        let collider = checkCollision(this);
+        if (collider instanceof Character && this.target instanceof Character && collider.index === this.target.index)
+        {
+            let game = Game.getInstance();
+            if (game)
+                game.removeEntity((this.target as Character).index);
+        }
+
         // Grab current map
         let data = Data.getInstance();
         let gameData = data.getGameData();
@@ -176,14 +187,19 @@ class Enemy extends EntityTemplate
 
     private checkForTarget(): Character | undefined
     {
-        let entities = this.vision(this.range, this.x, this.y);
-        for (const entity of entities)
+        let game = Game.getInstance();
+        if (game)
         {
-            if (entity instanceof Character)
+            let entities = game.checkSurroundings(this.range, this.x, this.y);
+            for (const entity of entities)
             {
-                return entity;
+                if (entity instanceof Character)
+                {
+                    return entity;
+                }
             }
         }
+
         return undefined;
     }
 }

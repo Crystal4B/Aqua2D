@@ -41,7 +41,11 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 
 	// Load image
 	const image = new Image();
-	if (sceneData.tileset.image)
+	if (selectedLayerId.includes("Collision"))
+	{
+		image.src = "/collider.png";
+	}
+	else if (sceneData.tileset.image)
 	{
 		image.src = sceneData.tileset.image;
 	}
@@ -453,7 +457,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		}
 
 		setDrag(hitImage);
-		if (hitImage !== null)
+		if (selected && hitImage !== null)
 			dispatch(selectObject(sceneId, selectedLayerId, hitImage));
 		else if (!selected || originalValue !== null)
 			dispatch(selectScene(levelId, sceneData.id));

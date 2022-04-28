@@ -37,6 +37,7 @@ const compile = (data: CombinedState<{
                             tilemap: []
                         }
                     },
+                    connections: scene.connections,
                     objects: []
                 }
             }
