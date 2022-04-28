@@ -56,7 +56,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-<img src="images/logo.png" alt="Logo" width="80" height="80">
+<img src="images/interface.png" alt="ui" width="80" height="80">
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
