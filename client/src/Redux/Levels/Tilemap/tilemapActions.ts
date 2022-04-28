@@ -6,7 +6,7 @@ import { objectState } from "./tilemapReducer"
  */
 export interface tilemapAction
 {
-	type: "ADD_LEVEL" | "ADD_SCENE" | "ADD_LAYER" | "ADD_TILE" | "RESIZE_SCENE" | "RESIZE_TILES" | "REMOVE_TILE" | "ADD_OBJECT" | "MOVE_OBJECT" | "REMOVE_OBJECT"
+	type: "ADD_LEVEL" | "ADD_SCENE" | "ADD_LAYER" | "ADD_TILE" | "RESIZE_SCENE" | "RESIZE_TILES" | "REMOVE_TILE" | "ADD_OBJECT" | "MOVE_OBJECT" | "REMOVE_OBJECT" | "UPDATE_OBJECT"
 	payload: {
 		levelId?: string
 		name?: string
@@ -96,4 +96,17 @@ export const resetTile = (sceneId: string, layerId: string, xPos: number, yPos: 
 			yPos: yPos,
 		}
 	};
+}
+
+export const updateObject = (sceneId: string, layerId: string, objectIndex: number, object: objectState): tilemapAction =>
+{
+	return {
+		type: "UPDATE_OBJECT",
+		payload: {
+			sceneId: sceneId,
+			layerId: layerId,
+			objectIndex: objectIndex,
+			object: object
+		}
+	}
 }

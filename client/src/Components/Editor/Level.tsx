@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCanvasCoords, getGridCoords} from "../../Helpers/TileHelper";
 import { layerState } from "../../Redux/Levels/Layers/layerReducer";
+import { selectObject } from "../../Redux/Levels/Properties/PropertiesActions";
 import { selectScene } from "../../Redux/Levels/Scenes/sceneActions";
 import { sceneState } from "../../Redux/Levels/Scenes/sceneReducer";
 import { addObject, moveObject, resetTile, setTile } from "../../Redux/Levels/Tilemap/tilemapActions";
@@ -97,7 +98,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				}
 			}
 		}
-	}, [tilemapData, layerData, redraw]);
+	}, [tilemapData, layerData, redraw, order]);
 
 	/**
 	 * Renders a preview of the selected tile on the canvas
@@ -263,11 +264,6 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 */
 	const handleMouseDown = ({target, clientX, clientY, button}: React.MouseEvent) =>
 	{
-		if (!sceneData.selected)
-		{
-			dispatch(selectScene(levelId, sceneData.id));
-		}
-
 		if (button === 0 || button === 2)
 		{
 			mouseDownRef.current = true;
@@ -425,8 +421,10 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		let imageLink = dataTransfer.getData('drag-item');
 		const [xCoord, yCoord] = getCanvasCoords(target as HTMLElement, clientX, clientY);
 
-		drawObject({x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink});
-		dispatch(addObject(sceneId, selectedLayerId, {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink}));
+		let object = {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink, name: "Object", controller: {type: "npc", control: {}}};
+
+		drawObject({x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink, name: "Object", controller: {type: "npc", control: {}}});
+		dispatch(addObject(sceneId, selectedLayerId, {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink, name: "Object", controller: {type: "npc", control: {}}}));
 	}
 
 	/**
@@ -436,6 +434,8 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	 */
 	const imageHit = (x: number, y: number) =>
 	{
+		let originalValue = drag;
+
 		let hitImage = null;
 
 		const layerTileData = tilemapData[selectedLayerId]
@@ -453,6 +453,10 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 		}
 
 		setDrag(hitImage);
+		if (hitImage !== null)
+			dispatch(selectObject(sceneId, selectedLayerId, hitImage));
+		else if (!selected || originalValue !== null)
+			dispatch(selectScene(levelId, sceneData.id));
 	}
 
 	return (

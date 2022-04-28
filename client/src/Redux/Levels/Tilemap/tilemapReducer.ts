@@ -2,6 +2,20 @@ import { convertNameToId, DEFAULT_SCENE_ID } from "../../../Helpers/LevelsReduxH
 import { tileState } from "../../Tools/toolReducer"
 import { tilemapAction } from "./tilemapActions"
 
+export interface keyboardState
+{
+	up: string
+	down: string
+	left: string
+	right: string
+	attack: string
+}
+
+export interface npcState
+{
+	//TODO: Make stuff
+}
+
 export interface objectState
 {
 	x: number
@@ -9,6 +23,11 @@ export interface objectState
 	width: number
 	height: number
 	image: string
+	name: string
+	controller: {
+		type: string
+		control: keyboardState | npcState
+	}
 }
 
 /**
@@ -76,6 +95,17 @@ const createDefaultState = (): tilemapsState =>
 				}
 			}
 		}
+	}
+}
+
+const createDefaultController = (type: string): keyboardState | npcState =>
+{
+	switch(type)
+	{
+	case 'player':
+		return {up: "W", down: "S", left: "A", right: "D", attack: "E"};
+	default:
+		return {};
 	}
 }
 
@@ -232,7 +262,7 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 			x: payload.xPos,
 			y: payload.yPos
 		}
-		return state;
+		return {...state};
 	case "RESIZE_SCENE":
 		const width = payload.size?.width;
 		const height = payload.size?.height;
@@ -259,24 +289,32 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 		if (tileWidth === undefined || tileHeight === undefined)
 			return state;
 
-		// TODO: resize the scene
-		let resizeTilesScene = state.byId[payload.sceneId].data[payload.layerId];
+		let w = tileWidth;
+		let h = tileHeight;
 
+		let resizeTilesScene = state.byId[payload.sceneId].data;
 		Object.keys(resizeTilesScene).map((key) => {
-			let layer = resizeScene[key];
-			let tileSize = layer.tileSize;
-			let originalWidthRatio = layer.tilemap.length / tileSize.tileWidth;
-			let originalHeightRatio = layer.tilemap.length / tileSize.tileWidth;
+			let layer = resizeTilesScene[key];
 
-		// 	let tilemap = resizeArray(layer.tilemap, tileWidth * originalWidthRatio, tileHeight/originalHeightRatio);
-		// 	layer.tilemap = tilemap;
-		// 	layer.tileSize = {tileWidth: tileWidth, tileHeight: tileHeight}
-		// 	resizeScene[key] = layer;
+			layer.tileSize = {tileWidth: w, tileHeight: h}
+			resizeTilesScene[key] = layer;
 		});
-		// let originalWidth = resizeTile
-		// resizeTileslayer.tileSize = payload.tileset;
 
-		
+		state.byId[payload.sceneId].data = resizeTilesScene
+		return state;
+	case "UPDATE_OBJECT":
+		let object = payload.object;
+		let objectIndex = payload.objectIndex;
+
+		if (!object || objectIndex === undefined)
+			return state;
+
+		let originalObject = state.byId[payload.sceneId].data[payload.layerId].objects[objectIndex];
+		if (originalObject.controller.type !== object.controller.type)
+			object.controller.control = createDefaultController(object.controller.type);
+
+		state.byId[payload.sceneId].data[payload.layerId].objects[objectIndex] = object;
+		return {...state};
 	default:
 		return state;
 	}
