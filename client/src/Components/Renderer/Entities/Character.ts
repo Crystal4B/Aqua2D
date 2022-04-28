@@ -1,4 +1,4 @@
-import { keyboardState, npcState, objectState } from "../../../Redux/Levels/Tilemap/tilemapReducer";
+import { keyboardState, objectState } from "../../../Redux/Levels/Tilemap/tilemapReducer";
 import Data from "../Data/Data";
 import Game from "../Game";
 import Input from "../Input";

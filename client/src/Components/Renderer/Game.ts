@@ -1,5 +1,5 @@
 import React from "react";
-import Data, { GameData } from "./Data/Data";
+import Data from "./Data/Data";
 import Character from "./Entities/Character";
 import Collidable from "./Entities/Collidable";
 import Enemy from "./Entities/Enemy";

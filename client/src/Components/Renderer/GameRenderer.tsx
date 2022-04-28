@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import {createPortal} from "react-dom"
 import { useSelector } from "react-redux";
 import { CombinedState } from "redux";
@@ -56,7 +56,7 @@ const GameRenderer: React.FC<Props> = ({container}) =>
 		data.setGameData(compile(levels));
 
 		new Game(canvasRef);
-	}, [])
+	}, [levels])
 
 	return createPortal(
 		<canvas ref={canvasRef} 

@@ -153,7 +153,7 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 			size = {width: 320, height: 320};
 		}
 
-		var newScene = createNewScene(payload.levelId, name, false, position, size);
+		newScene = createNewScene(payload.levelId, name, false, position, size);
 		return {
 			byId: {
 				...state.byId,
@@ -201,7 +201,7 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 			return state;
 		}
 
-		var name = payload.name;
+		name = payload.name;
 		if (!name)
 		{
 			name = "";
@@ -223,7 +223,7 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 			}
 		};
 	case "RESIZE_SCENE":
-		var size = payload.size;
+		size = payload.size;
 		if (!payload.sceneId || !size)
 			return state;
 
@@ -248,7 +248,7 @@ const sceneReducer = (state: scenesState = createDefaultState(), action: sceneAc
 			return state;
 		}
 
-		var position = payload.position;
+		position = payload.position;
 		if (!position)
 		{
 			position = {xPos: 150, yPos: 150};

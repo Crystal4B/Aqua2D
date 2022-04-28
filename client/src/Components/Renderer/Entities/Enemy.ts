@@ -175,7 +175,7 @@ class Enemy extends EntityTemplate
             return undefined;
 
         // Grab tilesize
-        let {tileWidth, tileHeight} = gameData[config.currentLevelId][config.currentSceneId].tileset;
+        let {tileWidth} = gameData[config.currentLevelId][config.currentSceneId].tileset;
 
         if (this.walked > tileWidth && this.currentPath)
         {

@@ -102,9 +102,9 @@ const layerReducer = (state: layersState = createDefaultState(), action: layerAc
 		{
 			return state
 		}
-		var id = `${payload.levelId}_${convertNameToId(payload.name)}`;
-		var collision = createNewLayer(id, "Collision");
-		var layer1 = createNewLayer(id, "Layer 1");
+		id = `${payload.levelId}_${convertNameToId(payload.name)}`;
+		collision = createNewLayer(id, "Collision");
+		layer1 = createNewLayer(id, "Layer 1");
 		return {
 			byId: {
 				...state.byId,

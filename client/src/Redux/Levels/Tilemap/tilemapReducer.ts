@@ -13,7 +13,7 @@ export interface keyboardState
 
 export interface npcState
 {
-	//TODO: Make stuff
+	//TODO: future npc options
 }
 
 export interface objectState
@@ -270,7 +270,8 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 			return state;
 
 		let resizeScene = state.byId[payload.sceneId].data;
-		Object.keys(resizeScene).map((key) => {
+		for (const key of Object.keys(resizeScene))
+		{
 			let layer = resizeScene[key];
 			let tileSize = layer.tileSize;
 
@@ -279,7 +280,7 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 			layer.tilemap = tilemap;
 
 			resizeScene[key] = layer;
-		});
+		}
 
 		state.byId[payload.sceneId].data = resizeScene;
 		return state;
@@ -293,12 +294,13 @@ const tilemapReducer = (state: tilemapsState = createDefaultState(), action: til
 		let h = tileHeight;
 
 		let resizeTilesScene = state.byId[payload.sceneId].data;
-		Object.keys(resizeTilesScene).map((key) => {
+		for (const key of Object.keys(resizeTilesScene))
+		{
 			let layer = resizeTilesScene[key];
 
 			layer.tileSize = {tileWidth: w, tileHeight: h}
 			resizeTilesScene[key] = layer;
-		});
+		}
 
 		state.byId[payload.sceneId].data = resizeTilesScene
 		return state;

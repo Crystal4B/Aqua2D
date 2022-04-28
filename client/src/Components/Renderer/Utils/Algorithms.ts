@@ -77,7 +77,7 @@ export function aStar(startX: number, startY: number, endX: number, endY: number
 
     // Get collision layer of map
     let collisionMap = gameData[config.currentLevelId][config.currentSceneId].layers.collisions.tilemap;
-    let {tileWidth, tileHeight} = gameData[config.currentLevelId][config.currentSceneId].tileset;
+    let {tileWidth} = gameData[config.currentLevelId][config.currentSceneId].tileset;
 
     // Convert coordinates to Nodes
     const end: node = {

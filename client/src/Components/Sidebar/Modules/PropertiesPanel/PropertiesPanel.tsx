@@ -1,6 +1,4 @@
 import "./PropertiesPanel.css"
-import React, { useState } from "react";
-import Card from "./Card";
 import { useSelector } from "react-redux";
 import { rootState } from "../../../../Redux/store";
 import { PropertiesState } from "../../../../Redux/Levels/Properties/PropertiesReducer";

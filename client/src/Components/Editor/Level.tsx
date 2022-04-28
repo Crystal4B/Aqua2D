@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {getCanvasCoords, getGridCoords} from "../../Helpers/TileHelper";
 import { layerState } from "../../Redux/Levels/Layers/layerReducer";
@@ -40,23 +40,64 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	const locationRef = useRef({x: sceneData.position.xPos, y: sceneData.position.yPos});
 
 	// Load image
-	const image = new Image();
-	const collisionImage = new Image();
-	if (selectedLayerId.includes("Collision"))
-	{
-		collisionImage.src = "/collider.png";
-	}
-	
-	if (sceneData.tileset.image)
-	{
-		image.src = sceneData.tileset.image;
-	}
+	const image = useMemo(() => {
+		var memoImage = new Image();
+		if (sceneData.tileset.image)
+		{
+			memoImage.src = sceneData.tileset.image;
+		}
+		return memoImage;
+	}, [sceneData.tileset.image]);
+
+	const collisionImage = useMemo(() => {
+		var memoImage = new Image();
+		if (selectedLayerId.includes("Collision"))
+		{
+			memoImage.src = "/collider.png";
+		}
+		return memoImage;
+	}, [])
 
 	// Initilise References for level
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const contextRef = useRef<CanvasRenderingContext2D | null>(null);
 	const mouseDownRef = useRef(false);
 	const previewRef = useRef({x: -1, y: -1});
+
+		/**
+	 * draw completes a drawing of a single tile on the canvas
+	 * @param tile Tile being drawn onto the screen
+	 * @param x the x position in tileset coordinates
+	 * @param y the y position in tileset coordinates
+	 */
+	const draw = useMemo(() => (image: HTMLImageElement, tile: tileState, x: number, y: number) =>
+	{
+		if (tile.xCoord === -1 || tile.yCoord === -1)
+		{
+			return;
+		}
+
+		const context = canvasRef.current?.getContext("2d");
+		if (context)
+		{
+			if (tile.rotation % 360 !== 0 && tile.rotation !== 0)
+			{
+				const TO_RADIANS = Math.PI/180;
+				const cx = x * sceneData.tileset.tileWidth + sceneData.tileset.tileWidth / 2;
+				const cy = y * sceneData.tileset.tileHeight +  sceneData.tileset.tileHeight / 2;
+
+				context.save();
+				context.translate(cx, cy);
+				context.rotate(tile.rotation * TO_RADIANS);
+				context.translate(-cx, -cy);
+			}
+			context.drawImage(image, tile.xCoord * sceneData.tileset.tileWidth, tile.yCoord * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight, x * sceneData.tileset.tileWidth, y * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
+			if (tile.rotation % 360 !== 0 || tile.rotation !== 0)
+			{
+				context.restore();
+			}
+		}
+	}, []);
 
 	useEffect(() =>
 	{
@@ -109,7 +150,7 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				}
 			}
 		}
-	}, [tilemapData, layerData, redraw, order]);
+	}, [draw, tilemapData, layerData, redraw, order, image, collisionImage]);
 
 	/**
 	 * Renders a preview of the selected tile on the canvas
@@ -221,41 +262,6 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 				}
 			}
 
-		}
-	}
-
-	/**
-	 * draw completes a drawing of a single tile on the canvas
-	 * @param tile Tile being drawn onto the screen
-	 * @param x the x position in tileset coordinates
-	 * @param y the y position in tileset coordinates
-	 */
-	const draw = (image: HTMLImageElement, tile: tileState, x: number, y: number) =>
-	{
-		if (tile.xCoord === -1 || tile.yCoord === -1)
-		{
-			return;
-		}
-
-		const context = canvasRef.current?.getContext("2d");
-		if (context)
-		{
-			if (tile.rotation % 360 !== 0 && tile.rotation !== 0)
-			{
-				const TO_RADIANS = Math.PI/180;
-				const cx = x * sceneData.tileset.tileWidth + sceneData.tileset.tileWidth / 2;
-				const cy = y * sceneData.tileset.tileHeight +  sceneData.tileset.tileHeight / 2;
-
-				context.save();
-				context.translate(cx, cy);
-				context.rotate(tile.rotation * TO_RADIANS);
-				context.translate(-cx, -cy);
-			}
-			context.drawImage(image, tile.xCoord * sceneData.tileset.tileWidth, tile.yCoord * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight, x * sceneData.tileset.tileWidth, y * sceneData.tileset.tileHeight, sceneData.tileset.tileWidth, sceneData.tileset.tileHeight);
-			if (tile.rotation % 360 !== 0 || tile.rotation !== 0)
-			{
-				context.restore();
-			}
 		}
 	}
 
@@ -451,8 +457,6 @@ export const Level = ({levelId, sceneId, xOffset, yOffset, scale, selected, move
 	{
 		let imageLink = dataTransfer.getData('drag-item');
 		const [xCoord, yCoord] = getCanvasCoords(target as HTMLElement, clientX, clientY);
-
-		let object = {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink, name: "Object", controller: {type: "npc", control: {}}};
 
 		drawObject({x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink, name: "Object", controller: {type: "npc", control: {}}});
 		dispatch(addObject(sceneId, selectedLayerId, {x: xCoord, y: yCoord, width: 32, height: 50, image: imageLink, name: "Object", controller: {type: "npc", control: {}}}));

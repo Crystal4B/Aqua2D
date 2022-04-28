@@ -15,7 +15,7 @@ const ImageBox = (props: imageProps) =>
 
 	return (
 		<div className="block" draggable='true' onDragStart={startDrag}>
-			<img src={props.image} />
+			<img src={props.image} alt={"character object"} />
 		</div>
 	)
 }

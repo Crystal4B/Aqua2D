@@ -16,7 +16,7 @@ const LevelsPanel = () =>
 	const scenes = useSelector<rootState, scenesState["byId"]>(state => state.levels.scenes.byId)
 	const {selectedId, byId} = useSelector<rootState, levelsState>(state => state.levels.levels);
 	
-	const [expand, setExpand] = useState(Array());
+	const [expand, setExpand] = useState<boolean[]>([]);
 
 	useEffect(() => {
 		setExpand(Array(Object.keys(byId).length).fill(true))

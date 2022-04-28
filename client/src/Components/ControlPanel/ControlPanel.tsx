@@ -2,7 +2,6 @@ import "./ControlPanel.css"
 import { FaPause, FaPlay } from "react-icons/fa";
 import { useRef, useState } from "react";
 import GameRenderer from "../Renderer/GameRenderer";
-import { createPortal } from "react-dom";
 
 /**
  * Level Renderer is a componenet responsible for organizing and managing the level display
