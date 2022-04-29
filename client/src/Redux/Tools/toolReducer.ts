@@ -9,6 +9,9 @@ export interface toolState
 	tile: tileState;
 };
 
+/**
+ * interface representing the state of a tile in the scene
+ */
 export interface tileState
 {
 	xCoord: number;

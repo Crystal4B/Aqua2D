@@ -5,6 +5,10 @@ type Props = {
 	children: ReactElement[]
 }
 
+/**
+ * Simple tabs component
+ * @returns JSX implementation of numerous tabs
+ */
 const Tabs: React.FC<Props> = ({children}) =>
 {
 	const [selectedTab, setSelectedTab] = useState(0);

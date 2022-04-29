@@ -6,6 +6,10 @@ import React, { useRef, useState } from 'react';
 import { switchTile } from '../../../../Redux/Tools/toolActions';
 import { rootState } from '../../../../Redux/store';
 
+/**
+ * Panel handling the setting of tilesets as well as the selection of tiles for drawing
+ * @returns JSX implementation of the TilesetPanel
+ */
 const TilesetPanel = () =>
 {
 	const tileset = useSelector<rootState, {image?: string, tileWidth: number, tileHeight: number}>(state => {
@@ -33,6 +37,9 @@ const TilesetPanel = () =>
 	const [selection, setSelection] = useState({xPos: 0, yPos: 0, selected: false});
 	const dispatch = useDispatch();
 
+	/**
+	 * Function handling the update of tile selection
+	 */
 	const handleOnClick = ({target, clientX, clientY}: React.MouseEvent) => {
 		const [x, y] = getGridCoords(target as HTMLElement, clientX, clientY, tileset.tileWidth, tileset.tileHeight);
 		setSelection({xPos: x*tileset.tileWidth, yPos: y*tileset.tileHeight, selected: true});

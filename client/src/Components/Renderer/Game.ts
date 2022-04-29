@@ -7,6 +7,9 @@ import EntityTemplate from "./Entities/EntityTemplate";
 import GameMap from "./GameMap";
 import Input from "./Input";
 
+/**
+ * Interface defining a game event
+ */
 interface GameEvent
 {
     type: "SCENE_CHANGE"
@@ -16,6 +19,9 @@ interface GameEvent
     }
 }
 
+/**
+ * Singleton class defining the central game object
+ */
 class Game
 {
     static game: Game | undefined;
@@ -25,6 +31,11 @@ class Game
     map: GameMap | undefined;
     entities: EntityTemplate[];
 
+    /**
+     * Simple constructor for the game
+     * @param canvas reference to the HTMLCavnas being used as a viewport
+     * @returns undefined in case of error
+     */
     constructor(canvas: React.RefObject<HTMLCanvasElement>)
     {
         this.canvas = canvas;
@@ -65,6 +76,10 @@ class Game
         this.render();
     }
 
+    /**
+     * Singleton get instance function
+     * @returns the game instance if it exists
+     */
     static getInstance()
     {
         if (Game.game)
@@ -73,6 +88,11 @@ class Game
         }
     }
 
+    /**
+     * Function for removing an entity from the game world
+     * @param index of the entity being removed
+     * @returns undefined in case of error
+     */
     removeEntity(index: number)
     {
         // Grab current map
@@ -86,6 +106,13 @@ class Game
         this.entities.splice(index, 1);
     }
 
+    /**
+     * Function for finding entities in an area around a point
+     * @param range the range of vision in tiles
+     * @param originX the central x position in canvas coordinates
+     * @param originY the central y position in canvas coordinates
+     * @returns List of entities in the area of vision
+     */
     checkSurroundings(range: number, originX: number, originY: number)
     {
         let surroundingEntities: EntityTemplate[] = [];
@@ -108,6 +135,10 @@ class Game
         return surroundingEntities;
     }
 
+    /**
+     * Function for updating the world upon entering a new scene
+     * @returns undefined in case of error
+     */
     updateMap()
     {
         // Grab current map
@@ -136,6 +167,11 @@ class Game
         }
     }
 
+    /**
+     * Function for handling scene events in the game
+     * @param event the event object being triggered
+     * @returns undefined in case of error
+     */
     sceneEvent(event: GameEvent)
     {
         // Grab current map
@@ -228,6 +264,10 @@ class Game
         }
     }
 
+    /**
+     * Renderer function running the main game loop
+     * @returns undefined in case of error
+     */
     render()
     {
         let canvas = this.canvas.current;

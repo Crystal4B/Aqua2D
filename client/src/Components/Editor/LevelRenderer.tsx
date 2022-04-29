@@ -10,6 +10,9 @@ import { getLocalizedCoords } from '../../Helpers/TileHelper';
 import { addScene, connectScene, moveScene } from '../../Redux/Levels/Scenes/sceneActions';
 import { sceneState } from '../../Redux/Levels/Scenes/sceneReducer';
 
+/**
+ * interface representing the settings of the renderer
+ */
 interface viewerSettings
 {
 	xOffset: number;
@@ -49,6 +52,9 @@ const LevelRenderer = () =>
 		{optionName: "Add Scene", optionFunction: onAddScene}
 	];
 
+	/**
+	 * Function beginning action on mouse down
+	 */
 	const handleMouseDown = (e: React.MouseEvent) =>
 	{
 		// 1 === Middle Click / Wheel Click
@@ -59,16 +65,25 @@ const LevelRenderer = () =>
 		}
 	}
 
+	/**
+	 * Function cancelling action upon mouse up
+	 */
 	const handleMouseUp = () =>
 	{
 		setDrag(false);
 	}
 
+	/**
+	 * Function cancelling action upon mouse out
+	 */
 	const handleMouseOut = () =>
 	{
 		setDrag(false);
 	}
 
+	/**
+	 * Function handling the dragging of the world
+	 */
 	const handleMouseMove = (e: React.MouseEvent) =>
 	{
 		if (drag)
@@ -77,18 +92,30 @@ const LevelRenderer = () =>
 		}
 	}
 
-	const handleWheel = ({deltaY, clientX, clientY}: React.WheelEvent) =>
+	/**
+	 * Function handling the zoom in and out of the world
+	 */
+	const handleWheel = ({deltaY}: React.WheelEvent) =>
 	{
 		// calculate scale
 		const scale = viewerSettings.scale + (deltaY < 0 ? 0.1 : -0.1);
 		setViewerSettings({...viewerSettings, scale: scale});
 	}
 
+	/**
+	 * Function setting the context menu options
+	 */
 	const handleContextMenu = () =>
 	{
 		dispatch(setOptions(contextMenu));
 	}
 
+	/**
+	 * Function for moving a scene within the world
+	 * @param sceneId id of the scene being moved 
+	 * @param xPos the new x position
+	 * @param yPos the new y position
+	 */
 	const handleSceneMove = (sceneId: string, xPos: number, yPos: number) =>
 	{
 		const radius = 160;

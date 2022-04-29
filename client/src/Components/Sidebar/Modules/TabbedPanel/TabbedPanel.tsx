@@ -3,6 +3,10 @@ import Tabs from "../../../Tabs/Tabs"
 import LayersPanel from "../LayersPanel/LayersPanel"
 import TilesetPanel from "../TilesetPanel/TilesetPanel"
 
+/**
+ * Tabbed Panel handling two panels in tabs
+ * @returns JSX implemenation of a tabbed panel
+ */
 const TabbedPanel = () =>
 {
 	return (

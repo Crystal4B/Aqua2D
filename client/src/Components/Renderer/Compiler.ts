@@ -6,6 +6,11 @@ import { scenesState } from "../../Redux/Levels/Scenes/sceneReducer";
 import { tilemapsState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import { GameData } from "./Data/Data";
 
+/**
+ * Function for compiling data into a format that works for the game runtime
+ * @param data the game data formatted by the editor
+ * @returns the game data formatted for the game running process
+ */
 const compile = (data: CombinedState<{
     levels: levelsState;
     scenes: scenesState;

@@ -1,6 +1,9 @@
 import {DEFAULT_SCENE_ID} from "../../../Helpers/LevelsReduxHelper";
 import { PropertiesAction } from "./PropertiesActions";
 
+/**
+ * Interface representing the properties state
+ */
 export interface PropertiesState
 {
 	focusedId: string
@@ -9,6 +12,9 @@ export interface PropertiesState
 	startSceneId: string
 }
 
+/**
+ * Initial state of the properties
+ */
 const initialState: PropertiesState = {
 	focusedId: DEFAULT_SCENE_ID,
 	focusedType: "Scene",
@@ -16,6 +22,12 @@ const initialState: PropertiesState = {
 	startSceneId: "Level_1_Scene_1"
 }
 
+/**
+ * Reducer handling actions imposed on the properties store
+ * @param state of the store
+ * @param action being taken
+ * @returns new state of the store
+ */
 const PropertiesReducer = (state: PropertiesState = initialState, action: PropertiesAction): PropertiesState => {
 	switch(action.type)
 	{

@@ -2,7 +2,7 @@ import { convertNameToId, DEFAULT_SCENE_ID } from "../../../Helpers/LevelsReduxH
 import { layerAction } from "./layerActions";
 
 /**
- * TODO: COMMENT
+ * Interface representing multiple layers within a scene
  */
 export interface layersState
 {
@@ -47,7 +47,7 @@ const createNewLayer = (sceneId: string, layerName: string): layerState =>
 }
 
 /**
- * TODO: COMMENT
+ * Create default layers
  */
 const createDefaultState = (): layersState =>
 {

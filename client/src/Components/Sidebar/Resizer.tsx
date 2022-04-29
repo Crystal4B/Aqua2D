@@ -17,15 +17,24 @@ const Resizer = ({orientation}: resizerProps) => {
 	const dragRef = useRef(false);
 	const [active, setActive] = useState(false);
 
+	/**
+	 * Function handling the onHover functionality of the resizer
+	 */
 	const handleMouseOver = () => {
 		setActive(true);
 	}
 
+	/**
+	 * Function hiding the onHover functionality of the resize
+	 */
 	const handleMouseOut = () => {
 		setActive(false);
 		dragRef.current =false;
 	}
 
+	/**
+	 * Function handling the mouse down event on the resizer
+	 */
 	const handleMouseDown = ({button}: React.MouseEvent) => {
 		if (button === 0)
 		{
@@ -33,6 +42,9 @@ const Resizer = ({orientation}: resizerProps) => {
 		}
 	}
 
+	/**
+	 * Function handling the mouse up event on the resizer
+	 */
 	const handleMouseUp = ({button}: React.MouseEvent) => {
 		if (button === 0)
 		{
@@ -40,6 +52,9 @@ const Resizer = ({orientation}: resizerProps) => {
 		}
 	}
 
+	/**
+	 * Function handling the mouse move event on the resizer
+	 */
 	const handleMouseMove = (e: React.MouseEvent) => {
 		if (dragRef.current === true)
 		{

@@ -2,6 +2,9 @@ import { convertNameToId, DEFAULT_SCENE_ID } from "../../../Helpers/LevelsReduxH
 import { tileState } from "../../Tools/toolReducer"
 import { tilemapAction } from "./tilemapActions"
 
+/**
+ * Interface representing the state of keyboard controls
+ */
 export interface keyboardState
 {
 	up: string
@@ -11,11 +14,17 @@ export interface keyboardState
 	attack: string
 }
 
+/**
+ * Interface representing the npc behaviour controls
+ */
 export interface npcState
 {
 	//TODO: future npc options
 }
 
+/**
+ * Interface representing an object in the game
+ */
 export interface objectState
 {
 	x: number
@@ -31,7 +40,7 @@ export interface objectState
 }
 
 /**
- * TODO: COMMENT
+ * interface representing the tilemaps in the scenes
  */
 export interface tilemapsState
 {
@@ -51,7 +60,7 @@ export interface tilemapsState
 }
 
 /**
- * TODO: COMMENT
+ * Function for creating a new tilemap from scratch
  */
 function createNewTilemap(): tileState[][]
 {
@@ -68,7 +77,7 @@ function createDefaultTile(): tileState
 }
 
 /**
- * TODO: COMMENT
+ * Function for creating the default state of the store
  */
 const createDefaultState = (): tilemapsState =>
 {
@@ -98,6 +107,11 @@ const createDefaultState = (): tilemapsState =>
 	}
 }
 
+/**
+ * Function for creating the default controller for an object
+ * @param type of object
+ * @returns formatted control state for object
+ */
 const createDefaultController = (type: string): keyboardState | npcState =>
 {
 	switch(type)
@@ -109,6 +123,13 @@ const createDefaultController = (type: string): keyboardState | npcState =>
 	}
 }
 
+/**
+ * Function for resizing an array
+ * @param array being resized
+ * @param newWidth the new width for the array
+ * @param newHeight the new height for the array
+ * @returns the resized array
+ */
 const resizeArray = (array: tileState[][], newWidth: number, newHeight: number): tileState[][] =>
 {
 	let heightDelta = array[0].length - newHeight;

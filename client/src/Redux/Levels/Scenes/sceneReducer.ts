@@ -1,6 +1,9 @@
 import { convertNameToId, DEFAULT_LEVEL_ID, DEFAULT_SCENE_ID } from "../../../Helpers/LevelsReduxHelper";
 import { sceneAction } from "./sceneActions";
 
+/**
+ * Interface representing multiple scenes in a level
+ */
 export interface scenesState
 {
 	byId: {
@@ -87,6 +90,11 @@ const createDefaultState = (): scenesState =>
 	}
 }
 
+/**
+ * function for inverting the direction of a scene connection
+ * @param dir the direction being inverted
+ * @returns the inverted direction
+ */
 const invertDir = (dir: "up" | "down" | "left" | "right") =>
 {
 	switch(dir)

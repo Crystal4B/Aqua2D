@@ -35,7 +35,11 @@ export const switchTile = (xCoord: number, yCoord: number): toolAction =>
 	return {type: "SWITCHTILE", payload: {tile: {xCoord: xCoord, yCoord: yCoord}}};
 }
 
-// TODO: DOCS
+/**
+ * rotationTile generates an action for rotating the selected tile
+ * @param rotation the angle of rotation being applied
+ * @returns formatted action ready for dispatch
+ */
 export const rotationTile = (rotation: number) =>
 {
 	return {type: "ROTATETILE", payload: {tile: {rotation: rotation}}};

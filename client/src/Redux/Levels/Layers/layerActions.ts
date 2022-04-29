@@ -1,5 +1,5 @@
 /**
- * TODO: COMMENT
+ * Interface representing the actions possible on layers
  */
 export interface layerAction
 {

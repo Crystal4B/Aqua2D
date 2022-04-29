@@ -1,6 +1,10 @@
 import Toolbar from "../Toolbar";
 import ImageBox from "./ImageBox";
 
+/**
+ * The panel handling the managment of objects available for use in the game creation
+ * @returns JSX Implemenation of the object panel
+ */
 const ObjectPanel = () => {
 	return (
 		<div className="panel">

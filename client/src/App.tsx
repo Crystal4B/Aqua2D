@@ -8,6 +8,10 @@ import ControlPanel from './Components/ControlPanel/ControlPanel';
 import TabbedPanel from './Components/Sidebar/Modules/TabbedPanel/TabbedPanel';
 import ObjectPanel from './Components/Sidebar/Modules/ObjectPanel/ObjectPanel';
 
+/**
+ * Central component defining the entire application
+ * @returns the JSX implementation of the application
+ */
 const App = () =>
 {
 	return (

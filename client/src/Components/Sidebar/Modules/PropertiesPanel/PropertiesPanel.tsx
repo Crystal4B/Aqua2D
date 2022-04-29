@@ -5,6 +5,10 @@ import { PropertiesState } from "../../../../Redux/Levels/Properties/PropertiesR
 import SceneProperies from "./SceneProperties";
 import ObjectProperies from "./ObjectProperties";
 
+/**
+ * Properties panel handling the data used by the Object and Scene Panels
+ * @returns JSX implementation of the properties panel
+ */
 const PropertiesPanel = () => {
 	const properties = useSelector<rootState, PropertiesState>(state => state.levels.properties);
 

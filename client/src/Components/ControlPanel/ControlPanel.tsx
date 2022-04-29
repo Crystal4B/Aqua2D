@@ -12,6 +12,9 @@ const ControlPanel = () =>
 	const divRef = useRef<HTMLDivElement>();
 	const windowRef = useRef<Window>();
 
+	/**
+	 * Function for running the preview of the game
+	 */
 	const runPreview = () =>
 	{
 		if (previewOn)

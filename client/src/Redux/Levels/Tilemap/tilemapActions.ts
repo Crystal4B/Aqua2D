@@ -2,7 +2,7 @@ import { tileState } from "../../Tools/toolReducer"
 import { objectState } from "./tilemapReducer"
 
 /**
- * TODO: COMMENT
+ * Interface representing the actions available for tilemaps
  */
 export interface tilemapAction
 {
@@ -28,6 +28,13 @@ export interface tilemapAction
 	}
 }
 
+/**
+ * Function for creating an action for adding an object to a scene
+ * @param sceneId of the parent scene
+ * @param layerId of the parent scene
+ * @param object the object being added
+ * @returns formatted action ready for dispatch
+ */
 export const addObject = (sceneId: string, layerId: string, object: objectState): tilemapAction =>
 {
 	return {
@@ -40,6 +47,15 @@ export const addObject = (sceneId: string, layerId: string, object: objectState)
 	};
 }
 
+/**
+ * Function for creating an action for moving an object in a scene
+ * @param sceneId of the parent scene
+ * @param layerId of the parent layer
+ * @param objectIndex of the object in the layer
+ * @param xPos new x position
+ * @param yPos new y position
+ * @returns formatted action ready for dispatch
+ */
 export const moveObject = (sceneId: string, layerId: string, objectIndex: number, xPos: number, yPos: number) =>
 {
 	return {
@@ -98,6 +114,14 @@ export const resetTile = (sceneId: string, layerId: string, xPos: number, yPos: 
 	};
 }
 
+/**
+ * Function for creating a update action for objects in a layer
+ * @param sceneId the id of the parent scene
+ * @param layerId the id of the parent layer
+ * @param objectIndex the index of the object in the scene
+ * @param object the new object being used to update the old one
+ * @returns the formatted action ready for dispatch
+ */
 export const updateObject = (sceneId: string, layerId: string, objectIndex: number, object: objectState): tilemapAction =>
 {
 	object.x = object.x as number;

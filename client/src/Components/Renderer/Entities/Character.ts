@@ -6,12 +6,20 @@ import { checkCollision } from "../Utils/Algorithms";
 import Enemy from "./Enemy";
 import EntityTemplate from "./EntityTemplate";
 
+/**
+ * Character class representing a playable character
+ */
 class Character extends EntityTemplate
 {
     control: keyboardState | undefined;
 
     static speed: number = 0.8;
 
+    /**
+     * Simple character contructor
+     * @param object state being used to initialize the character
+     * @param index of the character in the data
+     */
     public constructor(object: objectState, index: number)
     {
         super(object, index);
@@ -97,6 +105,10 @@ class Character extends EntityTemplate
         this.checkPosition();
     }
 
+    /**
+     * Function looping the character if they leave the scene
+     * @returns undefined in case of error
+     */
     private checkPosition()
     {
         // Grab current map
@@ -163,6 +175,9 @@ class Character extends EntityTemplate
 
     }
 
+    /**
+     * Function handling the projectile spawning and attacking
+     */
     private attack()
     {
 

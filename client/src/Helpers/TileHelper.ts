@@ -16,6 +16,15 @@ export const getCanvasCoords = (target: HTMLElement, clientX: number, clientY: n
 	return [xCoord, yCoord];
 }
 
+/**
+ * Function for converting mouse coordinates to Tile-grid coordinates
+ * @param target element being targetted
+ * @param clientX the x position of the mouse
+ * @param clientY the y position of the mouse
+ * @param tileWidth the width of tiles
+ * @param tileHeight the height of tiles
+ * @returns the Coordinates in the tilegrid
+ */
 export const getGridCoords = (target: HTMLElement, clientX: number, clientY: number, tileWidth: number, tileHeight: number) =>
 {
 	const [xCoord, yCoord] = getCanvasCoords(target, clientX, clientY);

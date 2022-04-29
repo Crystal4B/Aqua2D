@@ -1,5 +1,5 @@
 /**
- * TODO: COMMENT
+ * Interface representing the possible action for scenes
  */
 export interface sceneAction
 {
@@ -67,6 +67,13 @@ export const selectScene = (levelId: string, sceneId: string): sceneAction =>
 	}
 }
 
+/**
+ * connectScene generates an action for connecting two scenes together
+ * @param levelId id of the level owning the scenes
+ * @param sceneId the id of the scene being connected
+ * @param connection the connection being made
+ * @returns the formatted action ready for dispatch
+ */
 export const connectScene = (levelId: string, sceneId: string, connection: {dir: "up" | "down" | "left" | "right",
 sceneId: string}): sceneAction => 
 {
@@ -103,12 +110,12 @@ export const moveScene = (levelId: string, sceneId: string, xPos: number, yPos: 
 }
 
 /**
- * TODO:
- * @param levelId 
- * @param sceneId 
- * @param width 
- * @param height 
- * @returns 
+ * resizeScene generates an action for resizing scenes
+ * @param levelId the id of the level owning the scene
+ * @param sceneId the id of the scene
+ * @param width the new width of the scene
+ * @param height the new height of the scene
+ * @returns the formatted action ready for dispatch
  */
 export const resizeScene = (levelId: string, sceneId: string, width: number, height: number): sceneAction =>
 {
@@ -143,6 +150,13 @@ export const renameScene = (levelId: string, sceneId: string, newSceneName: stri
 	};
 }
 
+/**
+ * switchTileset generates an action for switching the tileset in use for scene
+ * @param levelId the id of the level owning the scene
+ * @param sceneId the id of the scene owning the tileset
+ * @param tileset the url to the tileset
+ * @returns the formatted action ready for dispatch
+ */
 export const switchTileset = (levelId: string, sceneId: string, tileset: string): sceneAction =>
 {
 	return {
@@ -157,6 +171,14 @@ export const switchTileset = (levelId: string, sceneId: string, tileset: string)
 	};
 }
 
+/**
+ * resizeTiles generates an action for resizing the tiles in a scene
+ * @param levelId the id of the level owning the scene
+ * @param sceneId the id of the scene owning the tiles 
+ * @param tileWidth the new tile width
+ * @param tileHeight the new tile height
+ * @returns the formatted action ready for dispatch
+ */
 export const resizeTiles = (levelId: string, sceneId: string, tileWidth: number, tileHeight: number): sceneAction =>
 {
 	return {

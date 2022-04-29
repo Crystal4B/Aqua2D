@@ -11,6 +11,10 @@ import { scenesState } from '../../../../Redux/Levels/Scenes/sceneReducer';
 import { selectScene } from '../../../../Redux/Levels/Scenes/sceneActions';
 import { levelsState } from '../../../../Redux/Levels/Levels/levelReducer';
 
+/**
+ * LevelsPanel handling the managment of scenes and levels on a higher level
+ * @returns JSX implemenation of the panel
+ */
 const LevelsPanel = () =>
 {
 	const scenes = useSelector<rootState, scenesState["byId"]>(state => state.levels.scenes.byId)
@@ -22,6 +26,10 @@ const LevelsPanel = () =>
 		setExpand(Array(Object.keys(byId).length).fill(true))
 	}, [byId])
 
+	/**
+	 * Function handling the expansion of levels on the list
+	 * @param index of level being expanded
+	 */
 	const updateExpand = (index: number) =>
 	{
 		setExpand(expand.map((_, valueIndex) => {
@@ -35,12 +43,20 @@ const LevelsPanel = () =>
 
 	const dispatch = useDispatch();
 
+	/**
+	 * Function handling the addition of levels into the game
+	 */
 	const onAddLevel = () =>
 	{
 		const counter = Object.keys(byId).length;
 		dispatch(addLevel(`Level ${counter + 1}`));
 	}
 
+	/**
+	 * Function handling the selection of a scene
+	 * @param levelId of the parent level
+	 * @param sceneId of the scene being selected
+	 */
 	const onSelectScene = (levelId: string, sceneId: string) =>
 	{
 		dispatch(selectScene(levelId, sceneId));
@@ -48,6 +64,9 @@ const LevelsPanel = () =>
 
 	const contextMenu: Array<optionState> = [{optionName: "Add Level", optionFunction: onAddLevel}];
 
+	/**
+	 * Function updating the context menu options
+	 */
 	const handleContextMenu = () =>
 	{
 		dispatch(setOptions(contextMenu));

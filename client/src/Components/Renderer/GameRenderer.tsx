@@ -16,7 +16,10 @@ type Props = {
 	container: HTMLDivElement
 }
 
-// Runs the game
+/**
+ * Renderer displaying the main game on the screen
+ * @returns JSX implementation the game view
+ */
 const GameRenderer: React.FC<Props> = ({container}) =>
 {
 	const levels = useSelector<rootState, CombinedState<{

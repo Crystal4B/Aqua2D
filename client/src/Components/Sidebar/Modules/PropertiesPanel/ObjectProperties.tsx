@@ -5,18 +5,28 @@ import { objectState } from "../../../../Redux/Levels/Tilemap/tilemapReducer";
 import { rootState } from "../../../../Redux/store";
 import Card from "./Card";
 
+/**
+ * Interface representing the props required by the ObjectProperties
+ */
 interface ObjectProperiesProps
 {
 	focusedId: string
 }
 
-const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
+/**
+ * ObjectProperties handles display and updating of properties specific to objects
+ * @returns JSX implmementation of the ObjectPropertiesPanel
+ */
+const ObjectProperties: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 {
 	const selectedSceneId = useSelector<rootState, string>(state => state.levels.scenes.byId[state.levels.levels.selectedId].selectedId);
 	const selectedLayerId = useSelector<rootState, string>(state => state.levels.layers.byId[selectedSceneId].selectedId);
 	const object = useSelector<rootState, objectState>(state => state.levels.tilemaps.byId[selectedSceneId].data[selectedLayerId].objects[+focusedId])
 	const dispatch = useDispatch();
 
+	/**
+	 * Function handling the change of object name
+	 */
 	const handleNameChange = (event: React.ChangeEvent) =>
 	{
 		let value = (event.target as HTMLInputElement).value;
@@ -24,6 +34,9 @@ const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 		dispatch(updateObject(selectedSceneId, selectedLayerId, +focusedId, {...object, name: value}));
 	}
 
+	/**
+	 * Function handling positional changes for the object
+	 */
 	const handlePositionChange = (event: React.ChangeEvent) =>
 	{
 		let name = (event.target as HTMLInputElement).name;
@@ -34,6 +47,10 @@ const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 		dispatch(updateObject(selectedSceneId, selectedLayerId, +focusedId, {...object, [name]: val}));
 	}
 
+	/**
+	 * Function handling the Control changes for the object
+	 * @returns undefined incase of error
+	 */
 	const handleControlChange = (event: React.ChangeEvent) =>
 	{
 		let name = (event.target as HTMLInputElement).name;
@@ -136,4 +153,4 @@ const ObjectProperies: React.FC<ObjectProperiesProps> = ({focusedId}) =>
 	)
 }
 
-export default ObjectProperies;
+export default ObjectProperties;

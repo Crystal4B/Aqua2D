@@ -4,17 +4,27 @@ import { sceneState } from "../../../../Redux/Levels/Scenes/sceneReducer";
 import { rootState } from "../../../../Redux/store";
 import Card from "./Card";
 
+/**
+ * Interface representing the required props for the component
+ */
 interface SceneProperiesProps
 {
 	focusedId: string
 }
 
+/**
+ * Scene properties handles the change and display of scene specific properties
+ * @returns JSX implementation of the panel
+ */
 const SceneProperies: React.FC<SceneProperiesProps> = ({focusedId}) =>
 {
 	const scene = useSelector<rootState, sceneState>(state => state.levels.scenes.byId[state.levels.levels.selectedId].data[focusedId]);
 
 	const dispatch = useDispatch();
 
+	/**
+	 * Function handling the change of Scene name
+	 */
 	const handleNameChange = (event: React.ChangeEvent) =>
 	{
 		// Dispatch new name
@@ -22,6 +32,9 @@ const SceneProperies: React.FC<SceneProperiesProps> = ({focusedId}) =>
 		dispatch(renameScene(scene.levelId, scene.id, value));
 	}
 
+	/**
+	 * Function handling the change of positional values of the scene
+	 */
 	const handlePositionChange = (event: React.ChangeEvent) =>
 	{
 		// Dispatch new position

@@ -1,12 +1,19 @@
 import { tileState } from "../../Redux/Tools/toolReducer";
 import { GameScene } from "./Data/Data";
 
+/**
+ * Class handling the data and rendering of the scene being on screen
+ */
 class GameMap
 {
     scene: GameScene;
     image: HTMLImageElement;
     preloadedCavnas: HTMLCanvasElement;
 
+    /**
+     * Simple constructor
+     * @param scene the game scene data
+     */
     constructor(scene: GameScene)
     {
         this.image = new Image();
@@ -50,6 +57,11 @@ class GameMap
         }
 	}
 
+    /**
+     * Render function for drawing the scene
+     * @param context being drawn on
+     * @param preload whether the image is preloaded or not
+     */
     render(context: CanvasRenderingContext2D, preload: boolean)
     {
         if (preload)

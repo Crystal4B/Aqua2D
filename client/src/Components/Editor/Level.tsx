@@ -10,6 +10,9 @@ import { objectState } from "../../Redux/Levels/Tilemap/tilemapReducer";
 import {rootState} from "../../Redux/store";
 import {tileState, toolState} from "../../Redux/Tools/toolReducer";
 
+/**
+ * interface representing the props required by the component
+ */
 export interface ILevelProps
 {
 	levelId: string;

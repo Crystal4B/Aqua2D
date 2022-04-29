@@ -13,11 +13,18 @@ import { rotationTile, switchTool } from '../../../Redux/Tools/toolActions';
 import { extractFilesAsURL } from '../../../Helpers/InputHelper';
 import { switchTileset } from '../../../Redux/Levels/Scenes/sceneActions';
 
+/**
+ * Interface representing the props required by the toolbar
+ */
 interface toolbarProps
 {
 	type: string
 }
 
+/**
+ * Toolbar component displaying multiple button options and handling changes in tools
+ * @returns JSX implementation of the toolbar
+ */
 const Toolbar = (props: toolbarProps) =>
 {
 	const tileset = useSelector<rootState, {levelId: string, sceneId: string, tileset: {image?: string, tileWidth: number, tileHeight: number}}>(state => {
@@ -35,16 +42,27 @@ const Toolbar = (props: toolbarProps) =>
 	const tool = useSelector<rootState, toolState["tool"]>(state => state.toolbar.tool);
 	const dispatch = useDispatch();
 
+	/**
+	 * Function handling the update of selection of a tool
+	 * @param tool being selected
+	 */
 	const updateToolSelection = (tool: string) =>
 	{
 		dispatch(switchTool(tool));
 	}
 
+	/**
+	 * Function handling the update of tile rotation
+	 * @param rotation being changed
+	 */
 	const updateTileRotation = (rotation: number) =>
 	{
 		dispatch(rotationTile(rotation));
 	}
 
+	/**
+	 * Function handling the update of tileset in the tileset panel
+	 */
 	const handleInput = ({target}: React.FormEvent<HTMLInputElement>) =>
 	{
 		const input = target as HTMLInputElement;

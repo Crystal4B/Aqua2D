@@ -5,6 +5,9 @@ import { aStar, canvasCoordsToTileCoords, checkCollision, Coordinates, node, sel
 import Character from "./Character";
 import EntityTemplate from "./EntityTemplate";
 
+/**
+ * Enemy class handling the Enemy Entities in the game
+ */
 class Enemy extends EntityTemplate
 {
     // states
@@ -34,6 +37,11 @@ class Enemy extends EntityTemplate
     static thinkTime: number = 8000;
     static speed: number = 0.8;
 
+    /**
+     * Simple Enemy constructor
+     * @param object used in the contruction of the enemy
+     * @param index of the enemy within the game data
+     */
     public constructor(object: objectState, index: number)
     {
         super(object, index);
@@ -115,6 +123,10 @@ class Enemy extends EntityTemplate
         }
     }
     
+    /**
+     * Function handling how the AI interpretes and traverses the A* found path
+     * @returns undefined in case of error
+     */
     private moveAlongPath()
     {
         // Convert our coordinates
@@ -185,6 +197,10 @@ class Enemy extends EntityTemplate
         }
     }
 
+    /**
+     * Function for finding targets for the enemy to attack
+     * @returns the target entity or undefined if no entity is found
+     */
     private checkForTarget(): Character | undefined
     {
         let game = Game.getInstance();

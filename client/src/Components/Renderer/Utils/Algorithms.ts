@@ -4,12 +4,18 @@ import Collidable from "../Entities/Collidable";
 import EntityTemplate from "../Entities/EntityTemplate";
 import Game from "../Game";
 
+/**
+ * Interface representing coordinates on the 2d plane
+ */
 export interface Coordinates
 {
     x: number,
     y: number
 }
 
+/**
+ * Interface representing a node inside the A* algorithm
+ */
 export interface node
 {
     x: number,
@@ -20,11 +26,23 @@ export interface node
     parent?: node
 }
 
+/**
+ * Function for calculating the manhattanDistance heuristic
+ * @param from node being tested
+ * @param to the target node
+ * @returns the manhattan distance between the two nodes
+ */
 function manhattanDistance(from: node, to: node)
 {
     return Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
 }
 
+/**
+ * Function for splitting a node into valid children
+ * @param parent the node being split
+ * @param collisionMap the map being used to check for valid tiles
+ * @returns The valid children of the parent node
+ */
 function splitNode(parent: node, collisionMap: tileState[][])
 {
     const common = {
@@ -66,6 +84,14 @@ function splitNode(parent: node, collisionMap: tileState[][])
     return results;
 }
 
+/**
+ * The A* algorithm for enemy pathfinding
+ * @param startX the starting x position of the enemy
+ * @param startY the starting y position of the enemy
+ * @param endX the ending x position of the target in Tile coordiantes
+ * @param endY the ending y position of the target in Tile coordinates
+ * @returns The best path found by the algorithm or an empty array if no path was found
+ */
 export function aStar(startX: number, startY: number, endX: number, endY: number)
 {
     // Grab current map
@@ -151,7 +177,7 @@ export function aStar(startX: number, startY: number, endX: number, endY: number
                 open.push(child);
             }
         }
-        // Sort by F
+        // Sort by the final cost of each node
         open.sort((n1: node, n2: node) => {
             if (n1.f < n2.f)
             {
@@ -170,6 +196,13 @@ export function aStar(startX: number, startY: number, endX: number, endY: number
     return [];
 }
 
+/**
+ * Function for selecting a random valid location in an area
+ * @param range the distance in tiles that the location can be selected from
+ * @param originX x position marking the centre of the area being chosen from
+ * @param originY y position marking the centre of the area being chosen from
+ * @returns a random coordinate or undefined in case of error
+ */
 export function selectRandomLocation(range: number, originX: number, originY: number): Coordinates | undefined
 {
     // Grab current map
@@ -211,6 +244,12 @@ export function selectRandomLocation(range: number, originX: number, originY: nu
     return candidates[randomIndex];
 }
 
+/**
+ * Function for converting canvas coordaintes to tile coordinates
+ * @param x in canvas coordinates
+ * @param y in canvas coordinates
+ * @returns Tile coordinates or undefined in case of error
+ */
 export function canvasCoordsToTileCoords(x: number, y: number): Coordinates | undefined
 {
     // Grab current map
@@ -226,6 +265,12 @@ export function canvasCoordsToTileCoords(x: number, y: number): Coordinates | un
     return {x: Math.floor(x / tileWidth), y: Math.floor(y / tileHeight)}
 }
 
+/**
+ * Function for making sure that coordinates are reachable in a map
+ * @param map the map being checked against
+ * @param coords the coordinates being checked
+ * @returns valid coordinates for the provided map
+ */
 export function checkRange(map: tileState[][], coords: Coordinates)
 {
     // Make sure they are within reach
@@ -249,6 +294,11 @@ export function checkRange(map: tileState[][], coords: Coordinates)
     return coords;
 }
 
+/**
+ * Function for checking collisions in a wide and narrow phase
+ * @param entity being checked for collisions
+ * @returns boolean value in case of collision with wall or entity when colliding with another collidable
+ */
 export function checkCollision(entity: Collidable)
 {
     // Grab current map
